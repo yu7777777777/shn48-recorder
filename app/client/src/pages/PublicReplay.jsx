@@ -11,7 +11,6 @@ import {
   IconRadio,
   IconRefresh,
   IconSearch,
-  IconSparkles,
   IconTv,
 } from "../components/Icons";
 import LoadingState from "../components/LoadingState";
@@ -343,50 +342,6 @@ function ReplayCard({ replay, onSelect, groupHint = "", t = TEXT.zh }) {
   );
 }
 
-function formatSummaryTime(value) {
-  if (!Number.isFinite(value) || value < 0) return "";
-  const seconds = Math.floor(value);
-  const minutes = Math.floor(seconds / 60);
-  return `${minutes}:${String(seconds % 60).padStart(2, "0")}`;
-}
-
-function PublicReplaySummary({ value }) {
-  const chapters = Array.isArray(value.chapters) ? value.chapters : [];
-  const highlights = Array.isArray(value.highlights) ? value.highlights : [];
-  return (
-    <div className="public-replay-summary" aria-label="重播内容总结">
-      <div className="public-replay-summary-head">
-        <IconSparkles size={16} />
-        <strong>内容总结</strong>
-        <span className="public-replay-summary-note">AI 生成，仅供参考</span>
-      </div>
-      {value.summary ? <p className="public-replay-summary-text">{value.summary}</p> : <p className="public-replay-summary-note">这条回放只公开章节与时间。</p>}
-      {chapters.length > 0 && (
-        <ol className="public-replay-summary-list">
-          {chapters.map((item, index) => (
-            <li key={`c${index}`}>
-              <strong>{item.title || "未命名章节"}</strong>
-              {Number.isFinite(item.start) && <time>{formatSummaryTime(item.start)}{Number.isFinite(item.end) ? ` – ${formatSummaryTime(item.end)}` : ""}</time>}
-              {item.summary && <span>{item.summary}</span>}
-            </li>
-          ))}
-        </ol>
-      )}
-      {highlights.length > 0 && (
-        <ol className="public-replay-summary-list is-highlight">
-          {highlights.map((item, index) => (
-            <li key={`h${index}`}>
-              <strong>{item.title || "精彩片段"}</strong>
-              {Number.isFinite(item.start) && <time>{formatSummaryTime(item.start)}{Number.isFinite(item.end) ? ` – ${formatSummaryTime(item.end)}` : ""}</time>}
-              {item.summary && <span>{item.summary}</span>}
-            </li>
-          ))}
-        </ol>
-      )}
-    </div>
-  );
-}
-
 export default function PublicReplayPage() {
   const t = TEXT[languageOf(typeof navigator === "undefined" ? "zh" : navigator.languages || navigator.language)];
   const { replayId } = useParams();
@@ -405,7 +360,6 @@ export default function PublicReplayPage() {
   const [listError, setListError] = useState("");
   const [moreError, setMoreError] = useState("");
   const [detailError, setDetailError] = useState("");
-  const [summary, setSummary] = useState(null);
   const [shareState, setShareState] = useState("idle");
   const { layout, setLayout } = useReplayLayout();
 
@@ -573,19 +527,6 @@ export default function PublicReplayPage() {
     );
     setDetailError("");
     const detailRequestId = ++detailRequestRef.current;
-    setSummary(null);
-    publicApi
-      .get(`/replays/${encodeURIComponent(id)}/summary`)
-      .then((response) => {
-        if (detailRequestId !== detailRequestRef.current) return;
-        const body = payload(response, {});
-        const hasProse = typeof body?.summary === "string" && body.summary.trim();
-        const hasChapters =
-          (Array.isArray(body?.chapters) && body.chapters.length > 0) ||
-          (Array.isArray(body?.highlights) && body.highlights.length > 0);
-        if (body && (hasProse || hasChapters)) setSummary(body);
-      })
-      .catch(() => undefined);
     publicApi
       .get(`/replays/${encodeURIComponent(id)}`)
       .then((response) => {
@@ -772,7 +713,6 @@ export default function PublicReplayPage() {
                     )}
                   </div>
                 )}
-                {summary && <PublicReplaySummary value={summary} />}
                 {!selected && detailError && (
                   <div className="detail-note" role="alert">{detailError}</div>
                 )}

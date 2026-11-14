@@ -17,18 +17,12 @@ const DashboardPage = lazy(() => import("./pages/Dashboard"));
 const AdminLivePage = lazy(() => import("./pages/Live"));
 const PublicLivePage = lazy(() => import("./pages/PublicLive"));
 const PublicReplayPage = lazy(() => import("./pages/PublicReplay"));
-const PublicDailyPage = lazy(() => import("./pages/PublicDaily"));
 const PublicSocialPage = lazy(() => import("./pages/PublicSocial"));
 const SecurityPage = lazy(() => import("./pages/Security"));
 const ArchivePage = lazy(() => import("./pages/Video"));
-const RecordingDetail = lazy(() => import("./pages/RecordingDetail"));
 const ReplayAudit = lazy(() => import("./pages/ReplayAudit"));
-const AnalysisSettings = lazy(() => import("./pages/AnalysisSettings"));
-const NotifySettings = lazy(() => import("./pages/NotifySettings"));
 const UpdateChecker = lazy(() => import("./pages/UpdateChecker"));
-const SubtitleSearch = lazy(() => import("./pages/SubtitleSearch"));
 const SocialAccountsPage = lazy(() => import("./pages/SocialAccounts"));
-const ReplayAnalysisImport = lazy(() => import("./pages/ReplayAnalysisImport"));
 
 
 export default function App() {
@@ -40,7 +34,6 @@ export default function App() {
           <Route path="/live/:liveId" element={<PublicLivePage />} />
           <Route path="/replays" element={<PublicReplayPage />} />
           <Route path="/replays/:replayId" element={<PublicReplayPage />} />
-          <Route path="/daily" element={<PublicDailyPage />} />
             <Route path="/s/:code" element={<PublicSocialPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route element={<AuthGuard />}>
@@ -49,17 +42,17 @@ export default function App() {
               <Route path="overview" element={<DashboardPage />} />
               <Route path="live" element={<AdminLivePage />} />
               <Route path="archive" element={<ArchivePage />} />
-              <Route path="archive/:id" element={<RecordingDetail />} />
               <Route path="replay-audit" element={<ReplayAudit />} />
-              <Route path="replay-analysis" element={<ReplayAnalysisImport />} />
-              <Route path="analysis-settings" element={<AnalysisSettings />} />
-              <Route path="notify" element={<NotifySettings />} />
               <Route path="update" element={<UpdateChecker />} />
-              <Route path="search" element={<SubtitleSearch />} />
               <Route path="social" element={<SocialAccountsPage />} />
               {/* Retired tools: preserve old bookmarks without loading obsolete pages. */}
               <Route path="cover-settings" element={<Navigate to="/admin/archive" replace />} />
               <Route path="room-voice" element={<Navigate to="/admin/pocket48" replace />} />
+              <Route path="search" element={<Navigate to="/admin/archive" replace />} />
+              <Route path="replay-analysis" element={<Navigate to="/admin/archive" replace />} />
+              <Route path="analysis-settings" element={<Navigate to="/admin/settings" replace />} />
+              <Route path="notify" element={<Navigate to="/admin/settings" replace />} />
+              <Route path="archive/:id" element={<Navigate to="/admin/archive" replace />} />
               <Route path="bilibili" element={<BilibiliPage />} />
               <Route path="settings" element={<ConfigPage />} />
               <Route path="security" element={<SecurityPage />} />

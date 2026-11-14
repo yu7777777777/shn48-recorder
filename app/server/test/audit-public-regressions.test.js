@@ -10,12 +10,10 @@ for (const name of ['DATA_DIR', 'POCKET48_DATA_DIR', 'RECORDINGS_DIR', 'COVERS_D
 process.env.CONFIG_PATH = path.join(root, 'config.yaml');
 const live = require('../modules/pocket48/live');
 const manager = require('../modules/recorder/manager');
-const settings = require('../modules/analysis/settings');
-const service = require('../modules/analysis/service');
 const { danmakuManager } = require('../modules/pocket48/danmaku');
 const router = require('../routes/public');
 const { createApp } = require('../index');
-test.after(() => { service.stop(); fs.rmSync(root, { recursive: true, force: true }); });
+test.after(() => { fs.rmSync(root, { recursive: true, force: true }); });
 function handler(route) { return router.stack.find(layer => layer.route?.path === route).route.stack[0].handle; }
 function response() {
   const res = new EventEmitter();
@@ -82,24 +80,4 @@ test('F13: synchronous disconnect from subscription callback also releases its r
   t.mock.method(global, 'setInterval', () => { timers++; return { unref() {} }; });
   await handler('/live/:liveId/danmaku')(req, res);
   assert.equal(releases, 1); assert.equal(timers, 0);
-});
-
-test('F04: actual HTML preview and JSON obey the same summary visibility policy', async t => {
-  t.mock.method(manager, 'getRecordings', () => [{ id: 'audit-summary', liveId: '900009', source: 'pocket48', mediaType: 'video', status: 'done', title: 'Fixture' }]);
-  let mode = 'chapters', enabled = true;
-  t.mock.method(settings, 'get', () => ({ publish: { summary: enabled, chapters: true, highlights: true }, publicDetail: { mode } }));
-  t.mock.method(service, 'result', () => ({ summary: 'HIDDEN_PROSE_SENTINEL', segments: [{ text: 'PRIVATE_SUBTITLE' }], summaryModel: 'PRIVATE_MODEL', summaryEndpoint: 'https://private.invalid', chapters: [{ start: 0, end: 1, title: 'Chapter', summary: 'caption' }], highlights: [] }));
-  const server = createApp().listen(0, '127.0.0.1'); await new Promise(resolve => server.once('listening', resolve));
-  try {
-    const base = `http://127.0.0.1:${server.address().port}`;
-    const read = async () => ({ html: await (await fetch(base + '/replays/900009')).text(), api: await fetch(base + '/api/public/replays/900009/summary') });
-    let result = await read(), data = await result.api.json();
-    assert.match(result.html, /og:description/); assert.equal(result.html.includes('HIDDEN_PROSE_SENTINEL'), false);
-    assert.equal(data.data.summary, ''); assert.equal(data.data.detail, 'chapters');
-    assert.equal(JSON.stringify(router.publishedSummaryFor('900009')).includes('PRIVATE_'), false);
-    mode = 'full'; result = await read(); data = await result.api.json();
-    assert.ok(result.html.includes('HIDDEN_PROSE_SENTINEL')); assert.equal(data.data.summary, 'HIDDEN_PROSE_SENTINEL');
-    enabled = false; result = await read();
-    assert.equal(result.api.status, 404); assert.equal(result.html.includes('HIDDEN_PROSE_SENTINEL'), false);
-  } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
 });

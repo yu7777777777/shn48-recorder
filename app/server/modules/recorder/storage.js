@@ -12,7 +12,7 @@ const INVENTORY_CACHE_MS = 3000;
 const inventoryCache = new Map();
 function paths(rec) { return [...new Set([rec.filePath, rec.replayRecovery?.replayFilePath, ...(rec.sourceFiles || [])].filter(Boolean).map(p => path.resolve(p)))]; }
 function locked(rec) {
-  return backupLeases.lockedRecording(rec) || require('./replay-recovery').busy(rec.id) || require('../analysis/service').busy(rec.id) || require('./clips').busy(rec.id) || activeStatuses.includes(rec.status) || manager.getQueue().some(q => String(q.recordingId) === String(rec.id) && ['queued', 'waiting_credentials', 'uploading', 'paused_recording'].includes(q.status));
+  return backupLeases.lockedRecording(rec) || require('./replay-recovery').busy(rec.id) || activeStatuses.includes(rec.status) || manager.getQueue().some(q => String(q.recordingId) === String(rec.id) && ['queued', 'waiting_credentials', 'uploading', 'paused_recording'].includes(q.status));
 }
 // One pass over all records per inventory run instead of `records.filter(...)`
 // per file: resolved path -> owners, so the per-file side is an O(1) lookup.

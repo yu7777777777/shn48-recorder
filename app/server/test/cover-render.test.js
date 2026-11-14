@@ -42,7 +42,7 @@ for label, size in [('portrait', (200, 400)), ('landscape', (400, 300))]:
     reports.append(label)
 print(json.dumps(dict(passed=reports)))
 `;
-    const result = await run(process.env.COVER_PYTHON_BIN || "/opt/asr-venv/bin/python", ["-c", script, root, path.join(__dirname, "../modules/recorder/cover-render.py")]);
+    const result = await run(process.env.COVER_PYTHON_BIN || "/opt/cover-venv/bin/python", ["-c", script, root, path.join(__dirname, "../modules/recorder/cover-render.py")]);
     assert.deepEqual(JSON.parse(result.stdout).passed, ["portrait", "landscape"]);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });

@@ -15,8 +15,6 @@ const streamProxy = require("../modules/pocket48/stream-proxy");
 const playbackPolicy = require("../modules/pocket48/playback-policy");
 const members = require("../modules/pocket48/members");
 const manager = require("../modules/recorder/manager");
-const analysisService = require("../modules/analysis/service");
-const analysisSettings = require("../modules/analysis/settings");
 const { danmakuManager } = require("../modules/pocket48/danmaku");
 const { relayManager } = require("../modules/pocket48/rtmp-relay");
 // `version` is a function: it must be called. Destructuring alone would bind the
@@ -373,140 +371,6 @@ router.get("/replays/:liveId", async (req, res) => {
   }
 });
 
-// Public analysis: only an administrator-published summary of a finished archive.
-// Subtitle text, model, endpoint, provenance and job state stay behind the admin
-// API; this endpoint exists so a shared replay link can show what it is about.
-function publicSummary(data, publish, detail = 'full') {
-  const rows = (list) => (Array.isArray(list) ? list : []).filter(row => row && typeof row === 'object').map(row => ({
-    start: Number.isFinite(row.start) ? row.start : null,
-    end: Number.isFinite(row.end) ? row.end : null,
-    title: String(row.title ?? '').slice(0, 200),
-    summary: String(row.summary ?? '').slice(0, 4000)
-  })).filter(row => row.start !== null && row.end !== null);
-  return {
-    recordingId: String(data.recordingId),
-    // 'chapters' mode publishes titles and times only; the prose is withheld.
-    detail,
-    summary: detail === 'chapters' ? '' : String(data.summary).slice(0, 20000),
-    // Administrators choose what a visitor may see; the switches default to
-    // "summary only" so a replay never silently starts publishing chapters.
-    chapters: publish.chapters ? rows(data.chapters) : [],
-    highlights: publish.highlights ? rows(data.highlights) : []
-  };
-}
-// One lookup for both the JSON endpoint and the share card, so a preview can
-// never describe a replay the endpoint would refuse.
-function publishedSummaryFor(liveId) {
-  const archive = manager.getRecordings().find(rec => rec && String(rec.liveId || "") === String(liveId) && rec.source === "pocket48" && rec.mediaType !== "audio" && rec.segment !== true && rec.source !== "clip" && rec.status === "done");
-  if (!archive) return null;
-  const config = analysisSettings.get();
-  if (config.publish.summary !== true) return null;
-  const analysis = analysisService.result(archive.id);
-  if (typeof analysis.summary !== "string" || !analysis.summary.trim()) return null;
-  // Both JSON and HTML previews consume the same public DTO, never raw analysis.
-  return {
-    ...publicSummary({ ...analysis, recordingId: archive.id }, config.publish, config.publicDetail?.mode),
-    title: String(archive.title || archive.name || ""),
-  };
-}
-router.get("/replays/:liveId/summary", async (req, res) => {
-  try {
-    const liveId = numericQuery(req.params.liveId, "liveId");
-    const published = publishedSummaryFor(liveId);
-    if (!published) return res.status(404).json({ success: false, error: "Replay summary is unavailable" });
-    const { title: _previewTitle, ...data } = published;
-    res.setHeader('Cache-Control', 'public, max-age=60');
-    res.json({ success: true, data });
-  } catch (err) {
-    // A missing archive or an analysis that cannot be read is indistinguishable to a
-    // visitor on purpose: neither should reveal whether an admin is preparing one.
-    res.status(err.statusCode === 400 ? 400 : 404).json({ success: false, error: err.statusCode === 400 ? err.message : "Replay summary is unavailable" });
-  }
-});
-
-// ---- 公开总结日报 ----
-// Aggregates already-published summaries by date (Asia/Shanghai) so a visitor
-// can skim "最近几天的直播都聊了什么". The publication gate is the same one the
-// per-replay summary endpoint uses: analysisSettings.publish.summary must be on,
-// and only finished pocket48 video archives of full sessions take part, so every
-// item links to a public replay page that will really show its summary.
-function dailyDigest() {
-  const config = analysisSettings.get();
-  if (config.publish.summary !== true) return { published: false, days: [] };
-  const byDay = new Map();
-  for (const rec of manager.getRecordings()) {
-    if (!rec || rec.status !== "done" || rec.source !== "pocket48" || rec.mediaType === "audio" || rec.segment === true || !rec.liveId) continue;
-    // 直读分析结果文件，绕开 service.result()：后者每场都会重新从磁盘加载
-    // analysis_jobs 队列，日报/RSS 轮询场景下是纯浪费。
-    const analysis = store.load(`analysis_${rec.id}`, null);
-    if (!analysis || typeof analysis.summary !== "string" || !analysis.summary.trim()) continue;
-    const when = new Date(rec.startedAt || rec.recordedAt || rec.endedAt || rec.createdAt || Date.now());
-    if (Number.isNaN(when.getTime())) continue;
-    const day = when.toLocaleDateString("sv-SE", { timeZone: "Asia/Shanghai" });
-    const item = {
-      recordingId: rec.id,
-      liveId: rec.liveId,
-      title: String(rec.title || rec.liveTitle || "直播录像").slice(0, 200),
-      memberName: String(rec.memberName || "").slice(0, 60),
-      startedAt: when.toISOString(),
-      summary: analysis.summary.slice(0, 1200),
-      chapters: config.publish.chapters ? (Array.isArray(analysis.chapters) ? analysis.chapters.length : 0) : 0,
-    };
-    if (!byDay.has(day)) byDay.set(day, []);
-    byDay.get(day).push(item);
-  }
-  const days = [...byDay.entries()]
-    .sort((a, b) => b[0].localeCompare(a[0]))
-    .slice(0, 30)
-    .map(([date, items]) => ({ date, items: items.sort((a, b) => Date.parse(b.startedAt) - Date.parse(a.startedAt)) }));
-  return { published: true, days };
-}
-
-router.get("/daily", (_req, res) => {
-  res.setHeader("Cache-Control", "public, max-age=60");
-  res.json({ success: true, data: dailyDigest() });
-});
-
-function xmlEscape(value) {
-  return String(value ?? "").replace(/[<>&'"]/g, ch => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" }[ch]));
-}
-
-router.get("/daily/rss", (req, res) => {
-  const digest = dailyDigest();
-  const base = `${req.protocol}://${req.get("host")}`;
-  const items = [];
-  for (const day of digest.days) {
-    for (const item of day.items) {
-      items.push({ ...item, link: `${base}/replays/${encodeURIComponent(item.liveId)}` });
-    }
-  }
-  const feedItems = items.slice(0, 50).map(item => [
-    "    <item>",
-    `      <title>${xmlEscape(item.memberName ? `${item.memberName} · ${item.title}` : item.title)}</title>`,
-    `      <link>${xmlEscape(item.link)}</link>`,
-    `      <guid isPermaLink="true">${xmlEscape(item.link)}</guid>`,
-    `      <pubDate>${new Date(item.startedAt).toUTCString()}</pubDate>`,
-    `      <description>${xmlEscape(item.summary)}</description>`,
-    "    </item>",
-  ].join("\n")).join("\n");
-  const xml = [
-    '<?xml version="1.0" encoding="UTF-8"?>',
-    '<rss version="2.0">',
-    "  <channel>",
-    `    <title>48tools 直播总结日报</title>`,
-    `    <link>${xmlEscape(base + "/daily")}</link>`,
-    "    <description>最近直播的 AI 总结聚合</description>",
-    "    <language>zh-CN</language>",
-    "    <lastBuildDate>" + new Date().toUTCString() + "</lastBuildDate>",
-    feedItems || "",
-    "  </channel>",
-    "</rss>",
-    "",
-  ].join("\n");
-  res.set("Cache-Control", "public, max-age=300");
-  res.type("application/rss+xml; charset=utf-8").send(xml);
-});
-
 // Guest view of one member's social directory, reached only with a valid code.
 router.get("/social/:code", (req, res) => {
   try {
@@ -526,6 +390,5 @@ router.get("/relays/:token/:fileName", relayManager.serveFile);
 router.get("/replay-streams/:sessionToken/manifest", replayProxy.serveManifest);
 router.get("/replay-streams/:sessionToken/resource/:childToken", replayProxy.serveResource);
 
-router.publishedSummaryFor = publishedSummaryFor;
 module.exports = router;
 module.exports._internals = { replayStartedAt };

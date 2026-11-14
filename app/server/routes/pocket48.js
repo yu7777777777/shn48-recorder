@@ -440,19 +440,5 @@ router.get("/user", async (req, res) => {
   }
 });
 
-// ---- 消息关键词监控 ----
-// Configuration + hit log for the outbound-notification keyword monitor.
-const keywordMonitor = require("../modules/pocket48/keyword-monitor");
-router.get("/keyword-monitor", (_req, res) => res.json({ success: true, data: keywordMonitor.status() }));
-router.put("/keyword-monitor", (req, res) => {
-  try { res.json({ success: true, data: keywordMonitor.save(req.body || {}) }); }
-  catch (err) { res.status(err.statusCode || 400).json({ success: false, error: err.message }); }
-});
-router.delete("/keyword-monitor/log", (_req, res) => res.json({ success: true, data: keywordMonitor.clearLog() }));
-router.post("/keyword-monitor/poll", async (_req, res) => {
-  try { await keywordMonitor.poll(true); res.json({ success: true, data: keywordMonitor.status() }); }
-  catch (err) { res.status(err.statusCode || 502).json({ success: false, error: err.message }); }
-});
-
 module.exports = router;
 module.exports._internals = { credentialAttempts, smsSendAttempts, failureState, consumeSmsSend, validMobile, validPassword, validAccessToken, validSmsCode, validChallengeAnswer };

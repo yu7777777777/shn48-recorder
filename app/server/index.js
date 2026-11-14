@@ -82,17 +82,12 @@ function createApp() {
     });
   });
 
-  app.use("/api/admin/ddtalks", require("./routes/ddtalks"));
   app.use("/api/admin/pocket48", require("./routes/pocket48"));
   app.use("/api/admin/bilibili", require("./routes/bilibili"));
   app.use("/api/admin/recordings", require("./routes/recordings"));
   app.use("/api/admin/config", require("./routes/config"));
   app.use("/api/admin/backup115", require("./routes/backup115"));
-  app.use("/api/admin/analysis", require("./routes/analysis"));
-  app.use("/api/admin/notify", require("./routes/notify"));
   app.use("/api/admin/update", require("./routes/update-checker"));
-  app.use("/api/admin/exports", require("./routes/exports"));
-  app.use("/api/admin/room-voice", require("./routes/room-voice"));
   app.use("/api/admin/social", require("./routes/social"));
 
   // API paths never fall through to the SPA; removed legacy endpoints return 404.
@@ -107,20 +102,7 @@ function createApp() {
   app.get("*", (req, res) => {
     const indexFile = path.join(staticDir, "index.html");
     if (!fs.existsSync(indexFile)) return res.status(200).send(`48tools ${APP_VERSION} - Frontend not built yet. Run: cd client && npm run build`);
-    // A shared replay gets its own link preview; every other path keeps the shell as-is.
-    const preview = require("./modules/analysis/share-preview");
-    const tags = preview.tagsFor(req.path, liveId => {
-      try {
-        const row = require("./routes/public").publishedSummaryFor(liveId);
-        return row ? { title: row.title, summary: row.summary } : null;
-      } catch { return null; }
-    });
-    if (!tags) return res.sendFile(indexFile);
-    let html = "";
-    try { html = fs.readFileSync(indexFile, "utf8"); } catch { return res.sendFile(indexFile); }
-    res.setHeader("Content-Type", "text/html; charset=utf-8");
-    res.setHeader("Cache-Control", "public, max-age=60");
-    res.send(preview.inject(html, tags));
+    return res.sendFile(indexFile);
   });
 
   // Body-parser and route errors carry an HTTP status: client errors (400-499,
@@ -151,16 +133,9 @@ function startServer() {
     archiveProcessor.start();
     void require("./modules/backup115/service").service().start().catch(() => console.error("[backup115] startup paused; inspect backup settings"));
     require("./modules/recorder/retention").start();
-    require("./modules/recorder/clips").start();
-    require("./modules/recorder/exports").start();
-    require("./modules/analysis/service").start();
-    // Room-voice capture is retired. Keep historical audio/message readers,
-    // but never restart saved watches or their background polling timer.
     require("./modules/pocket48/auto-recorder").start();
     require("./modules/recorder/replay-audit").start();
     require("./modules/pocket48/auto-checkin").start();
-  require("./modules/pocket48/replay-watch").start();
-  require("./modules/pocket48/keyword-monitor").start();
   require("./modules/update-checker").start();
   });
   const sockets = new Set();
@@ -172,7 +147,6 @@ function startServer() {
     server,
     stopRecorders: () => Promise.allSettled([
       require("./modules/pocket48/recorder").stopAll(),
-      require("./modules/pocket48/room-voice").stopAll(),
       require("./modules/backup115/service").service().stop(),
       require("./modules/pocket48/rtmp-relay").relayManager.closeAll(),
       Promise.resolve(require("./modules/pocket48/danmaku").danmakuManager.closeAll()),
@@ -181,14 +155,9 @@ function startServer() {
       sse.closeAll();
       archiveProcessor.stop();
       require("./modules/recorder/retention").stop();
-      require("./modules/recorder/clips").stop();
-      require("./modules/recorder/exports").stop();
-      require("./modules/analysis/service").stop();
-      require("./modules/pocket48/auto-recorder").stop();
       require("./modules/recorder/replay-audit").stop();
+      require("./modules/pocket48/auto-recorder").stop();
       require("./modules/pocket48/auto-checkin").stop();
-  require("./modules/pocket48/replay-watch").stop();
-  require("./modules/pocket48/keyword-monitor").stop();
   require("./modules/update-checker").stop();
     },
     saveState: () => {

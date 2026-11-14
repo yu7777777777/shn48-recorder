@@ -1,4 +1,4 @@
-// 48tools 1.34.0 smoke-test contract.
+// 48tools 2.0.0 smoke-test contract.
 const baseUrl = (process.env.SMOKE_BASE_URL || "http://127.0.0.1:3000").replace(/\/$/, "");
 const username = process.env.SMOKE_ADMIN_USERNAME || process.env.ADMIN_USERNAME;
 const password = process.env.SMOKE_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD;

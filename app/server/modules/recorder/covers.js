@@ -48,7 +48,7 @@ async function python(job, dir) {
   const input = path.join(dir, `${crypto.randomBytes(8).toString("hex")}.json`);
   fs.writeFileSync(input, JSON.stringify(job));
   try {
-    const bin = process.env.COVER_PYTHON_BIN || process.env.OFFLINE_PYTHON || (process.platform === "win32" ? "python" : "/opt/asr-venv/bin/python");
+    const bin = process.env.COVER_PYTHON_BIN || process.env.OFFLINE_PYTHON || (process.platform === "win32" ? "python" : "/opt/cover-venv/bin/python");
     const result = await run(bin, [path.join(__dirname, "cover-render.py"), input], { timeoutMs: 90000 });
     return JSON.parse(result.stdout);
   } finally { fs.rmSync(input, { force: true }); }

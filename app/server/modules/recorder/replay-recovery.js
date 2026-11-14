@@ -41,9 +41,8 @@ function assertReplaceable(rec) {
   if (isActive(rec)) throw new Error("同场直播仍在录制，暂不替换");
   if (backupLeases.lockedRecording(rec)) throw new Error("录像文件正由115备份使用，请先取消115备份后再替换");
   if (rec.draftId || rec.uploadStatus === "done" || manager.getQueue().some(q => String(q.recordingId) === String(rec.id) && ["uploading", "paused_recording", "done"].includes(q.status))) throw new Error("录像已进入上传队列或草稿箱，已保留原录像");
-  if (require("../analysis/service").busy(rec.id) || require("./clips").busy(rec.id)) throw new Error("字幕或剪辑任务正在使用录像，暂不替换");
-  const analysis = require("../../lib/store").load(`analysis_${rec.id}`, null);
-  if (analysis?.segments?.length || manager.getRecordings().some(item => item.parentRecordingId === rec.id)) throw new Error("录像已有字幕或剪辑，已保留原录像和下载的回放，避免时间轴错位");
+  // 历史剪辑产物（parentRecordingId）仍然保护原录像不被替换，避免时间轴错位。
+  if (manager.getRecordings().some(item => item.parentRecordingId === rec.id)) throw new Error("该录像存在历史剪辑产物，已保留原录像和下载的回放，避免时间轴错位");
   // Cancel only replaceable queued work, after every other replacement guard has passed.
   for (const item of manager.getQueue().filter(q => String(q.recordingId) === String(rec.id) && ["queued", "waiting_credentials"].includes(q.status))) {
     manager.updateQueueItem(item.id, { status: "failed", error: "录像需要官方回放核对，旧投稿任务已取消", failedAt: new Date().toISOString() });

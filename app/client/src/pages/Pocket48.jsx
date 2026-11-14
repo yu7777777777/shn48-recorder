@@ -22,17 +22,6 @@ const roomLabel = room => {
 // Kept for the check-in card, which prints a full timestamp.
 function time(value) { const n = Number(value); const d = new Date(n ? (n < 1e12 ? n * 1000 : n) : value); return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString('zh-CN'); }
 
-// replay-watch stores raw English error codes; map the known ones to Chinese
-// and show anything else verbatim instead of inventing a wrong reason.
-const REPLAY_WATCH_ERROR_LABELS = {
-  replay_watch_failed: '回放检查失败',
-  pocket48_replay_list_failed: '口袋48回放列表获取失败',
-  pocket48_auth_expired: '口袋48登录已过期',
-  replay_import_failed: '官方回放导入失败',
-  replay_download_failed: '官方回放下载失败',
-};
-const replayWatchErrorText = code => REPLAY_WATCH_ERROR_LABELS[str(code).trim()] || str(code);
-
 // A transcript printed the full locale timestamp on every row, which made the
 // stamp visually louder than the message. Group by day and show a clock only.
 function toDate(value) { const n = Number(value); const d = new Date(n ? (n < 1e12 ? n * 1000 : n) : value); return Number.isNaN(d.getTime()) ? null : d; }
@@ -376,7 +365,7 @@ function MemberList({ groups, query, onQuery, onPick, onToggle, onMissingRoom, b
 // Account + check-in used to be two permanent cards above the workspace, which
 // pushed the messages most of a screen down for settings that change rarely.
 // They now live behind one header button.
-function AccountSettings({ open, onClose, auth, profile, checkin, errors, busy, autoCheck, setAutoCheck, saveAutoCheck, replayWatch, setReplayWatch, saveReplayWatch, runReplayWatchNow, targetAccount, setTargetAccount, switchAccount, onCheckin, onRefresh }) {
+function AccountSettings({ open, onClose, auth, profile, checkin, errors, busy, autoCheck, setAutoCheck, saveAutoCheck, targetAccount, setTargetAccount, switchAccount, onCheckin, onRefresh }) {
   const closeRef = useRef(null);
   useEffect(() => {
     if (!open) return;
@@ -445,25 +434,6 @@ function AccountSettings({ open, onClose, auth, profile, checkin, errors, busy, 
             {autoCheck.lastResult && <small>{autoCheck.lastResult}</small>}
             {errors.autoCheck && <p className="p48-error" role="alert">{errors.autoCheck}</p>}
           </div>
-          <div className="p48-auto-form">
-            <label>
-              <input type="checkbox" checked={replayWatch.enabled} onChange={e => setReplayWatch(old => ({ ...old, enabled: e.target.checked }))} />
-              每天自动巡检成员回放
-            </label>
-            <div className="p48-auto-times">
-              <input aria-label="巡检成员 ID" placeholder="成员 ID" value={replayWatch.memberId} onChange={e => setReplayWatch(old => ({ ...old, memberId: e.target.value }))} />
-              <input aria-label="巡检成员名称" placeholder="备注名称（可选）" value={replayWatch.memberName || ""} onChange={e => setReplayWatch(old => ({ ...old, memberName: e.target.value }))} />
-            </div>
-            <small>每 24 小时最多检查一次；只导入开启之后开始的公开回放，已归档或正在下载的会跳过。</small>
-            {replayWatch.lastAttemptAt && <small>上次检查：{time(replayWatch.lastAttemptAt)}</small>}
-            {replayWatch.lastSuccessAt && <small>上次有新回放：{replayWatch.lastQueued} 场</small>}
-            {replayWatch.lastErrorCode && <small className="p48-error">上次错误：{replayWatchErrorText(replayWatch.lastErrorCode)}</small>}
-            {errors.replayWatch && <p className="p48-error" role="alert">{errors.replayWatch}</p>}
-            <div className="p48-auto-times">
-              <button type="button" className="btn btn-secondary btn-sm" disabled={!!busy} onClick={saveReplayWatch}>保存巡检设置</button>
-              <button type="button" className="btn btn-secondary btn-sm" disabled={!!busy || !replayWatch.memberId} onClick={runReplayWatchNow}>立即检查一次</button>
-            </div>
-          </div>
         </section>
       </div>
       <div className="modal-footer">
@@ -473,102 +443,6 @@ function AccountSettings({ open, onClose, auth, profile, checkin, errors, busy, 
       </div>
     </div>
   </div>;
-}
-
-// 消息关键词监控：命中关键词 → 推送到「通知推送」里启用的外部渠道。
-// 配置与命中记录都来自 /pocket48/keyword-monitor。
-function KeywordMonitor({ auth }) {
-  const toast = useToast();
-  const [state, setState] = useState(null);
-  const [draft, setDraft] = useState(null);
-  const [busy, setBusy] = useState('');
-  const [roomInput, setRoomInput] = useState({ id: '', name: '' });
-  const load = useCallback(async () => {
-    try {
-      const data = payload(await adminApi.get('/pocket48/keyword-monitor'));
-      setState(data); setDraft({ enabled: data.enabled, keywords: (data.keywords || []).join('，'), rooms: data.rooms || [], pollSeconds: data.pollSeconds, cooldownMinutes: data.cooldownMinutes });
-    } catch (e) { toast.error(errorMessage(e, '关键词监控配置读取失败')); }
-  }, [toast]);
-  useEffect(() => { void load(); }, [load]);
-  if (!state || !draft) return null;
-  const save = async () => {
-    setBusy('save');
-    try {
-      const data = payload(await adminApi.put('/pocket48/keyword-monitor', {
-        enabled: draft.enabled,
-        keywords: draft.keywords.split(/[，,;；\n]/).map(row => row.trim()).filter(Boolean),
-        rooms: draft.rooms,
-        pollSeconds: Number(draft.pollSeconds),
-        cooldownMinutes: Number(draft.cooldownMinutes),
-      }));
-      setState(data); setDraft({ enabled: data.enabled, keywords: (data.keywords || []).join('，'), rooms: data.rooms || [], pollSeconds: data.pollSeconds, cooldownMinutes: data.cooldownMinutes });
-      toast.success('关键词监控已保存');
-    } catch (e) { toast.error(errorMessage(e, '保存失败')); } finally { setBusy(''); }
-  };
-  const pollNow = async () => {
-    setBusy('poll');
-    try { setState(payload(await adminApi.post('/pocket48/keyword-monitor/poll'))); toast.success('已立即检查一轮'); }
-    catch (e) { toast.error(errorMessage(e, '检查失败')); } finally { setBusy(''); }
-  };
-  const addRoom = () => {
-    const id = roomInput.id.trim();
-    if (!/^\d{1,30}$/.test(id)) { toast.error('房间 ID 必须是数字'); return; }
-    if (draft.rooms.some(room => room.roomId === id)) return;
-    setDraft(old => ({ ...old, rooms: [...old.rooms, { roomId: id, name: roomInput.name.trim().slice(0, 60) }] }));
-    setRoomInput({ id: '', name: '' });
-  };
-  return <section className="card p48-keyword" style={{ marginTop: 20 }}>
-    <div className="page-header admin-page-header" style={{ marginBottom: 8 }}>
-      <div>
-        <h2 style={{ margin: 0 }}>消息关键词监控</h2>
-        <small style={{ color: 'var(--text-muted)' }}>成员/粉丝消息命中关键词时，推送到「通知推送」里启用的渠道——成员提到"直播""官宣""生日会"第一时间知道。需要口袋48登录。{state.lastError ? <span role="alert" style={{ color: 'var(--danger)' }}>最近错误：{state.lastError}</span> : state.lastRunAt ? `上次检查：${new Date(state.lastRunAt).toLocaleString('zh-CN', { hour12: false })}` : ''}</small>
-      </div>
-      <label className="p48-checkin-row" style={{ gap: 8 }}>
-        <input type="checkbox" checked={draft.enabled} onChange={e => setDraft(old => ({ ...old, enabled: e.target.checked }))} /> 启用监控
-      </label>
-    </div>
-    <div className="grid-2">
-      <div className="form-group">
-        <label>关键词（逗号分隔，最多 30 个）</label>
-        <input value={draft.keywords} onChange={e => setDraft(old => ({ ...old, keywords: e.target.value }))} placeholder="直播，官宣，生日会，新公演" />
-      </div>
-      <div className="form-group">
-        <label>轮询间隔（秒）/ 通知冷却（分钟）</label>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <input type="number" min={30} max={1800} value={draft.pollSeconds} onChange={e => setDraft(old => ({ ...old, pollSeconds: e.target.value }))} aria-label="轮询间隔秒数" />
-          <input type="number" min={0} max={1440} value={draft.cooldownMinutes} onChange={e => setDraft(old => ({ ...old, cooldownMinutes: e.target.value }))} aria-label="通知冷却分钟数" />
-        </div>
-      </div>
-    </div>
-    <div className="form-group">
-      <label>监控房间（{draft.rooms.length}/30）</label>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
-        {draft.rooms.map(room => <span key={room.roomId} style={{ border: '1px solid var(--border)', borderRadius: 999, padding: '2px 10px', display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-          {room.name || room.roomId}<small style={{ color: 'var(--text-muted)' }}>{room.name ? room.roomId : ''}</small>
-          <button type="button" aria-label={'移除 ' + (room.name || room.roomId)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--danger)' }} onClick={() => setDraft(old => ({ ...old, rooms: old.rooms.filter(item => item.roomId !== room.roomId) }))}>×</button>
-        </span>)}
-        {!draft.rooms.length && <small style={{ color: 'var(--text-dim)' }}>还没有房间。可以从成员列表复制房间号添加。</small>}
-      </div>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <input value={roomInput.id} onChange={e => setRoomInput(old => ({ ...old, id: e.target.value }))} placeholder="房间 ID（数字）" style={{ maxWidth: 180 }} />
-        <input value={roomInput.name} onChange={e => setRoomInput(old => ({ ...old, name: e.target.value }))} placeholder="备注名（可选）" />
-        <button type="button" className="btn btn-secondary btn-sm" onClick={addRoom}>添加</button>
-      </div>
-    </div>
-    <div className="detail-actions" style={{ marginTop: 10 }}>
-      <button type="button" className="btn btn-primary btn-sm" disabled={Boolean(busy)} onClick={save}>{busy === 'save' ? '保存中…' : '保存监控设置'}</button>
-      <button type="button" className="btn btn-secondary btn-sm" disabled={Boolean(busy) || !auth?.authenticated} onClick={pollNow}>{busy === 'poll' ? '检查中…' : '立即检查一轮'}</button>
-    </div>
-    {Boolean(state.matches?.length) && <div style={{ marginTop: 14 }}>
-      <h4 style={{ margin: '0 0 6px' }}>最近命中</h4>
-      <div style={{ display: 'grid', gap: 4 }}>
-        {state.matches.slice(0, 15).map((match, index) => <div key={index} style={{ fontSize: 13, padding: '4px 8px', background: 'var(--bg-panel)', borderRadius: 'var(--radius)' }}>
-          <strong>{match.keyword}</strong> · {match.roomName} · {match.nickname}：{match.text}
-          <small style={{ color: 'var(--text-muted)', marginLeft: 6 }}>{new Date(match.at).toLocaleString('zh-CN', { hour12: false })}</small>
-        </div>)}
-      </div>
-    </div>}
-  </section>;
 }
 
 export default function Pocket48Page() {
@@ -618,7 +492,6 @@ export default function Pocket48Page() {
   // Last message-read exchange, kept so the empty state can explain itself.
   const [streamTrace, setStreamTrace] = useState(null);
   const [autoCheck, setAutoCheck] = useState({ enabled: false, start: '09:00', end: '11:00' });
-  const [replayWatch, setReplayWatch] = useState({ enabled: false, memberId: '', memberName: '', lastAttemptAt: null, lastErrorCode: '', lastQueued: 0 });
   const [targetAccount, setTargetAccount] = useState('');
   const requestId = useRef(0);
   const get = async path => payload(await adminApi.get(path));
@@ -634,7 +507,6 @@ export default function Pocket48Page() {
     try {
       const status = await get('/pocket48/auth/status'); setAuth(status);
       await get(base + '/auto-checkin').then(setAutoCheck).catch(e => failure('autoCheck', e));
-      await get(base + '/replay-watch').then(setReplayWatch).catch(e => failure('replayWatch', e));
       if (status.authenticated) await Promise.all([
         get(base + '/profile').then(data => { setProfile(data); setTargetAccount(str(data.userId)); }).catch(e => failure('profile', e)),
         get(base + '/checkin').then(setCheckin).catch(e => failure('checkin', e)),
@@ -667,28 +539,6 @@ export default function Pocket48Page() {
     setBusy('autoCheck'); setErrors(old => ({ ...old, autoCheck: '' }));
     try { setAutoCheck(payload(await adminApi.put(base + '/auto-checkin', { enabled: autoCheck.enabled, start: autoCheck.start, end: autoCheck.end }))); toast.success('自动签到设置已保存'); }
     catch (e) { failure('autoCheck', e); } finally { setBusy(''); }
-  }
-  async function saveReplayWatch() {
-    setBusy('replayWatch'); setErrors(old => ({ ...old, replayWatch: '' }));
-    try {
-      setReplayWatch(payload(await adminApi.put(base + '/replay-watch', {
-        enabled: replayWatch.enabled, memberId: replayWatch.memberId, memberName: replayWatch.memberName,
-      })));
-      toast.success('自动回放巡检已保存');
-    } catch (e) { failure('replayWatch', e); } finally { setBusy(''); }
-  }
-  async function runReplayWatchNow() {
-    setBusy('replayWatch'); setErrors(old => ({ ...old, replayWatch: '' }));
-    try {
-      const result = payload(await adminApi.post(base + '/replay-watch/run', undefined));
-      setReplayWatch(result);
-      // The run result is `{ ...status, queued, upstreamError? }`: queued=0 with an
-      // upstreamError is an outage, not "no new replays", so it must not masquerade
-      // as a successful empty check.
-      if (result.upstreamError) toast.error('检查失败：' + result.upstreamError);
-      else if (result.queued > 0) toast.success(`已提交 ${result.queued} 场回放`);
-      else toast.success('本次没有新的公开回放');
-    } catch (e) { failure('replayWatch', e); } finally { setBusy(''); }
   }
   // Follow/unfollow writes to the Pocket48 account itself. The list is re-derived
   // from the server's own follow set afterwards so the star reflects the account,
@@ -764,10 +614,9 @@ export default function Pocket48Page() {
       </div>
     </section>
 
-    <KeywordMonitor auth={auth} />
 
     <AccountSettings open={settingsOpen} onClose={() => setSettingsOpen(false)} auth={auth} profile={profile} checkin={checkin} errors={errors}
-      busy={busy} autoCheck={autoCheck} setAutoCheck={setAutoCheck} saveAutoCheck={saveAutoCheck} replayWatch={replayWatch} setReplayWatch={setReplayWatch} saveReplayWatch={saveReplayWatch} runReplayWatchNow={runReplayWatchNow}
+      busy={busy} autoCheck={autoCheck} setAutoCheck={setAutoCheck} saveAutoCheck={saveAutoCheck}
       targetAccount={targetAccount} setTargetAccount={setTargetAccount} switchAccount={switchAccount}
       onCheckin={doCheckin} onRefresh={refresh} />
   </div>;

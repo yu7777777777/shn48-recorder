@@ -112,7 +112,7 @@ function createService(options = {}) {
   function stable(rec) {
     if (!rec || !["done", "completed", "archived"].includes(rec.status)) throw fail("请等待录像归档完成", 409);
     if (options.stable) options.stable(rec);
-    else if (require("../recorder/replay-recovery").busy(rec.id) || require("../recorder/archive-processor").busy?.(rec.id) || require("../recorder/clips").busy(rec.id)) throw fail("请等待归档、剪辑或完整回放替换结束", 409);
+    else if (require("../recorder/replay-recovery").busy(rec.id) || require("../recorder/archive-processor").busy?.(rec.id)) throw fail("请等待归档或完整回放替换结束", 409);
   }
   function resolveMain(rec) {
     stable(rec); const base = fs.realpathSync(root()), candidate = path.resolve(rec.filePath || "");
@@ -124,14 +124,6 @@ function createService(options = {}) {
   function snapshot(rec, source) {
     const attachments = [], meta = JSON.stringify(metadata(rec), null, 2);
     attachments.push({ role: "metadata", suffix: ".json", data: Buffer.from(meta) });
-    if (/^[\w-]{1,100}$/.test(String(rec.id))) {
-      const analysis = store.load("analysis_" + rec.id, null);
-      if (Array.isArray(analysis?.segments) && analysis.segments.length) {
-        const text = require("../analysis/service").subtitle(analysis.segments);
-        if (Buffer.byteLength(text) > 20000000) throw fail("字幕附件过大，请检查字幕内容");
-        attachments.push({ role: "subtitle", suffix: ".srt", data: Buffer.from(text) });
-      }
-    }
     if (rec.coverFile) {
       const cover = require("../recorder/covers").file(rec.coverFile);
       if (fs.existsSync(cover)) { if (fs.statSync(cover).size > 5000000) throw fail("封面附件过大"); attachments.push({ role: "cover", suffix: ".jpg", data: fs.readFileSync(cover) }); }
@@ -209,9 +201,6 @@ function createService(options = {}) {
     }
     assertCurrent(id, signal);
     const outcome = update(id, { status: failedAttachments ? "partial" : "succeeded", phase: failedAttachments ? "录像已校验，部分附件失败" : "全部文件已校验，本地原件保留", error: failedAttachments ? "部分附件未完成，请重试" : "", verifiedAt: failedAttachments ? null : nowIso(), progress: failedAttachments ? Math.min(99, job(id).progress) : 100, nextRetryAt: null });
-    const backupRec = manager.getRecording(j.recordingId);
-    if (failedAttachments) require("../notify").event("backup_failed", { id, recordingId: j.recordingId, title: backupRec?.title, error: "部分附件未完成，请重试", phase: outcome.phase });
-    else require("../notify").event("backup_done", { id, recordingId: j.recordingId, title: backupRec?.title, remotePath: j.remotePath });
   }
   async function pump() {
     if (running || stopped || corruption || [...sessions.values()].some(s => s.pending)) return running;
@@ -232,7 +221,6 @@ function createService(options = {}) {
             if (code === "unauthorized") connection = { ...connection, authorized: false, message: realProvider.MESSAGES.unauthorized };
             try { update(next.id, { status, phase: status === "retry_wait" ? "网络异常，等待重试" : "备份未完成", error: realProvider.MESSAGES[code] || "备份失败，请检查文件和磁盘后重试", nextRetryAt: retryable ? new Date(Date.now() + Math.min(600000, 15000 * 2 ** (latest.attempts || 1))).toISOString() : null }); }
             catch { corruption = "115备份状态无法写入磁盘，已暂停；未确认备份成功"; }
-            if (status === "failed") require("../notify").event("backup_failed", { id: next.id, recordingId: next.recordingId, title: manager.getRecording(next.recordingId)?.title, error: realProvider.MESSAGES[code] || "备份失败，请检查文件和磁盘后重试" });
           }
         } finally { current = null; if (!ACTIVE.has(job(next.id)?.status)) leases.releaseOwner(next.id); }
         if (job(next.id)?.status === "waiting_credentials") break;

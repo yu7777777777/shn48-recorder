@@ -71,7 +71,7 @@ export default function UpdateChecker() {
       setState(fresh.state || null);
       if (data.skipped) toast.success(data.reason || "已有检测在进行中");
       else if (data.upToDate) toast.success(`已是最新版本（${data.localVersion}）`);
-      else toast.success(`发现新版本 ${data.remoteVersion}${data.notified ? "，已推送通知" : ""}`);
+      else toast.success(`发现新版本 ${data.remoteVersion}`);
     } catch (err) {
       toast.error(errorMessage(err, "版本检测失败"));
     } finally {

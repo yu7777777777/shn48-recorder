@@ -10,7 +10,6 @@ const archiveProcessor = require("../modules/recorder/archive-processor");
 
 const diskStorage = require("../modules/recorder/storage");
 const backupLeases = require("../modules/backup115/leases");
-const clips = require("../modules/recorder/clips");
 const covers = require("../modules/recorder/covers");
 const replayRecovery = require("../modules/recorder/replay-recovery");
 const replayAudit = require("../modules/recorder/replay-audit");
@@ -258,17 +257,6 @@ router.get("/:id", (req, res) => {
   res.json({ success: true, data: recording });
 });
 
-router.get("/:id/clips", (req, res) => res.json({ success: true, data: clips.list(req.params.id) }));
-router.post("/:id/clips", (req, res) => {
-  if (replayRecovery.busy(req.params.id)) return res.status(409).json({ success: false, error: "请等待回放下载与对比完成后再剪辑" });
-  try { res.status(202).json({ success: true, data: clips.enqueue(req.params.id, req.body) }); }
-  catch (error) { res.status(error.statusCode || 400).json({ success: false, error: error.message }); }
-});
-router.post("/:id/retry-clip", (req, res) => {
-  try { res.status(202).json({ success: true, data: clips.retry(req.params.id) }); }
-  catch (error) { res.status(error.statusCode || 400).json({ success: false, error: error.message }); }
-});
-
 router.post("/:id/cover-candidates", async (req, res) => {
   const recording = manager.getRecording(req.params.id);
   if (!recording) return res.status(404).json({ success: false, error: "Recording not found" });
@@ -386,8 +374,6 @@ router.delete("/:id", (req, res) => {
   if (backupLeases.lockedRecording(recording)) return res.status(409).json({ success: false, error: "115备份正在使用录像文件，请先取消115备份后再删除" });
   if (replayRecovery.busy(recording.id)) return res.status(409).json({ success: false, error: "请等待官方回放下载与对比完成后再删除" });
   if (replayAudit.busy(recording.id)) return res.status(409).json({ success: false, error: "请等待历史审计修复完成后再删除" });
-  if (clips.busy(recording.id)) return res.status(409).json({ success: false, error: "请等待关联剪辑完成后再删除" });
-  if (require('../modules/analysis/service').busy(recording.id)) return res.status(409).json({success:false,error:'请先取消字幕或分析任务'});
   if (["recording", "waiting_merge", "processing"].includes(recording.status)) {
     return res.status(409).json({ success: false, error: "Stop the recording before deleting it" });
   }
@@ -436,10 +422,6 @@ router.delete("/:id", (req, res) => {
       deletedAt,
     });
     replayAudit.remove(recording.id);
-    // 分析结果、_before_* 备份与总结断点都是归档的派生数据，归档删除时一并清理。
-    // 清理失败只记日志，不能让残留文件阻塞删除本身；队列历史由 compact 自然淘汰。
-    try { require('../modules/analysis/service').purge(recording.id); }
-    catch (error) { console.error('[recordings] 分析数据清理失败:', recording.id, error.message); }
     // Keep the polling inventory consistent with what is actually on disk.
     diskStorage.invalidate(path.resolve(pocketRecorder._internals.recordingsDir()));
     res.json({ success: true, data: { id: recording.id, fileDeleted, sharedFilesKept: [...shared], deletedAt } });

@@ -2,10 +2,6 @@
 
 const store = require("../../lib/store");
 const sse = require("../../lib/sse");
-// Outbound notification hooks are one-way: manager pushes lifecycle events out,
-// notify never calls back into manager, so a notification failure (or the whole
-// module) cannot disturb recording state.
-const notify = require("../notify");
 
 // Recording job queue with automatic retry and SSE broadcasting
 const RECORDINGS_KEY = "recordings";
@@ -70,11 +66,6 @@ function insertRecording(rec) {
   recordings.unshift(r);
   saveRecordings();
   sse.broadcast("recording-added", r);
-  // Reconnect segments and clip rows are not new sessions; only a fresh session
-  // row that already starts live counts as "开始录制".
-  if (r.status === "recording" && r.segment !== true && r.source !== "clip") {
-    notify.event("recording_started", { id: r.id, title: r.title, memberName: r.memberName, liveId: r.liveId, source: r.source });
-  }
   return r;
 }
 
@@ -106,30 +97,12 @@ function updateRecording(id, updates) {
   if (!r) return null;
   const previous = { ...r };
   Object.assign(r, updates);
-  // Lifecycle notifications are decided BEFORE persisting so the one-shot
-  // "archive announced" flag lands atomically with the transition itself.
-  // 归档完成只在每条录像上通知一次：done → processing → done 的重新整理 MP4
-  // 不重复打扰；归档失败时清除标记，之后的 done 作为"恢复"再通知一次。
-  const notifyDone = r.source !== "clip" && r.status === "done" && previous.status !== "done" && !r.archiveNotified;
-  const notifyFailed = r.source !== "clip" && (r.status === "failed" || r.status === "archive_failed") && previous.status !== r.status;
-  const notifyStarted = r.source !== "clip" && r.status === "recording" && previous.status !== "recording" && r.segment !== true;
-  if (notifyDone) r.archiveNotified = true;
-  if (notifyFailed) r.archiveNotified = false;
   try { saveRecordings(); } catch (error) {
     for (const key of Object.keys(r)) delete r[key];
     Object.assign(r, previous);
     throw error;
   }
   sse.broadcast("recording-updated", { id, updates });
-  // DDTalks starts as pending → starting → recording; the starting→recording
-  // edge is where the capture actually begins, so it counts as 开始录制.
-  if (notifyDone) {
-    notify.event("recording_done", { id: r.id, title: r.title, memberName: r.memberName, duration: r.duration, size: r.fileSize || r.size });
-  } else if (notifyFailed) {
-    notify.event("recording_failed", { id: r.id, title: r.title, memberName: r.memberName, error: r.error || r.archiveError || "" });
-  } else if (notifyStarted) {
-    notify.event("recording_started", { id: r.id, title: r.title, memberName: r.memberName, liveId: r.liveId, source: r.source });
-  }
   return r;
 }
 
@@ -173,17 +146,9 @@ function dequeueUpload(id) {
 function updateQueueItem(id, updates) {
   const item = uploadQueue.find(x => x.id === id);
   if (!item) return null;
-  const previousStatus = item.status;
   Object.assign(item, updates);
   saveQueue();
   sse.broadcast("upload-updated", { id, updates });
-  // Upload lifecycle notifications: a queue item reaching done/failed reports
-  // the outcome once, keyed on the recording it belongs to.
-  if (item.status !== previousStatus && item.status === "done") {
-    notify.event("upload_done", { id, recordingId: item.recordingId, title: item.title, mode: item.mode, bvid: item.bvid });
-  } else if (item.status !== previousStatus && item.status === "failed") {
-    notify.event("upload_failed", { id, recordingId: item.recordingId, title: item.title, error: item.error });
-  }
   return item;
 }
 

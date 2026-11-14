@@ -1,16 +1,14 @@
 "use strict";
 
 // Update checker: periodically compares the released VERSION in the GitHub
-// repository against the running version and pushes a notification through the
-// existing notify module when a newer release is found. The checker only ever
-// READS from GitHub (Contents:read token) and never deploys anything by
-// itself — applying an update stays a deliberate server-side action. Every
-// failure is recorded in state and swallowed: a broken check must never
-// affect recording, backup or upload.
+// repository against the running version and records the outcome for the
+// admin "版本更新" page. The checker only ever READS from GitHub and never
+// deploys anything by itself — applying an update stays a deliberate
+// server-side action. Every failure is recorded in state and swallowed: a
+// broken check must never affect recording, backup or upload.
 
 const store = require("../../lib/store");
 const { version } = require("../../lib/version");
-const notify = require("../notify");
 
 const defaults = { enabled: false, repo: "yu7777777777/shn48-recorder", branch: "main", intervalHours: 6, token: "" };
 const REPO_RE = /^[\w.-]{1,100}\/[\w.-]{1,100}$/;
@@ -77,7 +75,6 @@ function state() {
     localVersion: saved.localVersion || null,
     upToDate: typeof saved.upToDate === "boolean" ? saved.upToDate : null,
     lastError: saved.lastError || null,
-    lastNotifiedVersion: saved.lastNotifiedVersion || null,
   };
 }
 
@@ -129,19 +126,8 @@ async function checkNow() {
     const remote = await fetchRemoteVersion(config);
     const local = version();
     const upToDate = !greater(remote, local);
-    const next = recordState({ lastCheckAt: new Date().toISOString(), remoteVersion: remote, localVersion: local, upToDate, lastError: null });
-    let notified = false;
-    // One notification per released version: re-checks and restarts must not
-    // re-send the same ping, but a newer version always does.
-    if (!upToDate && remote !== next.lastNotifiedVersion) {
-      notify.event("update_available", {
-        title: `发现新版本 ${remote}`,
-        text: `GitHub 仓库已发布 ${remote}，当前运行 ${local}。确认无误后在服务器执行更新脚本即可完成部署。`,
-      });
-      recordState({ lastNotifiedVersion: remote });
-      notified = true;
-    }
-    return { localVersion: local, remoteVersion: remote, upToDate, notified };
+    recordState({ lastCheckAt: new Date().toISOString(), remoteVersion: remote, localVersion: local, upToDate, lastError: null });
+    return { localVersion: local, remoteVersion: remote, upToDate };
   } catch (error) {
     recordState({ lastError: String(error?.message || error).slice(0, 300) });
     throw error;

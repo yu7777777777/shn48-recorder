@@ -25,13 +25,9 @@ const navItems = [
   { path: "/admin/auto-record", label: "自动录制", icon: IconRefresh },
   { path: "/admin/pocket48", label: "口袋48", icon: IconTv },
   { path: "/admin/archive", label: "录像归档", icon: IconArchive },
-  { path: "/admin/search", label: "字幕搜索", icon: IconLayers },
-  { path: "/admin/replay-analysis", label: "回放分析", icon: IconLayers },
   { path: "/admin/replay-audit", label: "历史审计", icon: IconLayers },
 
   { path: "/admin/social", label: "成员社交账号", icon: IconUsers },
-  { path: "/admin/analysis-settings", label: "字幕与 AI", icon: IconSettings },
-  { path: "/admin/notify", label: "通知推送", icon: IconSettings },
   { path: "/admin/update", label: "版本更新", icon: IconRefresh },
   { path: "/admin/bilibili", label: "B站草稿", icon: IconBilibili },
   { path: "/admin/settings", label: "系统设置", icon: IconSettings },
@@ -40,8 +36,8 @@ const navItems = [
 
 const NAV_SECTIONS = [
   { label: "工作台", from: 0, to: 5 },
-  { label: "内容工具", from: 5, to: 9 },
-  { label: "系统", from: 9, to: navItems.length },
+  { label: "内容工具", from: 5, to: 7 },
+  { label: "系统", from: 7, to: navItems.length },
 ];
 
 export default function AdminLayout() {
