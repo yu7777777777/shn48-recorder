@@ -119,6 +119,10 @@ docker exec shn48-recorder rm -f /tmp/update-rt.sums
 [ "$RT_OUT" = "0" ] || { docker exec shn48-recorder sh -c 'cd /app && sha256sum -c /tmp/update-rt.sums 2>&1 | grep -v ": OK$" | head -10' || true; die "运行文件哈希核验存在 $RT_OUT 项不一致"; }
 say "  $RT_TOTAL 个运行文件哈希全部一致"
 
+# 构建缓存是小磁盘服务器的主要累积源：核验通过后立即回收，保证下一次更新仍有余量。
+docker builder prune -f >/dev/null 2>&1 || true
+say "  构建缓存已回收，当前可用 $(free_gb)GB"
+
 trap - EXIT
 rm -rf "$WORK"
 say "✓ 更新完成：$OLD_VER -> $NEW_VER"
