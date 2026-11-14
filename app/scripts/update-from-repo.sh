@@ -75,11 +75,19 @@ SORTED="$(printf '%s\n%s\n' "$NEW_VER" "$OLD_VER" | sort -V | head -1)"
 [ -f "$WORK/repo/app/RUNTIME-SHA256SUMS" ] || die "仓库缺少 RUNTIME-SHA256SUMS，发布流程未完成"
 say "  $OLD_VER -> $NEW_VER"
 
-# 源码完整性：克隆树必须与发布清单逐字节一致（服务器上无 node，直接 sha256sum -c）。
-say "  核验克隆源码完整性（SHA256SUMS）"
-SRC_BAD="$(cd "$WORK/repo/app" && sha256sum -c SHA256SUMS 2>/dev/null | grep -cv ': OK$' || true)"
-[ "$SRC_BAD" = "0" ] || { cd "$WORK/repo/app" && sha256sum -c SHA256SUMS 2>/dev/null | grep -v ': OK$' | head -10; die "克隆源码与发布清单存在 $SRC_BAD 处不一致"; }
-say "  $(wc -l < "$WORK/repo/app/SHA256SUMS") 项源码哈希一致"
+# 源码完整性：克隆树必须与发布清单逐字节一致。清单中 git 忽略的构建产物
+# （client/dist、.tools 等）不在克隆里，按存在性过滤后核验 git 跟踪的源码。
+say "  核验克隆源码完整性（SHA256SUMS，跳过不入库的构建产物）"
+cd "$WORK/repo/app"
+: > "$WORK/src-check.sums"
+while IFS= read -r line; do
+  h="${line%%  *}"; p="${line#*  }"
+  [ -f "$p" ] && printf '%s  %s\n' "$h" "$p" >> "$WORK/src-check.sums"
+done < SHA256SUMS
+SRC_TOTAL="$(wc -l < "$WORK/src-check.sums")"
+SRC_BAD="$(sha256sum -c "$WORK/src-check.sums" 2>/dev/null | grep -cv ': OK$' || true)"
+[ "$SRC_BAD" = "0" ] || { sha256sum -c "$WORK/src-check.sums" 2>/dev/null | grep -v ': OK$' | head -10; die "克隆源码与发布清单存在 $SRC_BAD 处不一致"; }
+say "  $SRC_TOTAL 项源码哈希一致"
 
 say "4/7 构建镜像 shn48-shn48:$NEW_VER（约 10-20 分钟）"
 # Docker Hub 在部分网络不可达：优先使用本地已有基础镜像，其次走 ECR 公共镜像源兜底。
