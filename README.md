@@ -90,4 +90,4 @@ release/   各版本发布清单与核验证据（不入库，本地留存）
 
 ## 许可证
 
-`app/` 等自研代码暂未附开源许可证（保留所有权利）；`research/` 内的第三方项目副本分别遵循其原始许可证（MIT / GPL-3.0，见各自目录的 LICENSE 文件）。
+自研代码（`app/`、`audit/`、`docs/` 等）以 [MIT License](LICENSE) 发布；`research/` 内的第三方项目副本分别遵循其原始许可证（MIT / GPL-3.0，见各自目录的 LICENSE 文件）。
