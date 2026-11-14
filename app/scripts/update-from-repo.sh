@@ -41,10 +41,14 @@ OLD_VER="$(docker exec shn48-recorder cat /app/VERSION 2>/dev/null)" || die "当
 HEALTH="$(docker inspect shn48-recorder --format '{{.State.Health.Status}}')" || die "无法读取容器状态"
 [ "$HEALTH" = "healthy" ] || die "当前容器不健康（$HEALTH），先人工排障再更新"
 if [ "${UPDATE_FORCE:-0}" != "1" ]; then
-  if docker exec shn48-recorder sh -c 'pgrep -f "ffmpeg|biliup" >/dev/null 2>&1'; then
-    die "检测到录制/上传任务正在运行，等待其结束后再更新（或确认放弃任务后 UPDATE_FORCE=1）"
+  # 回放审计的完整解码校验（ffmpeg -f null）只读且可中断（状态持久化，下次复查重跑），
+  # 不算占用；录制/上传类 ffmpeg 与 biliup 才是必须等待的活动任务。
+  BUSY="$(docker exec shn48-recorder sh -c 'ps -eo args | grep -E "ffmpeg|biliup" | grep -v grep | grep -v -- "-f null" || true')"
+  if [ -n "$BUSY" ]; then
+    echo "$BUSY" | head -3 | sed 's/^/[update]   /'
+    die "检测到录制/上传任务正在运行，等待其结束后再更新（确认放弃任务后 UPDATE_FORCE=1）"
   fi
-  say "  无活动录制/上传任务"
+  say "  无录制/上传任务（回放校验类只读任务不算占用）"
 fi
 FREE="$(free_gb)"
 if [ "$FREE" -lt "$MIN_FREE_GB" ]; then
