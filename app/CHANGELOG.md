@@ -1,6 +1,14 @@
 # 更新记录
 
-## [Unreleased]
+## [1.33.0] - 2026-11-14
+
+### 新版本检测与更新提醒
+
+- 新增 `server/modules/update-checker/`：定时（默认 6 小时，1-168 可配）调用 GitHub Contents API 读取仓库 `app/VERSION`，与运行版本比对；发现更新时通过既有通知系统推送「新版本可用」事件，每个版本只提醒一次（`lastNotifiedVersion` 随状态持久化，重启不重复提醒）。
+- 新增管理端「版本更新」页（`/admin/update`）与 `/api/admin/update` 接口：仓库/分支/间隔/开关配置，GitHub fine-grained PAT 仅存数据目录（接口只回显 `tokenSet`，支持 `clear:["token"]` 清除），「立即检查」可在未启用定时的情况下手动验证；状态卡显示本地/远端版本、上次检查与最近错误。
+- 检测为纯只读（Contents:read），失败计入状态并吞异常，不影响录制/备份/上传主链路；更新本身仍由人工确认后在服务器执行发布脚本，不新增任何自动部署逻辑。
+- 服务器同步提供 `scripts/update-from-repo.sh`（部署为 `/opt/shn48/scripts/update-from-repo.sh`）：确认后一键执行「Deploy Key 只读拉取仓库 → 本地构建候选镜像 → 切换 → 等待 healthy → 健康接口与运行文件哈希核验」，活动任务运行中自动拒绝切换，失败自动回滚 compose 与旧镜像，旧容器仅列出待人工确认清理。
+- 通知事件列表新增「新版本可用」（默认开启）；7 项 update-checker 专项测试覆盖配置校验、版本比对、去重提醒、失败记录与状态持久化。
 
 ## [1.32.4] - 2026-11-02
 

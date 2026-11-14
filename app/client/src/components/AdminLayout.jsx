@@ -32,6 +32,7 @@ const navItems = [
   { path: "/admin/social", label: "成员社交账号", icon: IconUsers },
   { path: "/admin/analysis-settings", label: "字幕与 AI", icon: IconSettings },
   { path: "/admin/notify", label: "通知推送", icon: IconSettings },
+  { path: "/admin/update", label: "版本更新", icon: IconRefresh },
   { path: "/admin/bilibili", label: "B站草稿", icon: IconBilibili },
   { path: "/admin/settings", label: "系统设置", icon: IconSettings },
   { path: "/admin/security", label: "账户安全", icon: IconShield },

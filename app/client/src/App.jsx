@@ -25,6 +25,7 @@ const RecordingDetail = lazy(() => import("./pages/RecordingDetail"));
 const ReplayAudit = lazy(() => import("./pages/ReplayAudit"));
 const AnalysisSettings = lazy(() => import("./pages/AnalysisSettings"));
 const NotifySettings = lazy(() => import("./pages/NotifySettings"));
+const UpdateChecker = lazy(() => import("./pages/UpdateChecker"));
 const SubtitleSearch = lazy(() => import("./pages/SubtitleSearch"));
 const SocialAccountsPage = lazy(() => import("./pages/SocialAccounts"));
 const ReplayAnalysisImport = lazy(() => import("./pages/ReplayAnalysisImport"));
@@ -53,6 +54,7 @@ export default function App() {
               <Route path="replay-analysis" element={<ReplayAnalysisImport />} />
               <Route path="analysis-settings" element={<AnalysisSettings />} />
               <Route path="notify" element={<NotifySettings />} />
+              <Route path="update" element={<UpdateChecker />} />
               <Route path="search" element={<SubtitleSearch />} />
               <Route path="social" element={<SocialAccountsPage />} />
               {/* Retired tools: preserve old bookmarks without loading obsolete pages. */}

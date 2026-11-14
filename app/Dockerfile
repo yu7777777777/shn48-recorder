@@ -1,4 +1,4 @@
-# 48tools 1.32.4
+# 48tools 1.33.0
 # Multi-stage build: compile the public/admin web app, then run the Node service.
 
 ARG NODE_IMAGE=node:20-bookworm-slim
@@ -17,8 +17,8 @@ FROM public.ecr.aws/docker/library/python:3.12.11-slim-bookworm@sha256:519591d68
 
 FROM ${NODE_IMAGE} AS runtime
 LABEL org.opencontainers.image.title="48tools" \
-      org.opencontainers.image.version="1.32.4" \
-      description="48tools 1.32.4 - private recording hub with public live playback"
+      org.opencontainers.image.version="1.33.0" \
+      description="48tools 1.33.0 - private recording hub with public live playback"
 ARG DEBIAN_MIRROR=http://mirrors.aliyun.com/debian
 ARG NPM_REGISTRY=https://registry.npmmirror.com
 

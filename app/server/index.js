@@ -90,6 +90,7 @@ function createApp() {
   app.use("/api/admin/backup115", require("./routes/backup115"));
   app.use("/api/admin/analysis", require("./routes/analysis"));
   app.use("/api/admin/notify", require("./routes/notify"));
+  app.use("/api/admin/update", require("./routes/update-checker"));
   app.use("/api/admin/exports", require("./routes/exports"));
   app.use("/api/admin/room-voice", require("./routes/room-voice"));
   app.use("/api/admin/social", require("./routes/social"));
@@ -160,6 +161,7 @@ function startServer() {
     require("./modules/pocket48/auto-checkin").start();
   require("./modules/pocket48/replay-watch").start();
   require("./modules/pocket48/keyword-monitor").start();
+  require("./modules/update-checker").start();
   });
   const sockets = new Set();
   server.on("connection", (socket) => {
@@ -187,6 +189,7 @@ function startServer() {
       require("./modules/pocket48/auto-checkin").stop();
   require("./modules/pocket48/replay-watch").stop();
   require("./modules/pocket48/keyword-monitor").stop();
+  require("./modules/update-checker").stop();
     },
     saveState: () => {
       manager.saveRecordings();

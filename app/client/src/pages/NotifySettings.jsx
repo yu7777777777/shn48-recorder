@@ -16,6 +16,7 @@ const EVENT_LABELS = {
   export_failed: "转码导出失败",
   pocket48_keyword: "口袋48关键词命中",
   failure_alert: "连续失败告警",
+  update_available: "新版本可用",
 };
 
 const CHANNEL_LABELS = {

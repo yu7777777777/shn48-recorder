@@ -7,6 +7,7 @@ const LABELS = {
   upload_done: "B站投稿完成", upload_failed: "B站投稿失败", backup_done: "115备份完成", backup_failed: "115备份失败",
   analysis_done: "分析任务完成", analysis_failed: "分析任务失败", export_done: "转码导出完成", export_failed: "转码导出失败",
   pocket48_keyword: "口袋48关键词命中", failure_alert: "连续失败告警",
+  update_available: "新版本可用",
 };
 const clone = value => JSON.parse(JSON.stringify(value));
 const defaults = { enabled: false, channels: channels.DEFAULTS, events: Object.fromEntries(Object.keys(LABELS).map(key => [key, key !== "analysis_done"])), failures: { threshold: 3, cooldownMinutes: 60 } };
