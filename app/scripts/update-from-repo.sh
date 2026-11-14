@@ -74,6 +74,14 @@ SORTED="$(printf '%s\n%s\n' "$NEW_VER" "$OLD_VER" | sort -V | head -1)"
 say "  $OLD_VER -> $NEW_VER"
 
 say "4/7 构建镜像 shn48-shn48:$NEW_VER（约 10-20 分钟）"
+# Docker Hub 在部分网络不可达：优先使用本地已有基础镜像，其次走 ECR 公共镜像源兜底。
+if ! docker image inspect node:20-bookworm-slim >/dev/null 2>&1; then
+  docker pull node:20-bookworm-slim >/dev/null 2>&1 || {
+    say "  Docker Hub 不可达，改用 public.ecr.aws 镜像源拉取基础镜像"
+    docker pull public.ecr.aws/docker/library/node:20-bookworm-slim >/dev/null
+    docker tag public.ecr.aws/docker/library/node:20-bookworm-slim node:20-bookworm-slim
+  }
+fi
 docker build -t "shn48-shn48:$NEW_VER" \
   --build-arg DEBIAN_MIRROR="${DEBIAN_MIRROR:-http://mirrors.aliyun.com/debian}" \
   --build-arg NPM_REGISTRY="${NPM_REGISTRY:-https://registry.npmmirror.com}" \
