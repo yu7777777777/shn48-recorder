@@ -133,12 +133,12 @@ export default function UpdateChecker() {
               onChange={event => setForm({ ...form, intervalHours: event.target.value })}
             />
           </Field>
-          <Field label="GitHub Token" hint={settings.tokenSet ? "已保存，留空保持不变" : "fine-grained PAT：仅勾选本仓库的 Contents 只读权限"}>
+          <Field label="GitHub Token" hint={settings.tokenSet ? "已保存，留空保持不变" : "可选：公开仓库无需；私有仓库需 Contents:read 只读 PAT"}>
             <input
               type="password"
               value={form.token}
               onChange={event => setForm({ ...form, token: event.target.value })}
-              placeholder={settings.tokenSet ? "••••••••" : "github_pat_… 或 ghp_…"}
+              placeholder={settings.tokenSet ? "••••••••" : "github_pat_… 或 ghp_…（可选）"}
               autoComplete="new-password"
             />
           </Field>

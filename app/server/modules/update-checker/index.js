@@ -99,16 +99,20 @@ function greater(remote, local) {
 
 async function fetchRemoteVersion(config) {
   const url = `https://api.github.com/repos/${config.repo}/contents/app/VERSION?ref=${encodeURIComponent(config.branch)}`;
+  const headers = {
+    "User-Agent": "48tools-update-checker",
+    Accept: "application/vnd.github.raw",
+  };
+  // Token is optional: public repositories work anonymously (60 req/h per IP,
+  // far above the default schedule); a token only lifts private repositories
+  // into reach and raises the rate ceiling.
+  if (config.token) headers.Authorization = `Bearer ${config.token}`;
   const res = await fetch(url, {
-    headers: {
-      "User-Agent": "48tools-update-checker",
-      Accept: "application/vnd.github.raw",
-      Authorization: `Bearer ${config.token}`,
-    },
+    headers,
     signal: AbortSignal.timeout(15000),
   });
-  if (res.status === 401 || res.status === 403) throw new Error("GitHub Token 无效或缺少该仓库的只读权限");
-  if (res.status === 404) throw new Error("仓库、分支或 app/VERSION 不存在，请检查仓库与分支配置");
+  if (res.status === 401 || res.status === 403) throw new Error("GitHub Token 无效或缺少该仓库的只读权限（公开仓库可清空 Token 走匿名）");
+  if (res.status === 404) throw new Error("仓库、分支或 app/VERSION 不存在；私有仓库需要配置 Contents:read 的只读 PAT");
   if (!res.ok) throw new Error(`GitHub 接口返回 ${res.status}`);
   const text = (await res.text()).trim();
   if (!/^\d+\.\d+\.\d+$/.test(text)) throw new Error(`仓库 VERSION 内容异常：${text.slice(0, 40)}`);
@@ -122,7 +126,6 @@ async function checkNow() {
   checking = true;
   try {
     const config = settings();
-    if (!config.token) throw new Error("尚未配置 GitHub 只读 Token");
     const remote = await fetchRemoteVersion(config);
     const local = version();
     const upToDate = !greater(remote, local);

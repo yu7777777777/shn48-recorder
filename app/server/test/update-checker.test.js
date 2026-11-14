@@ -78,12 +78,12 @@ test("checkNow notifies once per released version and records state", async () =
   const { calls, restore } = mockFetch(async target => {
     assert.ok(target.includes("/contents/app/VERSION"), "reads the repo VERSION file");
     assert.ok(target.includes("ref=main"), "pins the configured branch");
-    return { ok: true, status: 200, text: async () => "1.34.0\n" };
+    return { ok: true, status: 200, text: async () => "99.0.0\n" };
   });
   try {
     const first = await updateChecker.checkNow();
     assert.equal(first.upToDate, false);
-    assert.equal(first.remoteVersion, "1.34.0");
+    assert.equal(first.remoteVersion, "99.0.0");
     assert.equal(first.notified, true);
     // Delivery is asynchronous: let the notify dispatcher settle.
     await new Promise(resolve => setImmediate(resolve));
@@ -91,9 +91,9 @@ test("checkNow notifies once per released version and records state", async () =
     const hookCalls = calls.filter(call => call.url.startsWith("https://hooks.example.com/"));
     assert.equal(hookCalls.length, 1, "one webhook delivery");
     assert.equal(JSON.parse(hookCalls[0].init.body).event, "update_available");
-    assert.ok(JSON.parse(hookCalls[0].init.body).text.includes("1.34.0"));
+    assert.ok(JSON.parse(hookCalls[0].init.body).text.includes("99.0.0"));
     const state = updateChecker.state();
-    assert.equal(state.lastNotifiedVersion, "1.34.0");
+    assert.equal(state.lastNotifiedVersion, "99.0.0");
     assert.equal(state.upToDate, false);
     assert.ok(state.lastCheckAt);
 
@@ -103,11 +103,11 @@ test("checkNow notifies once per released version and records state", async () =
 
     // A newer version notifies again.
     globalThis.fetch = async url => {
-      if (String(url).startsWith("https://api.github.com/")) return { ok: true, status: 200, text: async () => "1.35.0" };
+      if (String(url).startsWith("https://api.github.com/")) return { ok: true, status: 200, text: async () => "99.1.0" };
       return { ok: true, status: 200, text: async () => '{"ok":true}' };
     };
     const third = await updateChecker.checkNow();
-    assert.equal(third.remoteVersion, "1.35.0");
+    assert.equal(third.remoteVersion, "99.1.0");
     assert.equal(third.notified, true);
   } finally { restore(); }
 });
@@ -133,11 +133,21 @@ test("checkNow surfaces GitHub failures and records lastError", async () => {
   } finally { restore(); }
 });
 
-test("missing token rejects with a named error", async () => {
+test("missing token works anonymously against a public repo", async () => {
   updateChecker.save({ clear: ["token"] });
-  await assert.rejects(() => updateChecker.checkNow(), /尚未配置/);
-  // Restore for any later test or manual runs against this DATA_DIR.
-  updateChecker.save({ token: "github_pat_test1234567890" });
+  const { restore } = mockFetch(async (target, init) => {
+    assert.equal(init?.headers?.Authorization, undefined, "no Authorization header without a token");
+    return { ok: true, status: 200, text: async () => "1.0.0" };
+  });
+  try {
+    const result = await updateChecker.checkNow();
+    assert.equal(result.upToDate, true);
+    assert.equal(result.notified, false);
+  } finally {
+    restore();
+    // Restore for any later test or manual runs against this DATA_DIR.
+    updateChecker.save({ token: "github_pat_test1234567890" });
+  }
 });
 
 test("state persists across module reloads via the data dir", () => {

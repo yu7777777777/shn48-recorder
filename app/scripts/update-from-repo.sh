@@ -30,8 +30,17 @@ say() { echo "[update] $*"; }
 die() { echo "[update] ✗ $*" >&2; exit 1; }
 
 [ "$(id -u)" = "0" ] || die "请以 root 运行"
-[ -f "$KEY_FILE" ] || die "缺少 Deploy Key 私钥 $KEY_FILE（GitHub 仓库 Settings→Deploy keys，只读）"
-chmod 600 "$KEY_FILE"
+# Deploy Key（私有仓库必需）可选：公开仓库可直接匿名 HTTPS 克隆。
+if [ -f "$KEY_FILE" ]; then
+  chmod 600 "$KEY_FILE"
+  CLONE_URL="git@github.com:$REPO.git"
+  CLONE_ENV=(GIT_SSH_COMMAND="ssh -i $KEY_FILE -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" GIT_TERMINAL_PROMPT=0)
+  CLONE_MODE="Deploy Key 只读"
+else
+  CLONE_URL="https://github.com/$REPO.git"
+  CLONE_ENV=(GIT_TERMINAL_PROMPT=0)
+  CLONE_MODE="匿名 HTTPS（公开仓库）"
+fi
 
 WORK="$(mktemp -d /opt/shn48/build-repo-XXXXXX)"
 trap 'rm -rf "$WORK"' EXIT
@@ -61,11 +70,10 @@ if [ "$FREE" -lt "$MIN_FREE_GB" ]; then
 fi
 say "  当前版本 $OLD_VER，可用磁盘 ${FREE}GB"
 
-say "2/7 拉取仓库（浅克隆，Deploy Key 只读）"
-GIT_SSH_COMMAND="ssh -i $KEY_FILE -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" \
-  GIT_TERMINAL_PROMPT=0 \
-  git clone --depth 1 --branch "$BRANCH" "git@github.com:$REPO.git" "$WORK/repo" 2>&1 \
-  | sed 's/^/[update]   /' || die "克隆失败：检查 Deploy Key 权限与网络"
+say "2/7 拉取仓库（浅克隆，$CLONE_MODE）"
+env "${CLONE_ENV[@]}" \
+  git clone --depth 1 --branch "$BRANCH" "$CLONE_URL" "$WORK/repo" 2>&1 \
+  | sed 's/^/[update]   /' || die "克隆失败：检查仓库可见性 / Deploy Key 权限 / 网络"
 
 say "3/7 校验版本前进"
 NEW_VER="$(tr -d '[:space:]' < "$WORK/repo/app/VERSION")"
