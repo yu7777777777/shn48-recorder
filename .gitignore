@@ -40,3 +40,6 @@ Thumbs.db
 
 # Frontend build output (rebuilt inside Docker at release time).
 client/dist/
+
+# Any real env file, whatever its prefix (upstream deploy samples included).
+*.env
