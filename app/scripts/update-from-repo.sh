@@ -161,6 +161,11 @@ docker exec shn48-recorder rm -f /tmp/update-rt.sums
 [ -z "$RT_BAD" ] || { echo "$RT_BAD" | sed 's/^/[update]   /'; die "运行文件哈希核验存在不一致"; }
 say "  $RT_TOTAL 个运行文件哈希全部一致"
 
+# 镜像导出清单即本版本的运行基线：归档到 releases/<版本>/ 供后续核对。
+mkdir -p "$TARGET_DIR/releases/$NEW_VER"
+cp "$WORK/expected-rt.sums" "$TARGET_DIR/releases/$NEW_VER/RUNTIME-SHA256SUMS"
+say "  运行基线已归档：releases/$NEW_VER/RUNTIME-SHA256SUMS"
+
 # 构建缓存是小磁盘服务器的主要累积源：核验通过后立即回收，保证下一次更新仍有余量。
 docker builder prune -f >/dev/null 2>&1 || true
 say "  构建缓存已回收，当前可用 $(free_gb)GB"
