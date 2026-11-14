@@ -22,7 +22,9 @@ BRANCH="${BRANCH:-main}"
 KEY_FILE="${KEY_FILE:-/opt/shn48/config/github-deploy-key}"
 MIN_FREE_GB="${MIN_FREE_GB:-6}"
 TARGET_DIR=/opt/shn48
-COMPOSE="docker compose -f $TARGET_DIR/docker-compose.yml -f $TARGET_DIR/docker-compose.public.yml"
+# 优先 compose v2 插件；旧服务器只有 v1（docker-compose）时回退。
+if docker compose version >/dev/null 2>&1; then COMPOSE_BIN="docker compose"; else COMPOSE_BIN="docker-compose"; fi
+COMPOSE="$COMPOSE_BIN -f $TARGET_DIR/docker-compose.yml -f $TARGET_DIR/docker-compose.public.yml"
 
 say() { echo "[update] $*"; }
 die() { echo "[update] ✗ $*" >&2; exit 1; }
