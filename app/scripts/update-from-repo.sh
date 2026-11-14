@@ -85,6 +85,7 @@ fi
 docker build -t "shn48-shn48:$NEW_VER" \
   --build-arg DEBIAN_MIRROR="${DEBIAN_MIRROR:-http://mirrors.aliyun.com/debian}" \
   --build-arg NPM_REGISTRY="${NPM_REGISTRY:-https://registry.npmmirror.com}" \
+  --build-arg PIP_INDEX_URL="${PIP_INDEX_URL:-https://mirrors.aliyun.com/pypi/simple/}" \
   "$WORK/repo/app" 2>&1 | tail -5 || die "镜像构建失败（已保留缓存，可修复后重试）"
 
 say "5/7 备份并更新 compose（镜像 tag -> $NEW_VER）"
