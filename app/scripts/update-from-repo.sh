@@ -75,6 +75,12 @@ SORTED="$(printf '%s\n%s\n' "$NEW_VER" "$OLD_VER" | sort -V | head -1)"
 [ -f "$WORK/repo/app/RUNTIME-SHA256SUMS" ] || die "仓库缺少 RUNTIME-SHA256SUMS，发布流程未完成"
 say "  $OLD_VER -> $NEW_VER"
 
+# 源码完整性：克隆树必须与发布清单逐字节一致（服务器上无 node，直接 sha256sum -c）。
+say "  核验克隆源码完整性（SHA256SUMS）"
+SRC_BAD="$(cd "$WORK/repo/app" && sha256sum -c SHA256SUMS 2>/dev/null | grep -cv ': OK$' || true)"
+[ "$SRC_BAD" = "0" ] || { cd "$WORK/repo/app" && sha256sum -c SHA256SUMS 2>/dev/null | grep -v ': OK$' | head -10; die "克隆源码与发布清单存在 $SRC_BAD 处不一致"; }
+say "  $(wc -l < "$WORK/repo/app/SHA256SUMS") 项源码哈希一致"
+
 say "4/7 构建镜像 shn48-shn48:$NEW_VER（约 10-20 分钟）"
 # Docker Hub 在部分网络不可达：优先使用本地已有基础镜像，其次走 ECR 公共镜像源兜底。
 if ! docker image inspect node:20-bookworm-slim >/dev/null 2>&1; then
@@ -89,6 +95,14 @@ docker build -t "shn48-shn48:$NEW_VER" \
   --build-arg NPM_REGISTRY="${NPM_REGISTRY:-https://registry.npmmirror.com}" \
   --build-arg PIP_INDEX_URL="${PIP_INDEX_URL:-https://mirrors.aliyun.com/pypi/simple/}" \
   "$WORK/repo/app" 2>&1 | tail -5 || die "镜像构建失败（已保留缓存，可修复后重试）"
+
+# 运行时预期态从「构建出的镜像」导出：vite 产物跨环境非逐字节确定，本地构建的
+# dist 哈希不能作为服务器构建产物的核验基准；镜像本身才是刚审计过的预期。
+say "  从镜像导出运行时预期清单"
+docker run --rm --entrypoint /bin/sh "shn48-shn48:$NEW_VER" -c \
+  'cd /app && find VERSION client/dist server -type f -not -path "*/node_modules/*" | sort | xargs sha256sum' \
+  > "$WORK/expected-rt.sums"
+[ -s "$WORK/expected-rt.sums" ] || die "镜像运行清单导出为空"
 
 say "5/7 备份并更新 compose（镜像 tag -> $NEW_VER）"
 STAMP="$(date +%Y%m%d-%H%M%S)"
@@ -123,11 +137,12 @@ echo "$HB" | grep -q "$NEW_VER" || die "健康接口版本异常：$HB"
 say "  healthy，健康接口返回 $NEW_VER"
 
 say "7/7 运行文件哈希核验"
-docker exec -i shn48-recorder sh -c 'cat > /tmp/update-rt.sums' < "$WORK/repo/app/RUNTIME-SHA256SUMS"
-RT_OUT="$(docker exec shn48-recorder sh -c 'cd /app && sha256sum -c /tmp/update-rt.sums 2>&1 | grep -cv ": OK$" || true')"
-RT_TOTAL="$(docker exec shn48-recorder sh -c 'wc -l < /tmp/update-rt.sums')"
+docker exec -i shn48-recorder sh -c 'cat > /tmp/update-rt.sums' < "$WORK/expected-rt.sums"
+RT_CHECK="$(docker exec shn48-recorder sh -c 'cd /app && sha256sum -c /tmp/update-rt.sums 2>&1' || true)"
+RT_TOTAL="$(echo "$RT_CHECK" | grep -c ': OK$' || true)"
+RT_BAD="$(echo "$RT_CHECK" | grep -v ': OK$' | head -10 || true)"
 docker exec shn48-recorder rm -f /tmp/update-rt.sums
-[ "$RT_OUT" = "0" ] || { docker exec shn48-recorder sh -c 'cd /app && sha256sum -c /tmp/update-rt.sums 2>&1 | grep -v ": OK$" | head -10' || true; die "运行文件哈希核验存在 $RT_OUT 项不一致"; }
+[ -z "$RT_BAD" ] || { echo "$RT_BAD" | sed 's/^/[update]   /'; die "运行文件哈希核验存在不一致"; }
 say "  $RT_TOTAL 个运行文件哈希全部一致"
 
 # 构建缓存是小磁盘服务器的主要累积源：核验通过后立即回收，保证下一次更新仍有余量。
