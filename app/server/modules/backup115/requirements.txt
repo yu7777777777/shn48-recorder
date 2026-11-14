@@ -1,0 +1,2 @@
+# Isolated Python >=3.12 environment. Provider distribution declares MIT.
+p115client==0.0.9.6.5.1

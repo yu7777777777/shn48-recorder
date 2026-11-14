@@ -1,0 +1,11 @@
+FROM shn48-frontend-build:1.32.0 AS frontend
+COPY client/ /build/client/
+COPY VERSION /build/VERSION
+WORKDIR /build/client
+RUN npm run build
+FROM shn48-shn48:1.32.0
+LABEL org.opencontainers.image.version="1.32.1" org.opencontainers.image.revision="release-1.32.1-20261102"
+RUN rm -rf /app/client/dist
+COPY --from=frontend /build/client/dist/ /app/client/dist/
+COPY server/package.json server/package-lock.json /app/server/
+COPY VERSION /app/VERSION

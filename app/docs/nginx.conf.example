@@ -1,0 +1,56 @@
+# Run Nginx as a container attached to the same `shn48-web` Docker network.
+# Replace domains and certificate paths before use.
+
+upstream shn48_backend {
+    server shn48:3000;
+    keepalive 16;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name live.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/live.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/live.example.com/privkey.pem;
+
+    # The public host never exposes the admin UI or admin API. Authentication
+    # remains enforced by Node as the authoritative security boundary.
+    location ^~ /admin { return 404; }
+    location ^~ /api/admin/ { return 404; }
+
+    location ^~ /api/public/streams/ {
+        proxy_pass http://shn48_backend;
+        proxy_buffering off;
+        proxy_request_buffering off;
+        proxy_read_timeout 1h;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    location / {
+        proxy_pass http://shn48_backend;
+        proxy_buffering off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name admin.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/admin.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/admin.example.com/privkey.pem;
+
+    # Optionally add VPN/zero-trust or allow/deny rules here as a second layer.
+    location / {
+        proxy_pass http://shn48_backend;
+        proxy_buffering off;
+        proxy_read_timeout 1h;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}

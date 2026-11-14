@@ -1,0 +1,11 @@
+@use '../../../../common' as common
+
+.templateSelect
+  width: 250px !important
+
+  \:global(.ant-select-selection-item) .deleteIcon
+    display: none
+
+.deleteIcon
+  color: common.$ld-dust-red
+  transform: translateY(5px)

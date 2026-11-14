@@ -1,0 +1,74 @@
+import axios from "axios";
+
+export const publicApi = axios.create({
+  baseURL: "/api/public",
+  withCredentials: false,
+  timeout: 15000,
+});
+
+export const adminApi = axios.create({
+  baseURL: "/api/admin",
+  withCredentials: true,
+  timeout: 20000,
+});
+
+// A rejected request is the only place an ended session becomes observable.
+// Without this the admin console stayed mounted and kept polling after the
+// session expired: every request 401'd, the user saw a stream of error toasts
+// and never reached the login screen. Redirect once and let the caller's own
+// error handling still run.
+let redirecting = false;
+
+adminApi.interceptors.response.use(
+  response => response,
+  error => {
+    const status = error?.response?.status;
+    const url = String(error?.config?.url || "");
+    // The session probe is expected to 401 for a signed-out visitor; that is a
+    // normal answer, not an expiry, so it must not bounce the page.
+    const isSessionProbe = url.includes("/auth/session");
+    // A protected login route has already authenticated our administrator. Its
+    // explicitly marked 401 only rejects third-party credentials, not this session.
+    const credentialPaths = ["/pocket48/login", "/pocket48/login/sms/verify", "/pocket48/token"];
+    const credentialPath = url.split("?")[0].replace(/^\/api\/admin(?=\/)/, "");
+    const isPocketCredentialRejection = String(error?.config?.method).toLowerCase() === "post"
+      && credentialPaths.includes(credentialPath)
+      && error?.response?.data?.errorCode === "POCKET48_LOGIN_REJECTED";
+
+    if (status === 401 && !isSessionProbe && !isPocketCredentialRejection && !redirecting && typeof window !== "undefined") {
+      redirecting = true;
+      const here = window.location.pathname + window.location.search;
+      window.setTimeout(() => {
+        redirecting = false;
+        if (window.location.pathname !== "/admin/login") {
+          window.location.assign(`/admin/login?redirect=${encodeURIComponent(here)}`);
+        }
+      }, 0);
+    }
+    return Promise.reject(error);
+  }
+);
+
+export function payload(response, fallback = null) {
+  const body = response?.data;
+  if (body && Object.prototype.hasOwnProperty.call(body, "data")) return body.data;
+  return body ?? fallback;
+}
+
+export function listPayload(response, keys = []) {
+  const body = payload(response, []);
+  if (Array.isArray(body)) return body;
+  for (const key of keys) {
+    if (Array.isArray(body?.[key])) return body[key];
+  }
+  const nested = body?.content || body?.data;
+  if (Array.isArray(nested)) return nested;
+  for (const key of keys) {
+    if (Array.isArray(nested?.[key])) return nested[key];
+  }
+  return [];
+}
+
+export function errorMessage(error, fallback = "请求失败，请稍后重试") {
+  return error?.response?.data?.error || error?.response?.data?.message || error?.message || fallback;
+}

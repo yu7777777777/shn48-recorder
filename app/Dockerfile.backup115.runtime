@@ -1,0 +1,10 @@
+# Context: wheels/ plus requirements.lock.txt; verified baseline can be overridden explicitly.
+ARG BASE_IMAGE=shn48-shn48:1.23.1
+FROM public.ecr.aws/docker/library/python:3.12.11-slim-bookworm@sha256:519591d6871b7bc437060736b9f7456b8731f1499a57e22e6c285135ae657bf7 AS backup_python
+FROM ${BASE_IMAGE}
+COPY --from=backup_python /usr/local/ /opt/backup115-python/
+RUN /opt/backup115-python/bin/python3.12 -c "import ssl,zlib,ctypes,bz2,lzma,sqlite3" && /opt/backup115-python/bin/python3.12 -m venv /opt/backup115
+COPY wheels/ /tmp/backup115-wheels/
+COPY requirements.lock.txt /tmp/backup115-requirements.lock.txt
+RUN /opt/backup115/bin/python -m pip install --no-index --find-links=/tmp/backup115-wheels --require-hashes -r /tmp/backup115-requirements.lock.txt && /opt/backup115/bin/python -m pip check
+ENV BACKUP115_PYTHON=/opt/backup115/bin/python

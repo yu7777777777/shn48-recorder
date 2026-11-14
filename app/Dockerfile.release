@@ -1,0 +1,27 @@
+# Release-only image: reuse the verified production OS and installed dependencies.
+# Base must contain the verified offline ASR runtime; rebuild dependencies before release.
+ARG BASE_IMAGE=shn48-backup115-runtime:1.0.0
+FROM ${BASE_IMAGE}
+LABEL org.opencontainers.image.version="1.32.4" \
+      org.opencontainers.image.revision="release-1.32.4-20261024" \
+      description="48tools 1.32.4 - private recording hub with public live playback"
+RUN test -x /opt/asr-venv/bin/python && /opt/asr-venv/bin/python -c "import cv2; from PIL import Image" \
+ && /opt/backup115/bin/python -c "import importlib.metadata as m; assert m.version('p115client') == '0.0.9.6.5.1'"
+# Replace the source trees outright rather than layering on top of them.
+#
+# `COPY server/ /app/server/` MERGES into the base image's directory, so any file
+# deleted since the base image was built survived into the new release. A reuse
+# build from 1.20.0 shipped a stale `modules/pocket48/monitor.js` that no longer
+# existed in the source tree.
+#
+# `node_modules` is installed into /app/server by the base image's build step, so
+# it must be preserved: only the source subtrees are cleared, never /app/server
+# itself. The `find` below deletes everything under /app/server except
+# node_modules in one layer, keeping the image from growing a deleted-file tombstone.
+RUN find /app/server -mindepth 1 -maxdepth 1 -not -name node_modules -exec rm -rf {} + \
+ && rm -rf /app/client/dist
+COPY server/ /app/server/
+COPY client/dist/ /app/client/dist/
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+COPY VERSION /app/VERSION

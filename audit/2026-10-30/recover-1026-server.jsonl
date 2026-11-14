@@ -1,0 +1,13 @@
+{"at": "2026-10-30T02:38:29.324Z", "event": "started", "liveId": "1321554233301733376", "freeGiB": 12.3, "thresholdGiB": 4}
+{"at": "2026-10-30T02:38:38.170Z", "event": "progress", "pct": 9, "bytes": 232380784, "freeGiB": 12.07}
+{"at": "2026-10-30T02:38:48.294Z", "event": "progress", "pct": 19, "bytes": 489252140, "freeGiB": 11.84}
+{"at": "2026-10-30T02:38:58.691Z", "event": "progress", "pct": 29, "bytes": 748152580, "freeGiB": 11.6}
+{"at": "2026-10-30T02:39:08.951Z", "event": "progress", "pct": 39, "bytes": 1004574992, "freeGiB": 11.36}
+{"at": "2026-10-30T02:39:19.296Z", "event": "progress", "pct": 49, "bytes": 1261355920, "freeGiB": 11.11}
+{"at": "2026-10-30T02:39:29.597Z", "event": "progress", "pct": 59, "bytes": 1520892364, "freeGiB": 10.87}
+{"at": "2026-10-30T02:39:39.916Z", "event": "progress", "pct": 69, "bytes": 1778131072, "freeGiB": 10.63}
+{"at": "2026-10-30T02:39:50.302Z", "event": "progress", "pct": 79, "bytes": 2035389708, "freeGiB": 10.39}
+{"at": "2026-10-30T02:40:00.568Z", "event": "progress", "pct": 89, "bytes": 2294552596, "freeGiB": 10.15}
+{"at": "2026-10-30T02:40:10.805Z", "event": "progress", "pct": 99, "bytes": 2549894948, "freeGiB": 9.91}
+{"at": "2026-10-30T02:40:11.512Z", "event": "verifying", "pct": 100, "bytes": 2572191936, "freeGiB": 9.9}
+{"at": "2026-10-30T02:48:31.347Z", "event": "failed", "code": "ERR_FS_FILE_TOO_LARGE", "message": "下载处理失败", "freeGiB": 9.97}

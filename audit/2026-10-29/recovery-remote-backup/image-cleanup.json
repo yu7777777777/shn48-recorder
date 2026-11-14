@@ -1,0 +1,141 @@
+{
+  "removed": [
+    {
+      "tag": "shn48-shn48:1.31.1-guard",
+      "code": 0,
+      "note": "Deleted: sha256:dc096407aeeb93ddf05f5fb38a9889a3d7586a231705033fc488d1d53629ac10"
+    },
+    {
+      "tag": "shn48-shn48:1.30.1",
+      "code": 0,
+      "note": "Deleted: sha256:64c8aea1506cc13c9331e030e85f0a7f2dc501a88c4b675733391eab5a39a8e7"
+    },
+    {
+      "tag": "shn48-shn48:1.30.0",
+      "code": 0,
+      "note": "Untagged: shn48-shn48:1.30.0"
+    },
+    {
+      "tag": "shn48-shn48:rollback-1.30.0",
+      "code": 0,
+      "note": "Deleted: sha256:3d46d240de45586039627c0b1063dc9556f34c4d095c7668884ff1cff1526f44"
+    },
+    {
+      "tag": "shn48-shn48:1.29.0",
+      "code": 0,
+      "note": "Deleted: sha256:d433e121f24454074c70ea403ac642cc35e5531cfb4ed09c132044461db93bd4"
+    },
+    {
+      "tag": "shn48-shn48:1.28.14",
+      "code": 0,
+      "note": "Deleted: sha256:ea74154e8e1d1bb2fafa462aab90cf66804b3ec118c52b42d8f719af0ae8e457"
+    },
+    {
+      "tag": "shn48-shn48:1.28.13",
+      "code": 0,
+      "note": "Deleted: sha256:062dd33d03fd3f75b7fd19f123ac2831768a0ddae1584ac20938f141f025bd12"
+    },
+    {
+      "tag": "shn48-shn48:1.28.12",
+      "code": 0,
+      "note": "Deleted: sha256:9879d165f7ed0ef7e05665eadcc48ec721b89a8ba99b7c7670d3eecb0a050038"
+    },
+    {
+      "tag": "shn48-shn48:1.28.11",
+      "code": 0,
+      "note": "Deleted: sha256:03d1a0cfc561e23a227d5850dcb4886a31dc6e91ab28a69aecd19d8b0f5ca4fd"
+    },
+    {
+      "tag": "shn48-shn48:1.28.10",
+      "code": 0,
+      "note": "Deleted: sha256:0cd9e6122e1415628ac5c8ff56cb555657cf1d8b57491d7a6cfbb2209fd19311"
+    },
+    {
+      "tag": "shn48-shn48:1.28.9",
+      "code": 0,
+      "note": "Deleted: sha256:2b9d014c3ade631b65fa16d75db5fb9a62f57474b0153a89412b67645b19fd19"
+    },
+    {
+      "tag": "shn48-shn48:1.28.8",
+      "code": 0,
+      "note": "Deleted: sha256:46c788e10727063e099439828010928b8d695e2600e2e5ab65efae3425e82498"
+    },
+    {
+      "tag": "shn48-shn48:1.28.7",
+      "code": 0,
+      "note": "Deleted: sha256:7ad6cb5cc1bd3b69a41766aaf568a307eedb064595f77acbea4b1bde48951e04"
+    },
+    {
+      "tag": "shn48-shn48:1.28.6",
+      "code": 0,
+      "note": "Deleted: sha256:070e855a2554afd369357367241c73053466e2386dd6a8ad42f172a079c842eb"
+    },
+    {
+      "tag": "shn48-shn48:1.28.5",
+      "code": 0,
+      "note": "Deleted: sha256:95759d28ea3423000217f59c13116e9729fe06965a675ecc78ebee2c49a9d5e3"
+    },
+    {
+      "tag": "shn48-shn48:1.28.4",
+      "code": 0,
+      "note": "Deleted: sha256:a43d2b2c294cc6a379ab941ce5ad6c992133a19f8dfc7d1b71f545a62c6df142"
+    },
+    {
+      "tag": "shn48-shn48:1.28.3",
+      "code": 0,
+      "note": "Deleted: sha256:9231ba675a8e83ca1305c4b9cbccfd6b66a427cc575ccfba6fa9a5b3b00c3af2"
+    },
+    {
+      "tag": "shn48-shn48:1.28.2",
+      "code": 0,
+      "note": "Deleted: sha256:a30c4524ae9dfbd15ebe2927d295ba6fbd8e302517d5e386fc901996752e1850"
+    },
+    {
+      "tag": "shn48-shn48:1.28.1",
+      "code": 0,
+      "note": "Deleted: sha256:54982918625e22730e498c16e0bcaebadb0673dd9454be83b9742dc6379a5ab5"
+    },
+    {
+      "tag": "shn48-shn48:1.28.0",
+      "code": 0,
+      "note": "Deleted: sha256:289f83411e21c6f746da2709d50f8f28e6f2be8d9385195192e94f87e1fe3b61"
+    },
+    {
+      "tag": "flat-test-probe:latest",
+      "code": 0,
+      "note": "Deleted: sha256:7a38f8c4f2d642b2886778fbaac25de3e10fa452138ef9a552074e1d4320ecde"
+    },
+    {
+      "tag": "shn48-shn48:rollback-1.22.0",
+      "code": 0,
+      "note": "Untagged: shn48-shn48:rollback-1.22.0"
+    },
+    {
+      "tag": "shn48-shn48:rollback-1.21.0",
+      "code": 0,
+      "note": "Untagged: shn48-shn48:rollback-1.21.0"
+    },
+    {
+      "tag": "labeltest-c:latest",
+      "code": 0,
+      "note": "Deleted: sha256:cd70bbe9fe23de9844390d5ba39a306501d461ff2a90603a252ed330b0a23ddf"
+    },
+    {
+      "tag": "shn48-flat:1.6.0",
+      "code": 0,
+      "note": "Untagged: shn48-flat:1.6.0"
+    }
+  ],
+  "kept": [
+    "shn48-shn48:1.31.1-fe",
+    "shn48-shn48:1.31.1",
+    "shn48-shn48:rollback-1.31.1",
+    "shn48-shn48:1.31.0",
+    "shn48-shn48:rollback-1.31.0",
+    "shn48-backup115-runtime:1.0.0",
+    "shn48-asr-runtime:1.2.1",
+    "public.ecr.aws/docker/library/python:3.12.11-slim-bookworm"
+  ],
+  "errors": [],
+  "after": "TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE\nImages          6         1         3.85GB    3.845GB (99%)\nContainers      1         1         3.452GB   0B (0%)\nLocal Volumes   4         0         0B        0B\nBuild Cache     0         0         0B        0B\n/dev/vda1        40G   28G   11G  73% /\nrunning healthy\npublic.ecr.aws/docker/library/python:3.12.11-slim-bookworm\nshn48-asr-runtime:1.2.1\nshn48-backup115-runtime:1.0.0\nshn48-shn48:1.31.0\nshn48-shn48:1.31.1\nshn48-shn48:1.31.1-fe\nshn48-shn48:rollback-1.31.0\nshn48-shn48:rollback-1.31.1\n"
+}

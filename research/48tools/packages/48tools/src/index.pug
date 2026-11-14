@@ -1,0 +1,19 @@
+- var imports = require('./entry/imports');
+- var packageJson = require('../package.json');
+
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    title= `48tools - ${ packageJson.version }`
+    include components/basic/Theme/stylesheet
+
+  body.theme
+    div.app#app
+      include components/basic/loading/loading
+
+    include components/basic/initialState/initialState
+    include components/basic/HACK_INTERCEPTS_SEND_Websocket/HACK_INTERCEPTS_SEND_Websocket
+
+    if htmlWebpackPlugin.options.mode === 'development'
+      script(src=imports.dll)

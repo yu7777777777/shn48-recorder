@@ -1,0 +1,53 @@
+{
+  "version": "1.31.1",
+  "manifests": [
+    {
+      "file": "client/package.json",
+      "version": "1.31.1"
+    },
+    {
+      "file": "client/package-lock.json",
+      "version": "1.31.0",
+      "rootPackageVersion": "1.31.0"
+    },
+    {
+      "file": "server/package.json",
+      "version": "1.31.1"
+    },
+    {
+      "file": "server/package-lock.json",
+      "version": "1.31.0",
+      "rootPackageVersion": "1.31.0"
+    }
+  ],
+  "texts": [
+    {
+      "file": "Dockerfile",
+      "containsVersion": false
+    },
+    {
+      "file": "Dockerfile.release",
+      "containsVersion": true
+    },
+    {
+      "file": "README.md",
+      "containsVersion": false
+    },
+    {
+      "file": "client/index.html",
+      "containsVersion": true
+    },
+    {
+      "file": "client/src/App.css",
+      "containsVersion": false
+    },
+    {
+      "file": "scripts/smoke-test.mjs",
+      "containsVersion": false
+    },
+    {
+      "file": "docker-compose.yml",
+      "containsVersion": false
+    }
+  ]
+}

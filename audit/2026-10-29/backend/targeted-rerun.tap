@@ -1,0 +1,66 @@
+﻿TAP version 13
+# Subtest: manual stop immediately archives independently; automatic stop still waits
+ok 1 - manual stop immediately archives independently; automatic stop still waits
+  ---
+  duration_ms: 5012.0075
+  type: 'test'
+  ...
+# Subtest: archive rejects unfinished recordings and paths outside the recording root
+ok 2 - archive rejects unfinished recordings and paths outside the recording root
+  ---
+  duration_ms: 5.5813
+  type: 'test'
+  ...
+# Subtest: mixed-size/audio reconnects merge once, validate, and retain originals
+ok 3 - mixed-size/audio reconnects merge once, validate, and retain originals
+  ---
+  duration_ms: 2997.5829
+  type: 'test'
+  ...
+# Subtest: legacy queued conversion reserves a slot before awaiting and saves one draft
+ok 4 - legacy queued conversion reserves a slot before awaiting and saves one draft
+  ---
+  duration_ms: 2451.4737
+  type: 'test'
+  ...
+# Subtest: offline queue needs installed model, waits during recording and cancels without API calls
+ok 5 - offline queue needs installed model, waits during recording and cancels without API calls
+  ---
+  duration_ms: 405.7836
+  type: 'test'
+  ...
+# Subtest: the offline catalogue offers three pinned tiers and rejects anything else before spawning
+ok 6 - the offline catalogue offers three pinned tiers and rejects anything else before spawning
+  ---
+  duration_ms: 8.3562
+  type: 'test'
+  ...
+# Subtest: remembered login survives process replacement; ordinary login and forged cookies do not
+ok 7 - remembered login survives process replacement; ordinary login and forged cookies do not
+  ---
+  duration_ms: 687.1262
+  type: 'test'
+  ...
+# [auth] remembered session store unavailable; saved sessions rejected
+# [auth] remembered session store unavailable; saved sessions rejected
+# Subtest: logout persists per-device revocation; credential changes revoke all remembered devices after restart
+ok 8 - logout persists per-device revocation; credential changes revoke all remembered devices after restart
+  ---
+  duration_ms: 1177.6411
+  type: 'test'
+  ...
+# Subtest: saved-session corruption fails closed and failed writes never grant a remembered session
+ok 9 - saved-session corruption fails closed and failed writes never grant a remembered session
+  ---
+  duration_ms: 12.3016
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 102754.1448

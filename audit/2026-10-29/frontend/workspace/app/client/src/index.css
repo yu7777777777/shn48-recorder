@@ -1,0 +1,204 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Clean Light Theme Backgrounds */
+  --bg-base: #f4f7fb;
+  --bg-surface: #ffffff;
+  --bg-panel: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafc;
+  --bg-input: #ffffff;
+
+  /* Aliases for components that ask for `--surface` / `--surface-hover`. Those
+     names are used by ReplayAudit.css and App.css but were never defined, so the
+     declarations silently dropped: the audit overview cards and replay-import
+     form lost their background, and replay danmaku hover feedback was
+     invisible. Declaring them here repairs every such use at once. */
+  --surface: var(--bg-surface);
+  --surface-hover: var(--bg-card-hover);
+
+  /* Borders */
+  --border: #dfe7f1;
+  --border-soft: #edf2f7;
+  --border-focus: #2563eb;
+
+  /* Text Colors */
+  --text-main: #0f172a;
+  --text-soft: #334155;
+  --text-muted: #64748b;
+  /* 原为 #94a3b8：在白底仅 2.56:1、在 --bg-panel 上仅 2.34:1，未达 WCAG AA
+     (4.5:1)，而它被用于 10-11px 的表头与 .stat-label——极小字号配最浅颜色。
+     #5e7089 实测白底 5.05:1、面板底 4.61:1，两种底色均通过 AA，
+     且仍明显浅于 --text-muted (#64748b)，保持四级层级中的最浅一级。 */
+  --text-dim: #5e7089;
+
+  /* `--text-secondary` predates `--text-muted` and is still requested by
+     AnalysisPanel.css and Pocket48.css. Those uses carry a literal fallback so
+     they render correctly, but leaving the name undefined means the intended
+     token system is quietly bypassed. Point it at the same value. */
+  --text-secondary: var(--text-muted);
+
+  /* Clean Brand & Accents */
+  --accent: #315bea;
+  --accent-hover: #2448c7;
+  --accent-soft: rgba(49, 91, 234, 0.09);
+  --accent-glow: rgba(49, 91, 234, 0.22);
+
+  /* Status Colors */
+  --live: #ef4444;
+  --live-soft: rgba(239, 68, 68, 0.09);
+  --live-glow: rgba(239, 68, 68, 0.25);
+  --success: #10b981;
+  --success-soft: rgba(16, 185, 129, 0.09);
+  --warning: #f59e0b;
+  --warning-soft: rgba(245, 158, 11, 0.09);
+  --danger: #ef4444;
+  --danger-soft: rgba(239, 68, 68, 0.09);
+  --info: #0284c7;
+  --info-soft: rgba(2, 132, 199, 0.09);
+
+  /* Radius & Clean Shadows */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+  --shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  --shadow-lg: 0 12px 32px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+  --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.15);
+
+  /* Typography scale.
+     These values are the existing maximum-common-divisors of the stylesheets,
+     not new design decisions: before this block the codebase used 14 distinct
+     px font sizes (11px/12px/13px appeared 95 times between them, a 1px apart),
+     so three nominal levels rendered as one. Naming them freezes the de-facto
+     scale so it can be referenced instead of re-guessed. */
+  --text-2xs: 10px;   /* table headers, sidebar group labels, tiny badges */
+  --text-xs: 11px;    /* badges, .stat-label, helper text */
+  --text-sm: 12px;    /* card subtitles, timestamps, secondary info */
+  --text-base: 13px;  /* body copy, buttons, tables, forms (the main size) */
+  --text-md: 14px;    /* brand name, login button */
+  --text-lg: 16px;    /* card titles */
+  --text-xl: 20px;    /* page section headings */
+  --text-2xl: 24px;   /* page main headings */
+  --text-3xl: 28px;   /* large stat numbers */
+
+  /* Font weights. 400-800 are exactly the range loaded from Google Fonts
+     (see the @import above). A stray `font-weight: 750` existed in App.css and
+     was outside that list, so the browser synthesised faux-bold and the glyphs
+     rendered visibly lighter/blurrier than every other bold face. */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-heavy: 800;
+
+  /* 4px spacing grid. The stylesheets previously used 28 distinct px spacing
+     values with no common step (10/12/16 all in heavy use), which made card
+     padding drift by 2px between adjacent components. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  /* Pocket48 conversation-column accents. These stay at their literal values
+     (they intentionally distinguish the three columns); they are named here so
+     the page stylesheet stops hardcoding them. */
+  --column-members: #50a599;
+  --column-notify: #b18bd3;
+  --bubble-notify-bg: #f6f0fc;
+  --bubble-notify-border: #e9ddf4;
+}
+
+html, body, #root {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-main);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* Typography Defaults */
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+}
+
+button, input, textarea, select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* Custom Clean Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.18);
+  color: var(--text-main);
+}

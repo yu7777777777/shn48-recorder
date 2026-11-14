@@ -1,0 +1,1056 @@
+{
+  "metadata": {
+    "startedAt": "2026-10-30T08:50:33.466Z",
+    "dist": "D:\\飞牛同步\\AI资料库\\AI项目空间\\shn48录制\\app\\client\\dist",
+    "manifest": [
+      {
+        "file": "assets/AdminLogin-Bw9v1m5h.js",
+        "sha256": "af3b4cb8baaa5a9587d655bf27554e77945926226e80bf36044666cd5c60a536",
+        "bytes": 3678
+      },
+      {
+        "file": "assets/AnalysisPanel-BkQ8dXnA.css",
+        "sha256": "464cd33d8f2d13eda62fdf2778959eef5616b7889921c4018d998b2d6e191a68",
+        "bytes": 7032
+      },
+      {
+        "file": "assets/AnalysisSettings-BcM-q6x4.js",
+        "sha256": "0fb9f2a6592629bf166bb765a9b5a191746a4dadeb31ca0803a0a99a96d95790",
+        "bytes": 17953
+      },
+      {
+        "file": "assets/AutoRecord-B2pq0_NA.js",
+        "sha256": "aa8cae2801a6c23342383ae86051ec58d5cda94e8a26dbef8e0cbd487ee97401",
+        "bytes": 19468
+      },
+      {
+        "file": "assets/Backup115-EI98zjVG.css",
+        "sha256": "8cd180b24850e5d920cb7fb5f58009f3fd10922f751a89fccc46765d79ab7109",
+        "bytes": 2092
+      },
+      {
+        "file": "assets/Badge-Ck0ivRD_.js",
+        "sha256": "6a45349dc3c1b4bd7b917c67f5da2a45dc73acc32f5aa8ebc1d8f81aed183db5",
+        "bytes": 1316
+      },
+      {
+        "file": "assets/Bilibili-CiUektD9.js",
+        "sha256": "4c46364a810ff9e86777fbf7fbde15a32f4efb9628c5f73612fec33619f210e2",
+        "bytes": 14576
+      },
+      {
+        "file": "assets/Config-AgZHuzYQ.js",
+        "sha256": "a25ad24ab1a6737044a3db8a6d84dbbcd6f4251f8fc0ae1e66869f96e06165e1",
+        "bytes": 14209
+      },
+      {
+        "file": "assets/ConfirmModal-nNhcG020.js",
+        "sha256": "9327835eafb2c42fa4e628eb8bffcf10285dcd6d632f39bbecb12c2fae2ba380",
+        "bytes": 1409
+      },
+      {
+        "file": "assets/CoverPicker-Dj830Zr8.js",
+        "sha256": "cd444e3ee2efea9ba74181e5536022e6ec2da797253029ad4c12124509d3c5a3",
+        "bytes": 5618
+      },
+      {
+        "file": "assets/Dashboard-D1Y0jHTJ.js",
+        "sha256": "3003753750e860219846a0ba6349f5a788bfd56bd58f4e25b8d9abdc73c97e9d",
+        "bytes": 12215
+      },
+      {
+        "file": "assets/EmptyState-WvCfRJCo.js",
+        "sha256": "07bb4ec4537e5ad93877d1ab253a40641281166c1c53284e0da10ac17156ad7b",
+        "bytes": 414
+      },
+      {
+        "file": "assets/flv-CwS9Olga.js",
+        "sha256": "edcc4640166b31184436cc126394ef9efcf8f5c124875832e511d2128f2f8477",
+        "bytes": 156599
+      },
+      {
+        "file": "assets/hls-bsuTaLC4.js",
+        "sha256": "cec67e93b2b991370728742027028a312b77a07cabbe476e8ab4c2e3048ff435",
+        "bytes": 595074
+      },
+      {
+        "file": "assets/index-BordJ24f.js",
+        "sha256": "6c84821b66ca62d79ab535d667f70273bc32d448d57dccd9803efda70036d1de",
+        "bytes": 75212
+      },
+      {
+        "file": "assets/index-DViFHOo8.css",
+        "sha256": "0d5bd6be151effc05c1bd39d247e62a31c6ee0cffecf787b5d46948e370d6a48",
+        "bytes": 56439
+      },
+      {
+        "file": "assets/Live-DK-Z9K9y.js",
+        "sha256": "f56828c4b8020e0f55373b29bbee96c36ce59a447ce9f8f2fcec04c5ca645ef9",
+        "bytes": 6417
+      },
+      {
+        "file": "assets/PlatformIcon-B6krSZ4-.js",
+        "sha256": "6d2b100daf303bb58f81aff9c4cb6e95811ba2acc2ddb4eb3d786baa361eaa96",
+        "bytes": 2182
+      },
+      {
+        "file": "assets/Pocket48-DOJWnYeP.js",
+        "sha256": "7631cd5f223de585eb1e8b5ffaaf1427e62d7fd870bd6105401ab7a112ad5b6a",
+        "bytes": 28401
+      },
+      {
+        "file": "assets/pocket48-message-56SyfPP3.js",
+        "sha256": "a90d570839c6016c821a86e542f2859f28f6c7eb222d0a84d5f5cd656ed29c24",
+        "bytes": 1976
+      },
+      {
+        "file": "assets/Pocket48-Y86fP4VL.css",
+        "sha256": "11f6a3b6b1ac39d77bb32300cb2282519a90c2301608cba407cad0fd42086757",
+        "bytes": 18731
+      },
+      {
+        "file": "assets/ProgressBar-CWbzFSLF.js",
+        "sha256": "f81acda05929470c541fb2d9448f16ad0448bb6e4fa0baf5373f043b168bb424",
+        "bytes": 502
+      },
+      {
+        "file": "assets/PublicLive-WN_Sf41X.js",
+        "sha256": "404ea332d016b4d36a0a12a163e75d8b4ffbfa50fd7f9fa4e95fe0777d09e3f1",
+        "bytes": 9469
+      },
+      {
+        "file": "assets/PublicMediaTabs-CNwgHztr.js",
+        "sha256": "66f99e9bb52c5106c2313618fe5514fa154559d9ae4541cc430bb442a9e28eb2",
+        "bytes": 1055
+      },
+      {
+        "file": "assets/PublicMediaTabs-DdrGYLtM.css",
+        "sha256": "fcb13cf23506a57b3a228767e23aa0874dfc3cb0d320b8093947eda2b892ff5d",
+        "bytes": 12790
+      },
+      {
+        "file": "assets/PublicReplay-CXtfleox.js",
+        "sha256": "ddc7542a99d7a7eafd4fea4f4973296fffc21e05564aedbaa9beecbafb95b852",
+        "bytes": 22517
+      },
+      {
+        "file": "assets/PublicReplay-DPcFy0ud.css",
+        "sha256": "ffa09f49d47374f3c9a24dd1350a67412cbf8a04309bc3b9d43300f32da1127f",
+        "bytes": 1643
+      },
+      {
+        "file": "assets/PublicSocial-BHpoy8dJ.js",
+        "sha256": "19d01a8e038bc56e83f5dcbcf367d208c26a3e48d6120d0b99f25495c90ab3a3",
+        "bytes": 3130
+      },
+      {
+        "file": "assets/RecordingDetail-mbL4JAjz.css",
+        "sha256": "9838b7d6e3eba2ecd8d4e758fbd6c4684ed1798b2e50b9df0ce8eefbe302fa11",
+        "bytes": 8622
+      },
+      {
+        "file": "assets/RecordingDetail-NA4aRXCj.js",
+        "sha256": "d7a67846c2d2d130898f5519e76b4a91cada6428c243a61c7c2737e9805c8049",
+        "bytes": 38060
+      },
+      {
+        "file": "assets/ReplayAnalysisImport-CBTwy1Dt.js",
+        "sha256": "a914338e99dbf2ca1142cc423d68feb1418c06ff32399538a3b7f529aa64da9d",
+        "bytes": 6612
+      },
+      {
+        "file": "assets/ReplayAnalysisImport-Dd1tXUgP.css",
+        "sha256": "3ebd798811c19dcb27ea0f5e82189a4b4e00998f940124c0026bbb775400b13b",
+        "bytes": 1098
+      },
+      {
+        "file": "assets/ReplayAudit-BJr3-GM5.css",
+        "sha256": "b6ed402a9fe27f6e0775bace82de608a159cfde6624956cd6da3cf65568079a6",
+        "bytes": 2743
+      },
+      {
+        "file": "assets/ReplayAudit-pyiL3QDz.js",
+        "sha256": "048feb2af06a74d1a102aa8cfcaddc1278f919e01df8fd7a70c9dee555d4480a",
+        "bytes": 11237
+      },
+      {
+        "file": "assets/ReplayRecovery-D9tPCPyJ.js",
+        "sha256": "cf61a12fdce3d87711046b7781e25f6642dab0d2077b4c7bc38194c397307b16",
+        "bytes": 2112
+      },
+      {
+        "file": "assets/SafeImage-BW8xs7Pb.js",
+        "sha256": "7931ddc0136aa94aacf58d6554d6f2908009300d7de81fda6c4c6e02814deb76",
+        "bytes": 270
+      },
+      {
+        "file": "assets/Security-DMCN7Gpj.js",
+        "sha256": "dad1a5c2a92173f8294e28538c9033e2e1959d388b8b818ff70c178faf2a3631",
+        "bytes": 8038
+      },
+      {
+        "file": "assets/SocialAccounts-DRTAAXZm.css",
+        "sha256": "44076ee99abb33e9111e6a8692b8ac7e121a66750930d564b2399fddfa648bcd",
+        "bytes": 13774
+      },
+      {
+        "file": "assets/SocialAccounts-EkzdBU_m.js",
+        "sha256": "4571785ad1080127fc5fc34328316aa1d146132d8e7a803c8b2ab209ae8c07dd",
+        "bytes": 28470
+      },
+      {
+        "file": "assets/usePolling-BAQwvtF_.js",
+        "sha256": "4a0a959bf4d3e630d54d2d3d5e3353db173b6fb7175fb299609e0bf0aca81830",
+        "bytes": 699
+      },
+      {
+        "file": "assets/vendor-react-CUnftwWn.js",
+        "sha256": "7eef454e6e1f5970ae9a2d31c77e36cfa6c22ab42575afa1209cbad75273245c",
+        "bytes": 166196
+      },
+      {
+        "file": "assets/Video-wszfEmPg.js",
+        "sha256": "3fb6d14bad83e3bbb36acd6b7714530ff88a17337da1a95ae0b1d3e775726c05",
+        "bytes": 27858
+      },
+      {
+        "file": "assets/VideoPlayer-DnwnlIpL.js",
+        "sha256": "77ce8b24804c2f0e108ca97784a9d8cdf817e19cd6b0b9f5f1b00eb50f6f9289",
+        "bytes": 14659
+      },
+      {
+        "file": "favicon.svg",
+        "sha256": "48e4515f1ddc21080f297326124c47f69735b1daa88a445d70c65718923390a1",
+        "bytes": 487
+      },
+      {
+        "file": "index.html",
+        "sha256": "79890f0281af610e1cbf8a3f5343cdbf6e661e3cd170b93af19a3ba60f013f61",
+        "bytes": 579
+      }
+    ],
+    "node": "v24.21.0",
+    "chromePath": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    "fixtureLimitations": [
+      "API为固定虚构数据，认证仅本地mock，不验证真实鉴权/接口/录制任务。",
+      "无媒体流；回放详情截图中的“播放接口没有返回播放地址”为明确模拟的无流状态，不是生产故障。",
+      "缺省图片为空，覆盖团体色封面和头像fallback；不访问外部图片。"
+    ],
+    "unknownApi": [
+      {
+        "method": "GET",
+        "path": "/admin/backup115/"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/backup115/"
+      }
+    ],
+    "browserVersion": "156.0.8078.49",
+    "finishedAt": "2026-10-30T08:51:17.870Z",
+    "serverClosed": true
+  },
+  "results": [
+    {
+      "name": "live-list",
+      "route": "/",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "finalPath": "/",
+      "bodyText": "48tools\n正在直播\n3\n往期重播\n正在直播\n3\n刷新\nSNH48\nLIVE\n视频直播\nS\n今天也一起聊聊天\nSNH48-王睿琦 · 10-30 16:00\nGNZ48\nLIVE\n电台\nG\n周五的练习室日记\nGNZ48-陈珂 · 10-30 16:10\nBEJ48\nLIVE\n视频直播\nB\n下班后的一点小分享\nBEJ48-张笑盈 · 10-30 16:20",
+      "layout": {
+        "viewport": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "horizontalOverflow": false,
+        "overflowElements": []
+      },
+      "screenshot": "live-list-1440.png",
+      "pass": true
+    },
+    {
+      "name": "replay-list",
+      "route": "/replays",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "finalPath": "/replays",
+      "bodyText": "48tools\n正在直播\n往期重播\n往期公开重播\n全部\nSNH48\nBEJ48\nGNZ48\nCKG48\nCGT48\nSNH48\n视频\n30:00\nS\n秋日散步与今天的小确幸\nSNH48-王睿琦 · 10-29 19:30\nGNZ48\n电台\n35:31\nG\n晚安电台：听一首喜欢的歌\nGNZ48-陈珂 · 10-29 19:30\nBEJ48\n视频\n41:02\nB\n练习室下班后的日常分享\nBEJ48-张笑盈 · 10-29 19:30\nSNH48\n视频\n46:33\nS\n新舞台准备中，来聊聊近况\nSNH48-王睿琦 · 10-29 19:30\nGNZ48\n电台\n52:04\nG\n周末见面之前的碎碎念\nGNZ48-陈珂 · 10-29 19:30\nBEJ48\n视频\n57:35\nB\n一起记录普通但开心的一天\nBEJ48-张笑盈 · 10-29 19:30",
+      "layout": {
+        "viewport": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "horizontalOverflow": false,
+        "overflowElements": []
+      },
+      "screenshot": "replay-list-1440.png",
+      "pass": true
+    },
+    {
+      "name": "replay-detail",
+      "route": "/replays/replay-1",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "finalPath": "/replays/replay-1",
+      "bodyText": "48tools\n正在直播\n往期重播\n返回列表\n观看版式\n竖屏\n横屏\n重播暂时无法播放\n播放接口没有返回播放地址\n重试\n视频\n秋日散步与今天的小确幸\n\nSNH48-王睿琦\n·\n10-29 19:30\n·\n30:00\n\n下载视频\n复制回放链接\n内容总结\nAI 生成，仅供参考\n\n成员分享了练习、舞台准备与日常心情。这是用于独立截图验证的虚构内容。\n\n开场问候\n聊聊今天的练习日常。\n近况分享\n舞台准备中的小故事。\n更多近期重播\nSNH48\n视频\n30:00\nS\n秋日散步与今天的小确幸\nSNH48-王睿琦 · 10-29 19:30\nGNZ48\n电台\n35:31\nG\n晚安电台：听一首喜欢的歌\nGNZ48-陈珂 · 10-29 19:30\nBEJ48\n视频\n41:02\nB\n练习室下班后的日常分享\nBEJ48-张笑盈 · 10-29 19:30\nSNH48\n视频\n46:33\nS\n新舞台准备中，来聊聊近况\nSNH48-王睿琦 · 10-29 19:30\nGNZ48\n电台\n52:04\nG\n周末见面之前的碎碎念\nGNZ48-陈珂 · 10-29 19:30\nBEJ48\n视频\n57:35\nB\n一起记录普通但开心的一天\nBEJ48-张笑盈 · 10-29 19:30",
+      "layout": {
+        "viewport": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "horizontalOverflow": false,
+        "overflowElements": []
+      },
+      "screenshot": "replay-detail-1440.png",
+      "pass": true
+    },
+    {
+      "name": "admin-overview",
+      "route": "/admin/overview",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "finalPath": "/admin/overview",
+      "bodyText": "48tools\n管理台\n工作台\n总览\n直播管理\n自动录制\n口袋48\n录像归档\n内容工具\n回放分析\n历史审计\n成员社交账号\n字幕与 AI\n系统\nB站草稿\n系统设置\n账户安全\n退出\nv1.31.1\nCONTROL ROOM\n系统总览\n\n直播发现、实时录制、归档存储与 B站草稿发布状态集中监视。\n\n数据已同步\n每 10 秒自动更新\n刷新\n当前公开直播\n3\n可在公开页直接观看\n正在录制任务\n0\n无活动录制\n全部归档\n3\n共计 3 条归档记录\nB站待上传队列\n0\n排队或正在上传草稿\n正在录制监视\n\n录制任务在后台独立运行，关闭页面不会中断录制\n\n直播管理\n当前无正在录制的任务\n\n成员开播后可在「直播管理」手动录制，或配置「自动录制」监控。\n\n服务运行概况\n\n录播中枢系统状态与存储健康度\n\n运行正常\n服务在线时长\n24 小时\n录像占用空间\n—\n可用磁盘空间\n560.0 GB\n磁盘使用率\n45.3%\n最近归档录像\n\n录制完成后的录像文件，可在线回放或推送到 B站草稿箱\n\n全部归档\n录像名称\t来源渠道\t录制状态\t录制时间\t文件体积\nSNH48-王睿琦-秋日散步与今天的小确幸\tpocket48\t已归档\t2026/10/29 19:30:00\t233.0 MB\nGNZ48-陈珂-晚安电台：听一首喜欢的歌\tpocket48\t已归档\t2026/10/29 19:30:00\t233.0 MB\nBEJ48-张笑盈-练习室下班后的日常分享\tpocket48\t已归档\t2026/10/29 19:30:00\t233.0 MB",
+      "layout": {
+        "viewport": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "horizontalOverflow": false,
+        "overflowElements": []
+      },
+      "screenshot": "admin-overview-1440.png",
+      "pass": true
+    },
+    {
+      "name": "admin-auto-record",
+      "route": "/admin/auto-record",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "finalPath": "/admin/auto-record",
+      "bodyText": "48tools\n管理台\n工作台\n总览\n直播管理\n自动录制\n口袋48\n录像归档\n内容工具\n回放分析\n历史审计\n成员社交账号\n字幕与 AI\n系统\nB站草稿\n系统设置\n账户安全\n退出\nv1.31.1\nAUTOMATION\n自动录制\n\n配置监控名单与并发策略，成员开播后系统将自动启动后台录制并存为 B站草稿。\n\n保存自动录制配置\n\n进入口袋48：个人资料、每日签到与房间消息 →\n\n自动录制、公开直播和成员名单均不依赖口袋48登录；登录仅用于需要账号权限的功能。\n口袋48 账号绑定状态\n游客模式\n\n自动录制和公开直播可直接使用；登录仅用于需要账号权限的功能\n\n登录口袋48账号\n监控全局配置\n\n设置自动录制主开关及最大同时录制路数（1–20 场）\n\n启用全局自动录制\n开启后后台将按监控列表自动发现并录制开播\n同时最大录制路数\n2 场\n1 场 (低配)\n10 场\n20 场 (满载)\n监控成员名单 (共 3 位现役成员，1 人已选)\n\n点击成员卡片即可加入或移出监控；可随时调节录制优先级\n\n刷新名单\n团体筛选：\n全部组织\nSNH48\nGNZ48\n请先选择团体\nS\nSNH48-王睿琦\nTEAM X\nS\nSNH48-杨冰怡\nTEAM X\nG\nGNZ48-陈珂\nTEAM G\n手动添加成员 ID（高级模式）",
+      "layout": {
+        "viewport": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "horizontalOverflow": false,
+        "overflowElements": []
+      },
+      "screenshot": "admin-auto-record-1440.png",
+      "pass": true
+    },
+    {
+      "name": "admin-pocket48",
+      "route": "/admin/pocket48",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [
+        "打开王睿琦房间并验证消息"
+      ],
+      "status": 200,
+      "finalPath": "/admin/pocket48",
+      "bodyText": "48tools\n管理台\n工作台\n总览\n直播管理\n自动录制\n口袋48\n录像归档\n内容工具\n回放分析\n历史审计\n成员社交账号\n字幕与 AI\n系统\nB站草稿\n系统设置\n账户安全\n退出\nv1.31.1\nPOCKET48\n口袋48\n\n管理成员关注，阅读房间消息；账号与签到在此设置。\n\n账号与签到\n1\n成员关注\n3\n\n按队伍分组；点亮星标即关注该成员，写入口袋48账号。上方可按「已关注 / 正常 / 已收回」只看对应成员。\n\n全部\n3\n已关注\n1\n正常\n2\n已收回\n1\n收起全部队伍\nTEAM X\n2\n王睿琦\n67362328\n杨冰怡\n67333093\n其他\n1\n袋王\n67236601\n已收回\n\n已关注 1 / 共 3 位成员\n\nSNH48-王睿琦\n67362328\n全部消息\n仅成员\n成员＋粉丝的全部聊天 · 最新消息在上方\n2 条\n刷新\n今天 · 2026-10-30 周五\nSNH48-王睿琦\n16:01\n\n明天也继续加油，大家记得早点休息。\n\nSNH48-王睿琦\n16:00\n\n晚上好！今天的练习顺利结束啦。\n\n已经读到最早一条消息\n\n看不到消息？检查读取链路",
+      "layout": {
+        "viewport": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "horizontalOverflow": false,
+        "overflowElements": []
+      },
+      "screenshot": "admin-pocket48-1440.png",
+      "pass": true
+    },
+    {
+      "name": "admin-archive",
+      "route": "/admin/archive",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 501 (Not Implemented)"
+      ],
+      "consoleWarnings": [],
+      "httpErrors": [
+        {
+          "url": "http://127.0.0.1:21346/api/admin/backup115/",
+          "status": 501
+        }
+      ],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "finalPath": "/admin/archive",
+      "bodyText": "48tools\n管理台\n工作台\n总览\n直播管理\n自动录制\n口袋48\n录像归档\n内容工具\n回放分析\n历史审计\n成员社交账号\n字幕与 AI\n系统\nB站草稿\n系统设置\n账户安全\n退出\nv1.31.1\nARCHIVE\n录像归档\n\n检查录制结果、在线播放录像切片，并将完成的录像送入 B站草稿箱。\n\n官方回放分析\n刷新归档\n归档录像\n3\n磁盘实际 3 个文件 · 699.0 MB\n就绪可上传\n3\n录制完成且未推送\n草稿流程中\n0\n已排队、上传或入草稿箱\n可用磁盘\n560.0 GB\n总计 1.0 TB · 已用 45.3%\n全部归档列表\n\n录像文件存储于私有服务目录，不会在公开页面暴露\n\n全部\n可上传\n上传中\n已进草稿\n自动录制支持官方回放补全断流后合并同场片段；结束时先下载官方回放，完整校验并对比后再替换和上传。失败则保留原录像，成功也保留原片备份。\n批量重新生成\n勾选未上传录像，按原封面 → 智能选帧 → 成员模板重新生成，最多 100 条。\n115归档备份\n\n独立批选，已传B站的归档也可备份；本地文件保留。\n\n选择可备份归档\n清空115选择\n备份所选到115（0）\n刷新115状态\n\n115备份服务尚未启用\n\nUnmocked audit endpoint: /admin/backup115/\n\n共 3 条录像\n封面与标题 · 状态 · 文件信息 · 操作\nSNH48-王睿琦-秋日散步与今天的小确幸\npocket48\n已归档\n未上传\n选择封面\n暂无封面\nMP4 录像文件\n大小 233.0 MB\n录制 2026/10/29 19:30:00\n115备份\n未备份\n备份到115\n播放\n下载\n送入B站草稿\n删除\nGNZ48-陈珂-晚安电台：听一首喜欢的歌\npocket48\n已归档\n未上传\n选择封面\n暂无封面\nMP4 录像文件\n大小 233.0 MB\n录制 2026/10/29 19:30:00\n115备份\n未备份\n备份到115\n播放\n下载\n送入B站草稿\n删除\nBEJ48-张笑盈-练习室下班后的日常分享\npocket48\n已归档\n未上传\n选择封面\n暂无封面\nMP4 录像文件\n大小 233.0 MB\n录制 2026/10/29 19:30:00\n115备份\n未备份\n备份到115\n播放\n下载\n送入B站草稿\n删除\n磁盘文件清单 · 3 个文件\n\n录像共占用 699.0 MB，其中原始片段和遗留文件占用 —。按磁盘实际文件统计。\n\n文件名称\t用途\t实际大小\t操作",
+      "layout": {
+        "viewport": 1440,
+        "documentWidth": 1440,
+        "bodyWidth": 1440,
+        "horizontalOverflow": false,
+        "overflowElements": []
+      },
+      "screenshot": "admin-archive-1440.png",
+      "pass": false
+    },
+    {
+      "name": "admin-login",
+      "route": "/admin/login",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "error": "locator.waitFor: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input').first() to be visible\u001b[22m\n\n    at run (D:\\飞牛同步\\AI资料库\\AI项目空间\\shn48录制\\audit\\2026-10-30\\frontend-redesign\\visual-smoke.cjs:78:161)",
+      "pass": false,
+      "screenshot": "admin-login-1440-failure.png",
+      "bodyText": "48tools\n管理台\n工作台\n总览\n直播管理\n自动录制\n口袋48\n录像归档\n内容工具\n回放分析\n历史审计\n成员社交账号\n字幕与 AI\n系统\nB站草稿\n系统设置\n账户安全\n退出\nv1.31.1\nCONTROL ROOM\n系统总览\n\n直播发现、实时录制、归档存储与 B站草稿发布状态集中监视。\n\n数据已同步\n每 10 秒自动更新\n刷新\n当前公开直播\n3\n可在公开页直接观看\n正在录制任务\n0\n无活动录制\n全部归档\n3\n共计 3 条归档记录\nB站待上传队列\n0\n排队或正在上传草稿\n正在录制监视\n\n录制任务在后台独立运行，关闭页面不会中断录制\n\n直播管理\n当前无正在录制的任务\n\n成员开播后可在「直播管理」手动录制，或配置「自动录制」监控。\n\n服务运行概况\n\n录播中枢系统状态与存储健康度\n\n运行正常\n服务在线时长\n24 小时\n录像占用空间\n—\n可用磁盘空间\n560.0 GB\n磁盘使用率\n45.3%\n最近归档录像\n\n录制完成后的录像文件，可在线回放或推送到 B站草稿箱\n\n全部归档\n录像名称\t来源渠道\t录制状态\t录制时间\t文件体积\nSNH48-王睿琦-秋日散步与今天的小确幸\tpocket48\t已归档\t2026/10/29 19:30:00\t233.0 MB\nGNZ48-陈珂-晚安电台：听一首喜欢的歌\tpocket48\t已归档\t2026/10/29 19:30:00\t233.0 MB\nBEJ48-张笑盈-练习室下班后的日常分享\tpocket48\t已归档\t2026/10/29 19:30:00\t233.0 MB"
+    },
+    {
+      "name": "live-list",
+      "route": "/",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "finalPath": "/",
+      "bodyText": "48tools\n正在直播\n3\n往期重播\n正在直播\n3\n刷新\nSNH48\nLIVE\n视频直播\nS\n今天也一起聊聊天\nSNH48-王睿琦 · 10-30 16:00\nGNZ48\nLIVE\n电台\nG\n周五的练习室日记\nGNZ48-陈珂 · 10-30 16:10\nBEJ48\nLIVE\n视频直播\nB\n下班后的一点小分享\nBEJ48-张笑盈 · 10-30 16:20",
+      "layout": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "horizontalOverflow": false,
+        "overflowElements": []
+      },
+      "screenshot": "live-list-390.png",
+      "pass": true
+    },
+    {
+      "name": "replay-list",
+      "route": "/replays",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "finalPath": "/replays",
+      "bodyText": "48tools\n正在直播\n往期重播\n往期公开重播\n全部\nSNH48\nBEJ48\nGNZ48\nCKG48\nCGT48\nSNH48\n视频\n30:00\nS\n秋日散步与今天的小确幸\nSNH48-王睿琦 · 10-29 19:30\nGNZ48\n电台\n35:31\nG\n晚安电台：听一首喜欢的歌\nGNZ48-陈珂 · 10-29 19:30\nBEJ48\n视频\n41:02\nB\n练习室下班后的日常分享\nBEJ48-张笑盈 · 10-29 19:30\nSNH48\n视频\n46:33\nS\n新舞台准备中，来聊聊近况\nSNH48-王睿琦 · 10-29 19:30\nGNZ48\n电台\n52:04\nG\n周末见面之前的碎碎念\nGNZ48-陈珂 · 10-29 19:30\nBEJ48\n视频\n57:35\nB\n一起记录普通但开心的一天\nBEJ48-张笑盈 · 10-29 19:30",
+      "layout": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "horizontalOverflow": false,
+        "overflowElements": []
+      },
+      "screenshot": "replay-list-390.png",
+      "pass": true
+    },
+    {
+      "name": "replay-detail",
+      "route": "/replays/replay-1",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "finalPath": "/replays/replay-1",
+      "bodyText": "48tools\n正在直播\n往期重播\n返回列表\n观看版式\n竖屏\n横屏\n重播暂时无法播放\n播放接口没有返回播放地址\n重试\n视频\n秋日散步与今天的小确幸\n\nSNH48-王睿琦\n·\n10-29 19:30\n·\n30:00\n\n下载视频\n复制回放链接\n内容总结\nAI 生成，仅供参考\n\n成员分享了练习、舞台准备与日常心情。这是用于独立截图验证的虚构内容。\n\n开场问候\n聊聊今天的练习日常。\n近况分享\n舞台准备中的小故事。\n更多近期重播\nSNH48\n视频\n30:00\nS\n秋日散步与今天的小确幸\nSNH48-王睿琦 · 10-29 19:30\nGNZ48\n电台\n35:31\nG\n晚安电台：听一首喜欢的歌\nGNZ48-陈珂 · 10-29 19:30\nBEJ48\n视频\n41:02\nB\n练习室下班后的日常分享\nBEJ48-张笑盈 · 10-29 19:30\nSNH48\n视频\n46:33\nS\n新舞台准备中，来聊聊近况\nSNH48-王睿琦 · 10-29 19:30\nGNZ48\n电台\n52:04\nG\n周末见面之前的碎碎念\nGNZ48-陈珂 · 10-29 19:30\nBEJ48\n视频\n57:35\nB\n一起记录普通但开心的一天\nBEJ48-张笑盈 · 10-29 19:30",
+      "layout": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "horizontalOverflow": false,
+        "overflowElements": []
+      },
+      "screenshot": "replay-detail-390.png",
+      "pass": true
+    },
+    {
+      "name": "admin-overview",
+      "route": "/admin/overview",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [
+        "打开移动端导航"
+      ],
+      "status": 200,
+      "finalPath": "/admin/overview",
+      "bodyText": "48tools\n管理台\n工作台\n总览\n直播管理\n自动录制\n口袋48\n录像归档\n内容工具\n回放分析\n历史审计\n成员社交账号\n字幕与 AI\n系统\nB站草稿\n系统设置\n账户安全\n退出\nv1.31.1\n导航\n48tools\n系统总览\n刷新\n当前公开直播\n3\n正在录制任务\n0\n全部归档\n3\n共计 3 条归档记录\nB站待上传队列\n0\n正在录制监视\n\n录制任务在后台独立运行，关闭页面不会中断录制\n\n直播管理\n当前无正在录制的任务\n服务运行概况\n运行正常\n服务在线时长\n24 小时\n录像占用空间\n—\n可用磁盘空间\n560.0 GB\n磁盘使用率\n45.3%\n最近归档录像\n全部归档\n录像名称\t来源渠道\t录制状态\t录制时间\t文件体积\nSNH48-王睿琦-秋日散步与今天的小确幸\tpocket48\t已归档\t2026/10/29 19:30:00\t233.0 MB\nGNZ48-陈珂-晚安电台：听一首喜欢的歌\tpocket48\t已归档\t2026/10/29 19:30:00\t233.0 MB\nBEJ48-张笑盈-练习室下班后的日常分享\tpocket48\t已归档\t2026/10/29 19:30:00\t233.0 MB",
+      "layout": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "horizontalOverflow": false,
+        "overflowElements": [
+          {
+            "tag": "TABLE",
+            "className": "",
+            "left": 31,
+            "right": 695,
+            "display": "table",
+            "visibility": "visible"
+          },
+          {
+            "tag": "THEAD",
+            "className": "",
+            "left": 31,
+            "right": 695,
+            "display": "table-header-group",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TR",
+            "className": "",
+            "left": 31,
+            "right": 695,
+            "display": "table-row",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TH",
+            "className": "",
+            "left": 383,
+            "right": 461,
+            "display": "table-cell",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TH",
+            "className": "",
+            "left": 461,
+            "right": 613,
+            "display": "table-cell",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TH",
+            "className": "",
+            "left": 613,
+            "right": 695,
+            "display": "table-cell",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TBODY",
+            "className": "",
+            "left": 31,
+            "right": 695,
+            "display": "table-row-group",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TR",
+            "className": "",
+            "left": 31,
+            "right": 695,
+            "display": "table-row",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TD",
+            "className": "",
+            "left": 383,
+            "right": 461,
+            "display": "table-cell",
+            "visibility": "visible"
+          },
+          {
+            "tag": "SPAN",
+            "className": "badge badge-done",
+            "left": 395,
+            "right": 449,
+            "display": "inline-flex",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TD",
+            "className": "",
+            "left": 461,
+            "right": 613,
+            "display": "table-cell",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TD",
+            "className": "",
+            "left": 613,
+            "right": 695,
+            "display": "table-cell",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TR",
+            "className": "",
+            "left": 31,
+            "right": 695,
+            "display": "table-row",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TD",
+            "className": "",
+            "left": 383,
+            "right": 461,
+            "display": "table-cell",
+            "visibility": "visible"
+          },
+          {
+            "tag": "SPAN",
+            "className": "badge badge-done",
+            "left": 395,
+            "right": 449,
+            "display": "inline-flex",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TD",
+            "className": "",
+            "left": 461,
+            "right": 613,
+            "display": "table-cell",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TD",
+            "className": "",
+            "left": 613,
+            "right": 695,
+            "display": "table-cell",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TR",
+            "className": "",
+            "left": 31,
+            "right": 695,
+            "display": "table-row",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TD",
+            "className": "",
+            "left": 383,
+            "right": 461,
+            "display": "table-cell",
+            "visibility": "visible"
+          },
+          {
+            "tag": "SPAN",
+            "className": "badge badge-done",
+            "left": 395,
+            "right": 449,
+            "display": "inline-flex",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TD",
+            "className": "",
+            "left": 461,
+            "right": 613,
+            "display": "table-cell",
+            "visibility": "visible"
+          },
+          {
+            "tag": "TD",
+            "className": "",
+            "left": 613,
+            "right": 695,
+            "display": "table-cell",
+            "visibility": "visible"
+          }
+        ]
+      },
+      "screenshot": "admin-overview-390.png",
+      "extraScreenshot": "admin-mobile-menu-390.png",
+      "pass": true
+    },
+    {
+      "name": "admin-auto-record",
+      "route": "/admin/auto-record",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "finalPath": "/admin/auto-record",
+      "bodyText": "48tools\n管理台\n工作台\n总览\n直播管理\n自动录制\n口袋48\n录像归档\n内容工具\n回放分析\n历史审计\n成员社交账号\n字幕与 AI\n系统\nB站草稿\n系统设置\n账户安全\n退出\nv1.31.1\n导航\n48tools\n自动录制\n保存自动录制配置\n\n口袋48账号与房间消息 →\n\n口袋48账号\n游客模式\n\n自动录制、公开直播和成员名单均不依赖口袋48登录；登录仅用于需要账号权限的功能。\n\n登录口袋48账号\n录制设置\n启用全局自动录制\n同时最大录制路数\n2 场\n1 场 (低配)\n10 场\n20 场 (满载)\n监控成员名单 (共 3 位现役成员，1 人已选)\n刷新名单\n团体筛选：\n全部组织\nSNH48\nGNZ48\n请先选择团体\nS\nSNH48-王睿琦\nTEAM X\nS\nSNH48-杨冰怡\nTEAM X\nG\nGNZ48-陈珂\nTEAM G\n手动添加成员 ID（高级模式）",
+      "layout": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "horizontalOverflow": false,
+        "overflowElements": []
+      },
+      "screenshot": "admin-auto-record-390.png",
+      "pass": true
+    },
+    {
+      "name": "admin-pocket48",
+      "route": "/admin/pocket48",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [
+        "打开王睿琦房间并验证消息"
+      ],
+      "status": 200,
+      "finalPath": "/admin/pocket48",
+      "bodyText": "48tools\n管理台\n工作台\n总览\n直播管理\n自动录制\n口袋48\n录像归档\n内容工具\n回放分析\n历史审计\n成员社交账号\n字幕与 AI\n系统\nB站草稿\n系统设置\n账户安全\n退出\nv1.31.1\n导航\n48tools\n口袋48\n账号与签到\n1\n成员关注\n3\n\n关注变更会同步到口袋48账号。\n\n全部\n3\n已关注\n1\n正常\n2\n已收回\n1\n收起全部队伍\nTEAM X\n2\n王睿琦\n67362328\n杨冰怡\n67333093\n其他\n1\n袋王\n67236601\n\n已关注 1 / 共 3 位成员\n\nSNH48-王睿琦\n67362328\n全部消息\n仅成员\n2 条\n刷新\n今天 · 2026-10-30 周五\nSNH48-王睿琦\n16:01\n\n明天也继续加油，大家记得早点休息。\n\nSNH48-王睿琦\n16:00\n\n晚上好！今天的练习顺利结束啦。\n\n已经读到最早一条消息\n\n看不到消息？检查读取链路",
+      "layout": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "horizontalOverflow": false,
+        "overflowElements": [
+          {
+            "tag": "DIV",
+            "className": "p48-room-group",
+            "left": 31,
+            "right": 505,
+            "display": "flex",
+            "visibility": "visible"
+          },
+          {
+            "tag": "DIV",
+            "className": "p48-room-group-body",
+            "left": 81,
+            "right": 505,
+            "display": "flex",
+            "visibility": "visible"
+          },
+          {
+            "tag": "DIV",
+            "className": "p48-room-row",
+            "left": 297,
+            "right": 505,
+            "display": "flex",
+            "visibility": "visible"
+          },
+          {
+            "tag": "BUTTON",
+            "className": "p48-room-open",
+            "left": 298,
+            "right": 472,
+            "display": "flex",
+            "visibility": "visible"
+          },
+          {
+            "tag": "STRONG",
+            "className": "",
+            "left": 306,
+            "right": 405,
+            "display": "block",
+            "visibility": "visible"
+          },
+          {
+            "tag": "SPAN",
+            "className": "p48-room-id",
+            "left": 413,
+            "right": 464,
+            "display": "block",
+            "visibility": "visible"
+          },
+          {
+            "tag": "BUTTON",
+            "className": "p48-follow",
+            "left": 474,
+            "right": 502,
+            "display": "grid",
+            "visibility": "visible"
+          },
+          {
+            "tag": "svg",
+            "className": "",
+            "left": 481,
+            "right": 495,
+            "display": "block",
+            "visibility": "visible"
+          },
+          {
+            "tag": "polygon",
+            "className": "",
+            "left": 482,
+            "right": 493,
+            "display": "inline",
+            "visibility": "visible"
+          },
+          {
+            "tag": "DIV",
+            "className": "p48-room-group",
+            "left": 513,
+            "right": 748,
+            "display": "flex",
+            "visibility": "visible"
+          },
+          {
+            "tag": "H3",
+            "className": "p48-room-group-title",
+            "left": 513,
+            "right": 532,
+            "display": "block",
+            "visibility": "visible"
+          },
+          {
+            "tag": "BUTTON",
+            "className": "p48-room-group-toggle",
+            "left": 513,
+            "right": 526,
+            "display": "flex",
+            "visibility": "visible"
+          },
+          {
+            "tag": "svg",
+            "className": "",
+            "left": 513,
+            "right": 526,
+            "display": "block",
+            "visibility": "visible"
+          },
+          {
+            "tag": "polyline",
+            "className": "",
+            "left": 516,
+            "right": 522,
+            "display": "inline",
+            "visibility": "visible"
+          },
+          {
+            "tag": "SPAN",
+            "className": "",
+            "left": 513,
+            "right": 525,
+            "display": "block",
+            "visibility": "visible"
+          },
+          {
+            "tag": "DIV",
+            "className": "p48-room-group-body",
+            "left": 540,
+            "right": 748,
+            "display": "flex",
+            "visibility": "visible"
+          },
+          {
+            "tag": "DIV",
+            "className": "p48-room-row",
+            "left": 540,
+            "right": 748,
+            "display": "flex",
+            "visibility": "visible"
+          },
+          {
+            "tag": "BUTTON",
+            "className": "p48-room-open gone",
+            "left": 541,
+            "right": 715,
+            "display": "flex",
+            "visibility": "visible"
+          },
+          {
+            "tag": "STRONG",
+            "className": "",
+            "left": 549,
+            "right": 648,
+            "display": "block",
+            "visibility": "visible"
+          },
+          {
+            "tag": "SPAN",
+            "className": "p48-room-id",
+            "left": 656,
+            "right": 707,
+            "display": "block",
+            "visibility": "visible"
+          },
+          {
+            "tag": "BUTTON",
+            "className": "p48-follow",
+            "left": 717,
+            "right": 745,
+            "display": "grid",
+            "visibility": "visible"
+          },
+          {
+            "tag": "svg",
+            "className": "",
+            "left": 724,
+            "right": 738,
+            "display": "block",
+            "visibility": "visible"
+          },
+          {
+            "tag": "polygon",
+            "className": "",
+            "left": 725,
+            "right": 736,
+            "display": "inline",
+            "visibility": "visible"
+          }
+        ]
+      },
+      "screenshot": "admin-pocket48-390.png",
+      "pass": true
+    },
+    {
+      "name": "admin-archive",
+      "route": "/admin/archive",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pageErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 501 (Not Implemented)"
+      ],
+      "consoleWarnings": [],
+      "httpErrors": [
+        {
+          "url": "http://127.0.0.1:21346/api/admin/backup115/",
+          "status": 501
+        }
+      ],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "finalPath": "/admin/archive",
+      "bodyText": "48tools\n管理台\n工作台\n总览\n直播管理\n自动录制\n口袋48\n录像归档\n内容工具\n回放分析\n历史审计\n成员社交账号\n字幕与 AI\n系统\nB站草稿\n系统设置\n账户安全\n退出\nv1.31.1\n导航\n48tools\n录像归档\n官方回放分析\n刷新归档\n归档录像\n3\n磁盘实际 3 个文件 · 699.0 MB\n就绪可上传\n3\n录制完成且未推送\n草稿流程中\n0\n已排队、上传或入草稿箱\n可用磁盘\n560.0 GB\n总计 1.0 TB · 已用 45.3%\n全部归档列表\n\n录像文件存储于私有服务目录，不会在公开页面暴露\n\n全部\n可上传\n上传中\n已进草稿\n自动录制支持官方回放补全断流后合并同场片段；结束时先下载官方回放，完整校验并对比后再替换和上传。失败则保留原录像，成功也保留原片备份。\n批量重新生成\n勾选未上传录像，按原封面 → 智能选帧 → 成员模板重新生成，最多 100 条。\n115归档备份\n\n独立批选，已传B站的归档也可备份；本地文件保留。\n\n选择可备份归档\n清空115选择\n备份所选到115（0）\n刷新115状态\n\n115备份服务尚未启用\n\nUnmocked audit endpoint: /admin/backup115/\n\n共 3 条录像\nSNH48-王睿琦-秋日散步与今天的小确幸\npocket48\n已归档\n未上传\n选择封面\n暂无封面\nMP4 录像文件\n大小 233.0 MB\n录制 2026/10/29 19:30:00\n115备份\n未备份\n备份到115\n播放\n下载\n送入B站草稿\n删除\nGNZ48-陈珂-晚安电台：听一首喜欢的歌\npocket48\n已归档\n未上传\n选择封面\n暂无封面\nMP4 录像文件\n大小 233.0 MB\n录制 2026/10/29 19:30:00\n115备份\n未备份\n备份到115\n播放\n下载\n送入B站草稿\n删除\nBEJ48-张笑盈-练习室下班后的日常分享\npocket48\n已归档\n未上传\n选择封面\n暂无封面\nMP4 录像文件\n大小 233.0 MB\n录制 2026/10/29 19:30:00\n115备份\n未备份\n备份到115\n播放\n下载\n送入B站草稿\n删除\n磁盘文件清单 · 3 个文件\n\n录像共占用 699.0 MB，其中原始片段和遗留文件占用 —。按磁盘实际文件统计。\n\n文件名称\t用途\t实际大小\t操作",
+      "layout": {
+        "viewport": 390,
+        "documentWidth": 390,
+        "bodyWidth": 390,
+        "horizontalOverflow": false,
+        "overflowElements": []
+      },
+      "screenshot": "admin-archive-390.png",
+      "pass": false
+    },
+    {
+      "name": "admin-login",
+      "route": "/admin/login",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "pageErrors": [],
+      "consoleErrors": [],
+      "consoleWarnings": [],
+      "httpErrors": [],
+      "failedRequests": [],
+      "blockedExternalRequests": [],
+      "interactions": [],
+      "status": 200,
+      "error": "locator.waitFor: Timeout 12000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input').first() to be visible\u001b[22m\n\n    at run (D:\\飞牛同步\\AI资料库\\AI项目空间\\shn48录制\\audit\\2026-10-30\\frontend-redesign\\visual-smoke.cjs:78:161)",
+      "pass": false,
+      "screenshot": "admin-login-390-failure.png",
+      "bodyText": "48tools\n管理台\n工作台\n总览\n直播管理\n自动录制\n口袋48\n录像归档\n内容工具\n回放分析\n历史审计\n成员社交账号\n字幕与 AI\n系统\nB站草稿\n系统设置\n账户安全\n退出\nv1.31.1\n导航\n48tools\n系统总览\n刷新\n当前公开直播\n3\n正在录制任务\n0\n全部归档\n3\n共计 3 条归档记录\nB站待上传队列\n0\n正在录制监视\n\n录制任务在后台独立运行，关闭页面不会中断录制\n\n直播管理\n当前无正在录制的任务\n服务运行概况\n运行正常\n服务在线时长\n24 小时\n录像占用空间\n—\n可用磁盘空间\n560.0 GB\n磁盘使用率\n45.3%\n最近归档录像\n全部归档\n录像名称\t来源渠道\t录制状态\t录制时间\t文件体积\nSNH48-王睿琦-秋日散步与今天的小确幸\tpocket48\t已归档\t2026/10/29 19:30:00\t233.0 MB\nGNZ48-陈珂-晚安电台：听一首喜欢的歌\tpocket48\t已归档\t2026/10/29 19:30:00\t233.0 MB\nBEJ48-张笑盈-练习室下班后的日常分享\tpocket48\t已归档\t2026/10/29 19:30:00\t233.0 MB"
+    }
+  ]
+}

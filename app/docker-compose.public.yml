@@ -1,0 +1,10 @@
+version: "3.3"
+services:
+  shn48:
+    environment:
+      # Direct HTTP exposure is for the temporary server test only.
+      # Replace this override with a TLS reverse proxy before wider use.
+      COOKIE_SECURE: "false"
+      TRUST_PROXY: "false"
+    ports:
+      - "${HOST_IP:-0.0.0.0}:${HOST_PORT:-3000}:3000"

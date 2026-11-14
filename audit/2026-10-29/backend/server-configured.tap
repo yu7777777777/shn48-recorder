@@ -1,0 +1,3189 @@
+﻿TAP version 13
+# Subtest: upstream: Seedream request uses exact fields and ignores seed and extra options
+ok 1 - upstream: Seedream request uses exact fields and ignores seed and extra options
+  ---
+  duration_ms: 6.1338
+  type: 'test'
+  ...
+# Subtest: upstream: reference requires HTTPS, explicit path, no credentials, fragment or nonstandard port
+ok 2 - upstream: reference requires HTTPS, explicit path, no credentials, fragment or nonstandard port
+  ---
+  duration_ms: 1.0533
+  type: 'test'
+  ...
+# Subtest: upstream: each unfinished orientation generates once, completed assets are skipped
+ok 3 - upstream: each unfinished orientation generates once, completed assets are skipped
+  ---
+  duration_ms: 0.4445
+  type: 'test'
+  ...
+# Subtest: upstream: cached background resumes without another provider generation
+ok 4 - upstream: cached background resumes without another provider generation
+  ---
+  duration_ms: 0.3356
+  type: 'test'
+  ...
+# Subtest: upstream: external_retry_attempts counts total attempts, not extra retries
+ok 5 - upstream: external_retry_attempts counts total attempts, not extra retries
+  ---
+  duration_ms: 0.3007
+  type: 'test'
+  ...
+# Subtest: local-rule: portrait source expands horizontally and landscape vertically without cropping
+ok 6 - local-rule: portrait source expands horizontally and landscape vertically without cropping
+  ---
+  duration_ms: 0.5942
+  type: 'test'
+  ...
+# Subtest: local-rule: matching ratios keep the complete source unchanged
+ok 7 - local-rule: matching ratios keep the complete source unchanged
+  ---
+  duration_ms: 0.2733
+  type: 'test'
+  ...
+# Subtest: local-rule: extreme positive ratios clamp to 1:4 or 4:1 and report clamping
+ok 8 - local-rule: extreme positive ratios clamp to 1:4 or 4:1 and report clamping
+  ---
+  duration_ms: 0.3793
+  type: 'test'
+  ...
+# Subtest: local-rule: bad dimensions, ratios and request fields fail without IO
+ok 9 - local-rule: bad dimensions, ratios and request fields fail without IO
+  ---
+  duration_ms: 0.9242
+  type: 'test'
+  ...
+# Subtest: local-rule: empty or invalid candidates have no winner
+ok 10 - local-rule: empty or invalid candidates have no winner
+  ---
+  duration_ms: 0.5069
+  type: 'test'
+  ...
+# Subtest: local-rule: resolution precedes composition, sharpness breaks remaining ties stably
+ok 11 - local-rule: resolution precedes composition, sharpness breaks remaining ties stably
+  ---
+  duration_ms: 0.3369
+  type: 'test'
+  ...
+# Subtest: local-rule: only first eight candidates are considered, invalid scores do not outrank finite scores
+ok 12 - local-rule: only first eight candidates are considered, invalid scores do not outrank finite scores
+  ---
+  duration_ms: 0.2628
+  type: 'test'
+  ...
+# Subtest: local-rule: local attempt policy defaults to three and clamps the total to one through five
+ok 13 - local-rule: local attempt policy defaults to three and clamps the total to one through five
+  ---
+  duration_ms: 0.263
+  type: 'test'
+  ...
+# Subtest: clearing wipes derived text, keeps a snapshot and refuses for unknown recordings
+ok 14 - clearing wipes derived text, keeps a snapshot and refuses for unknown recordings
+  ---
+  duration_ms: 45.5951
+  type: 'test'
+  ...
+# Subtest: pending derived work keeps the stored analysis intact
+ok 15 - pending derived work keeps the stored analysis intact
+  ---
+  duration_ms: 12.9187
+  type: 'test'
+  ...
+# Subtest: correction budget rejects work that exceeds the declared per-request caps
+ok 16 - correction budget rejects work that exceeds the declared per-request caps
+  ---
+  duration_ms: 162.1665
+  type: 'test'
+  ...
+# Subtest: correction budget reports the actual payload size and keeps existing danmaku windows
+ok 17 - correction budget reports the actual payload size and keeps existing danmaku windows
+  ---
+  duration_ms: 0.5687
+  type: 'test'
+  ...
+# Subtest: validated corrections cannot be truncated by the transport budget
+ok 18 - validated corrections cannot be truncated by the transport budget
+  ---
+  duration_ms: 1.6545
+  type: 'test'
+  ...
+# Subtest: batch larger than the built-in segment budget is accepted when the caller raises the limit
+ok 19 - batch larger than the built-in segment budget is accepted when the caller raises the limit
+  ---
+  duration_ms: 2.5265
+  type: 'test'
+  ...
+# Subtest: a summary snapshot carries Japanese only when a row actually has it
+ok 20 - a summary snapshot carries Japanese only when a row actually has it
+  ---
+  duration_ms: 2.3458
+  type: 'test'
+  ...
+# Subtest: markdown quotes translations under the evidence line without breaking the quote
+ok 21 - markdown quotes translations under the evidence line without breaking the quote
+  ---
+  duration_ms: 4.4295
+  type: 'test'
+  ...
+# Subtest: the export never adds provenance or URLs to a segment row
+ok 22 - the export never adds provenance or URLs to a segment row
+  ---
+  duration_ms: 3.2052
+  type: 'test'
+  ...
+# Subtest: JSON exports only approved data and real overlapping evidence
+ok 23 - JSON exports only approved data and real overlapping evidence
+  ---
+  duration_ms: 4.2775
+  type: 'test'
+  ...
+# Subtest: Markdown preserves long timestamps, evidence, and escapes active content
+ok 24 - Markdown preserves long timestamps, evidence, and escapes active content
+  ---
+  duration_ms: 0.9727
+  type: 'test'
+  ...
+# Subtest: legacy insights remain exportable but explicitly lack verified evidence
+ok 25 - legacy insights remain exportable but explicitly lack verified evidence
+  ---
+  duration_ms: 0.3042
+  type: 'test'
+  ...
+# Subtest: empty results, invalid formats and invalid timestamps do not silently export
+ok 26 - empty results, invalid formats and invalid timestamps do not silently export
+  ---
+  duration_ms: 0.876
+  type: 'test'
+  ...
+# Subtest: summary download route uses attachments, no-store and safe status codes
+ok 27 - summary download route uses attachments, no-store and safe status codes
+  ---
+  duration_ms: 460.5866
+  type: 'test'
+  ...
+# Subtest: summary export inherits real administrator authentication
+ok 28 - summary export inherits real administrator authentication
+  ---
+  duration_ms: 153.1555
+  type: 'test'
+  ...
+# Subtest: names are normalised to one spelling so duplicates collapse
+ok 29 - names are normalised to one spelling so duplicates collapse
+  ---
+  duration_ms: 2.8206
+  type: 'test'
+  ...
+# Subtest: full-width and ascii spellings of the same name unify
+ok 30 - full-width and ascii spellings of the same name unify
+  ---
+  duration_ms: 2.7563
+  type: 'test'
+  ...
+# Subtest: a name owned by two different members is reported, not silently merged
+ok 31 - a name owned by two different members is reported, not silently merged
+  ---
+  duration_ms: 1.3795
+  type: 'test'
+  ...
+# Subtest: member ids must be numeric and are kept per row
+ok 32 - member ids must be numeric and are kept per row
+  ---
+  duration_ms: 0.368
+  type: 'test'
+  ...
+# Subtest: limits and malformed input are refused
+ok 33 - limits and malformed input are refused
+  ---
+  duration_ms: 0.965
+  type: 'test'
+  ...
+# Subtest: saving settings stores normalised rows and surfaces conflicts
+ok 34 - saving settings stores normalised rows and surfaces conflicts
+  ---
+  duration_ms: 14.4014
+  type: 'test'
+  ...
+# Subtest: glossary identity covers only enabled effective rows, independent of order or duplicates
+ok 35 - glossary identity covers only enabled effective rows, independent of order or duplicates
+  ---
+  duration_ms: 23.8319
+  type: 'test'
+  ...
+# Subtest: already disabled rows and legacy string flags do not change identity, re-enabling does
+ok 36 - already disabled rows and legacy string flags do not change identity, re-enabling does
+  ---
+  duration_ms: 0.8517
+  type: 'test'
+  ...
+# Subtest: settings reject duplicate aliases and blank effective names atomically
+ok 37 - settings reject duplicate aliases and blank effective names atomically
+  ---
+  duration_ms: 20.2708
+  type: 'test'
+  ...
+# Subtest: CJK terms are capped at 15 characters and ASCII terms at 7 fragments
+ok 38 - CJK terms are capped at 15 characters and ASCII terms at 7 fragments
+  ---
+  duration_ms: 1.9599
+  type: 'test'
+  ...
+# Subtest: full-width and control characters are folded before admission
+ok 39 - full-width and control characters are folded before admission
+  ---
+  duration_ms: 0.5723
+  type: 'test'
+  ...
+# Subtest: duplicates are dropped after normalisation and the reason is reported
+ok 40 - duplicates are dropped after normalisation and the reason is reported
+  ---
+  duration_ms: 2.4288
+  type: 'test'
+  ...
+# Subtest: disabled rows never reach the prompt
+ok 41 - disabled rows never reach the prompt
+  ---
+  duration_ms: 0.2908
+  type: 'test'
+  ...
+# Subtest: the prompt budget never splits a surrogate pair
+ok 42 - the prompt budget never splits a surrogate pair
+  ---
+  duration_ms: 0.3185
+  type: 'test'
+  ...
+# Subtest: queue failure keeps old result, atomically checkpoints and manual retry commits whole success
+ok 43 - queue failure keeps old result, atomically checkpoints and manual retry commits whole success
+  ---
+  duration_ms: 173.8399
+  type: 'test'
+  ...
+# Subtest: cancellation after a completed block preserves old successful result and retained checkpoint
+ok 44 - cancellation after a completed block preserves old successful result and retained checkpoint
+  ---
+  duration_ms: 95.8213
+  type: 'test'
+  ...
+# Subtest: manual edit, original restore and correction clear derived summary metadata
+ok 45 - manual edit, original restore and correction clear derived summary metadata
+  ---
+  duration_ms: 86.9109
+  type: 'test'
+  ...
+# Subtest: invalid evidence cannot replace prior summary and does not become resumable success
+ok 46 - invalid evidence cannot replace prior summary and does not become resumable success
+  ---
+  duration_ms: 48.9061
+  type: 'test'
+  ...
+# Subtest: F03: saving another endpoint without a key prevents enqueue before any provider request
+ok 47 - F03: saving another endpoint without a key prevents enqueue before any provider request
+  ---
+  duration_ms: 27.2417
+  type: 'test'
+  ...
+# Subtest: F15: disabled queue retries issue exactly one HTTP request, including 401, 429 and 503
+ok 48 - F15: disabled queue retries issue exactly one HTTP request, including 401, 429 and 503
+  ---
+  duration_ms: 96.1891
+  type: 'test'
+  ...
+# Subtest: F15: opted-in HTTP 401 still fails without scheduling or internal requests
+ok 49 - F15: opted-in HTTP 401 still fails without scheduling or internal requests
+  ---
+  duration_ms: 40.4673
+  type: 'test'
+  ...
+# Subtest: F15: HTTP 429 is durable, obeys Retry-After and consumes exactly the queue retry budget
+ok 50 - F15: HTTP 429 is durable, obeys Retry-After and consumes exactly the queue retry budget
+  ---
+  duration_ms: 52.0323
+  type: 'test'
+  ...
+# Subtest: dual limits include exact boundary, long gaps and stable global ids
+ok 51 - dual limits include exact boundary, long gaps and stable global ids
+  ---
+  duration_ms: 5.4676
+  type: 'test'
+  ...
+# Subtest: strict schema rejects missing, forged, duplicate, fractional and non-overlapping evidence
+ok 52 - strict schema rejects missing, forged, duplicate, fractional and non-overlapping evidence
+  ---
+  duration_ms: 3.3175
+  type: 'test'
+  ...
+# Subtest: chapter bounds, finite times, evidence hull, overlaps and maximum five minutes
+ok 53 - chapter bounds, finite times, evidence hull, overlaps and maximum five minutes
+  ---
+  duration_ms: 0.9647
+  type: 'test'
+  ...
+# Subtest: omitted windows use valid candidates only or reject, not synthetic full coverage
+ok 54 - omitted windows use valid candidates only or reject, not synthetic full coverage
+  ---
+  duration_ms: 0.9123
+  type: 'test'
+  ...
+# Subtest: successful blocks persist before next request; retry reuses only validated checkpoint
+ok 55 - successful blocks persist before next request; retry reuses only validated checkpoint
+  ---
+  duration_ms: 2.5128
+  type: 'test'
+  ...
+# Subtest: text, timestamps, model and endpoint invalidate old checkpoints; translation does not
+ok 56 - text, timestamps, model and endpoint invalidate old checkpoints; translation does not
+  ---
+  duration_ms: 1.9158
+  type: 'test'
+  ...
+# Subtest: cross-chunk overlapping source times merge without fabricated references
+ok 57 - cross-chunk overlapping source times merge without fabricated references
+  ---
+  duration_ms: 1.6693
+  type: 'test'
+  ...
+# Subtest: cancel and failed persistence cannot return a completed replacement
+ok 58 - cancel and failed persistence cannot return a completed replacement
+  ---
+  duration_ms: 2.0466
+  type: 'test'
+  ...
+# Subtest: partially overlapping evidence keeps the valid citations instead of failing the whole batch
+ok 59 - partially overlapping evidence keeps the valid citations instead of failing the whole batch
+  ---
+  duration_ms: 0.6913
+  type: 'test'
+  ...
+# Subtest: chapters declaring a wide span with few citations are accepted; blank-space padding is rejected
+ok 60 - chapters declaring a wide span with few citations are accepted; blank-space padding is rejected
+  ---
+  duration_ms: 0.9483
+  type: 'test'
+  ...
+# Subtest: silence between utterances is not a coverage gap
+ok 61 - silence between utterances is not a coverage gap
+  ---
+  duration_ms: 0.8494
+  type: 'test'
+  ...
+# Subtest: near matches only single-character differences of equal length
+ok 62 - near matches only single-character differences of equal length
+  ---
+  duration_ms: 1.5959
+  type: 'test'
+  ...
+# Subtest: build keeps long-enough terms and aliases, drops disabled rows
+ok 63 - build keeps long-enough terms and aliases, drops disabled rows
+  ---
+  duration_ms: 2.9443
+  type: 'test'
+  ...
+# Subtest: apply fixes one-character mishearing and leaves correct or unrelated text alone
+ok 64 - apply fixes one-character mishearing and leaves correct or unrelated text alone
+  ---
+  duration_ms: 0.7374
+  type: 'test'
+  ...
+# Subtest: apply abandons the term when the match is ambiguous or absent
+ok 65 - apply abandons the term when the match is ambiguous or absent
+  ---
+  duration_ms: 0.278
+  type: 'test'
+  ...
+# Subtest: stop words are never rewritten into glossary terms
+ok 66 - stop words are never rewritten into glossary terms
+  ---
+  duration_ms: 0.2444
+  type: 'test'
+  ...
+# Subtest: LRC timestamps accept mm:ss and hh:mm:ss only inside a valid clock
+ok 67 - LRC timestamps accept mm:ss and hh:mm:ss only inside a valid clock
+  ---
+  duration_ms: 1.6777
+  type: 'test'
+  ...
+# Subtest: danmaku lines are pulled three seconds earlier and sorted by time then file order
+ok 68 - danmaku lines are pulled three seconds earlier and sorted by time then file order
+  ---
+  duration_ms: 3.3671
+  type: 'test'
+  ...
+# Subtest: toLrc writes bracketed LRC that parseLrc reads back with the offset restored
+ok 69 - toLrc writes bracketed LRC that parseLrc reads back with the offset restored
+  ---
+  duration_ms: 0.7772
+  type: 'test'
+  ...
+# Subtest: ASR results accept both milliseconds and seconds, and sentences under output
+ok 70 - ASR results accept both milliseconds and seconds, and sentences under output
+  ---
+  duration_ms: 0.917
+  type: 'test'
+  ...
+# Subtest: a missing end is given one millisecond, overlapping starts are clamped forward
+ok 71 - a missing end is given one millisecond, overlapping starts are clamped forward
+  ---
+  duration_ms: 0.4138
+  type: 'test'
+  ...
+# Subtest: a result without transcripts or sentences is refused with a code
+ok 72 - a result without transcripts or sentences is refused with a code
+  ---
+  duration_ms: 0.8208
+  type: 'test'
+  ...
+# Subtest: SRT output keeps the speaker prefix and never breaks on a newline inside a line
+ok 73 - SRT output keeps the speaker prefix and never breaks on a newline inside a line
+  ---
+  duration_ms: 0.4656
+  type: 'test'
+  ...
+# Subtest: batch provenance aggregates per-recording records under the same redaction rules
+ok 74 - batch provenance aggregates per-recording records under the same redaction rules
+  ---
+  duration_ms: 14.015
+  type: 'test'
+  ...
+# Subtest: batch provenance de-duplicates ids and refuses empty or oversized requests
+ok 75 - batch provenance de-duplicates ids and refuses empty or oversized requests
+  ---
+  duration_ms: 4.8492
+  type: 'test'
+  ...
+# Subtest: an unreadable archive becomes an entry error instead of vanishing
+ok 76 - an unreadable archive becomes an entry error instead of vanishing
+  ---
+  duration_ms: 0.6842
+  type: 'test'
+  ...
+# Subtest: csv provenance writes one header and one row per archive
+ok 77 - csv provenance writes one header and one row per archive
+  ---
+  duration_ms: 3.681
+  type: 'test'
+  ...
+# Subtest: csv cells cannot smuggle a formula or split a row
+ok 78 - csv cells cannot smuggle a formula or split a row
+  ---
+  duration_ms: 3.0541
+  type: 'test'
+  ...
+# Subtest: csv provenance never includes a URL, key or payload
+ok 79 - csv provenance never includes a URL, key or payload
+  ---
+  duration_ms: 0.4259
+  type: 'test'
+  ...
+# Subtest: a Japanese run is reported on its own stage instead of being credited to English
+ok 80 - a Japanese run is reported on its own stage instead of being credited to English
+  ---
+  duration_ms: 10.7573
+  type: 'test'
+  ...
+# Subtest: an English-only archive reports no Japanese block at all
+ok 81 - an English-only archive reports no Japanese block at all
+  ---
+  duration_ms: 2.4062
+  type: 'test'
+  ...
+# Subtest: the Japanese stage keeps the same redaction as every other stage
+ok 82 - the Japanese stage keeps the same redaction as every other stage
+  ---
+  duration_ms: 1.34
+  type: 'test'
+  ...
+# Subtest: markdown provenance is readable, escapes text and never carries a URL
+ok 83 - markdown provenance is readable, escapes text and never carries a URL
+  ---
+  duration_ms: 12.0042
+  type: 'test'
+  ...
+# Subtest: markdown provenance escapes pipe characters so the table cannot be broken
+ok 84 - markdown provenance escapes pipe characters so the table cannot be broken
+  ---
+  duration_ms: 0.8118
+  type: 'test'
+  ...
+# Subtest: markdown provenance refuses nothing but reports an empty record honestly
+ok 85 - markdown provenance refuses nothing but reports an empty record honestly
+  ---
+  duration_ms: 5.8439
+  type: 'test'
+  ...
+# Subtest: provenance separates recorded, partial and absent stages without leaking secrets
+ok 86 - provenance separates recorded, partial and absent stages without leaking secrets
+  ---
+  duration_ms: 8.1478
+  type: 'test'
+  ...
+# Subtest: an absent stage reports every missing field instead of a bare null
+ok 87 - an absent stage reports every missing field instead of a bare null
+  ---
+  duration_ms: 0.5887
+  type: 'test'
+  ...
+# Subtest: translated count only counts rows that carry provenance
+ok 88 - translated count only counts rows that carry provenance
+  ---
+  duration_ms: 0.4663
+  type: 'test'
+  ...
+# Subtest: provider labels are hosts only, including opaque and malformed values
+ok 89 - provider labels are hosts only, including opaque and malformed values
+  ---
+  duration_ms: 2.703
+  type: 'test'
+  ...
+# Subtest: published replay summaries are off until an administrator opts in
+ok 90 - published replay summaries are off until an administrator opts in
+  ---
+  duration_ms: 5.689
+  type: 'test'
+  ...
+# Subtest: each publish switch can be set independently and survives a partial save
+ok 91 - each publish switch can be set independently and survives a partial save
+  ---
+  duration_ms: 38.4311
+  type: 'test'
+  ...
+# Subtest: invalid publish input is rejected instead of being ignored
+ok 92 - invalid publish input is rejected instead of being ignored
+  ---
+  duration_ms: 5.0079
+  type: 'test'
+  ...
+# Subtest: public detail can drop the summary text while keeping chapter titles
+ok 93 - public detail can drop the summary text while keeping chapter titles
+  ---
+  duration_ms: 28.992
+  type: 'test'
+  ...
+# Subtest: health counts each terminal state and never leaks payload or paths
+ok 94 - health counts each terminal state and never leaks payload or paths
+  ---
+  duration_ms: 2.9691
+  type: 'test'
+  ...
+# Subtest: work parked behind a closed switch is reported separately from dormant retries
+ok 95 - work parked behind a closed switch is reported separately from dormant retries
+  ---
+  duration_ms: 4.3203
+  type: 'test'
+  ...
+# Subtest: recovery outcome of the last start is counted, not inferred
+ok 96 - recovery outcome of the last start is counted, not inferred
+  ---
+  duration_ms: 0.4187
+  type: 'test'
+  ...
+# Subtest: live owner is never stolen, including expired heartbeat; release permits next owner
+ok 97 - live owner is never stolen, including expired heartbeat; release permits next owner
+  ---
+  duration_ms: 37.9319
+  type: 'test'
+  ...
+# Subtest: different host and malformed owners fail closed, not deleted
+ok 98 - different host and malformed owners fail closed, not deleted
+  ---
+  duration_ms: 18.614
+  type: 'test'
+  ...
+# Subtest: same hostname but different PID namespace remains unavailable and untouched
+ok 99 - same hostname but different PID namespace remains unavailable and untouched
+  ---
+  duration_ms: 14.2849
+  type: 'test'
+  ...
+# Subtest: initial owner write failure removes only the directory created by this acquire
+ok 100 - initial owner write failure removes only the directory created by this acquire
+  ---
+  duration_ms: 13.6558
+  type: 'test'
+  ...
+# Subtest: loss of token aborts once and old owner never removes replacement
+ok 101 - loss of token aborts once and old owner never removes replacement
+  ---
+  duration_ms: 8.8007
+  type: 'test'
+  ...
+# Subtest: real second process rejects live owner then recovers after killed owner
+ok 102 - real second process rejects live owner then recovers after killed owner
+  ---
+  duration_ms: 137.579
+  type: 'test'
+  ...
+# [analysis] queue unavailable: 此数据目录已有活跃分析 worker
+# Subtest: real process restart preserves queued and fails interrupted safely by default
+ok 103 - real process restart preserves queued and fails interrupted safely by default
+  ---
+  duration_ms: 653.675
+  type: 'test'
+  ...
+# [analysis] queue unavailable: 此数据目录已有活跃分析 worker
+# Subtest: real process restart preserves queued and reuses completed summary checkpoint with opt-in
+ok 104 - real process restart preserves queued and reuses completed summary checkpoint with opt-in
+  ---
+  duration_ms: 572.147
+  type: 'test'
+  ...
+# Subtest: require is read only; queued restart executes while interrupted defaults failed
+ok 105 - require is read only; queued restart executes while interrupted defaults failed
+  ---
+  duration_ms: 125.2972
+  type: 'test'
+  ...
+# Subtest: persist retains earliest waiting retry beyond 300 newer terminal jobs
+ok 106 - persist retains earliest waiting retry beyond 300 newer terminal jobs
+  ---
+  duration_ms: 42.4367
+  type: 'test'
+  ...
+# Subtest: enqueue automatically pumps; retry persists counters, obeys due time and favors new work
+ok 107 - enqueue automatically pumps; retry persists counters, obeys due time and favors new work
+  ---
+  duration_ms: 162.0792
+  type: 'test'
+  ...
+# Subtest: cancelling delayed retry persists terminal state and prevents later model calls
+ok 108 - cancelling delayed retry persists terminal state and prevents later model calls
+  ---
+  duration_ms: 61.9822
+  type: 'test'
+  ...
+# Subtest: closing autoRetry or changing endpoint/model invalidates old delayed retry
+ok 109 - closing autoRetry or changing endpoint/model invalidates old delayed retry
+  ---
+  duration_ms: 225.0469
+  type: 'test'
+  ...
+# Subtest: strict interrupted opt-in shares cumulative retry budget and survives re-restart
+ok 110 - strict interrupted opt-in shares cumulative retry budget and survives re-restart
+  ---
+  duration_ms: 127.493
+  type: 'test'
+  ...
+# [analysis] queue persistence/ownership failure: ENOSPC
+# [analysis] queue unavailable: 分析 worker 回收门闩存在；请确认旧进程退出后人工检查本地数据目录
+# Subtest: queue write failure rolls back enqueue and releases running flag without unhandled rejection
+ok 111 - queue write failure rolls back enqueue and releases running flag without unhandled rejection
+  ---
+  duration_ms: 99.9471
+  type: 'test'
+  ...
+# [analysis] queue unavailable: 分析队列初始化失败，请检查本地数据目录
+# Subtest: enqueue can recover startup-only failure, while explicit stop requires start
+ok 112 - enqueue can recover startup-only failure, while explicit stop requires start
+  ---
+  duration_ms: 105.3074
+  type: 'test'
+  ...
+# Subtest: invalid startup data is nonfatal, never overwritten, and successful start clears safe error
+ok 113 - invalid startup data is nonfatal, never overwritten, and successful start clears safe error
+  ---
+  duration_ms: 38.6783
+  type: 'test'
+  ...
+# Subtest: stop waits for in-flight request, never retries or commits after abort, leaves ordinary queued intact
+ok 114 - stop waits for in-flight request, never retries or commits after abort, leaves ordinary queued intact
+  ---
+  duration_ms: 60.8846
+  type: 'test'
+  ...
+# Subtest: old and partially saved settings never opt in to automatic paid work
+ok 115 - old and partially saved settings never opt in to automatic paid work
+  ---
+  duration_ms: 18.501
+  type: 'test'
+  ...
+# Subtest: queue settings support explicit opt in, zero budget and partial updates without exposing credentials
+ok 116 - queue settings support explicit opt in, zero budget and partial updates without exposing credentials
+  ---
+  duration_ms: 32.5685
+  type: 'test'
+  ...
+# Subtest: invalid retry policies fail atomically and cannot silently enable retries
+ok 117 - invalid retry policies fail atomically and cannot silently enable retries
+  ---
+  duration_ms: 44.1239
+  type: 'test'
+  ...
+# [analysis] queue unavailable: 分析队列初始化失败，请检查本地数据目录
+# [analysis] queue unavailable: 分析队列初始化失败，请检查本地数据目录
+# [analysis] queue unavailable: 分析队列初始化失败，请检查本地数据目录
+# [analysis] queue unavailable: 分析队列初始化失败，请检查本地数据目录
+# Subtest: queue status is a read-only safe snapshot and does not acquire or recover worker state
+ok 118 - queue status is a read-only safe snapshot and does not acquire or recover worker state
+  ---
+  duration_ms: 6.5712
+  type: 'test'
+  ...
+# Subtest: invalid JSON queue shapes cannot escape nonfatal startup or be overwritten
+ok 119 - invalid JSON queue shapes cannot escape nonfatal startup or be overwritten
+  ---
+  duration_ms: 65.8784
+  type: 'test'
+  ...
+# Subtest: queue endpoint returns state through static route and requires real administrator authentication
+ok 120 - queue endpoint returns state through static route and requires real administrator authentication
+  ---
+  duration_ms: 558.1397
+  type: 'test'
+  ...
+# Subtest: queue backoff is exactly 5/15/60 minutes, bounded by cumulative budget
+ok 121 - queue backoff is exactly 5/15/60 minutes, bounded by cumulative budget
+  ---
+  duration_ms: 5.1999
+  type: 'test'
+  ...
+# Subtest: only transient HTTP and network errors are eligible; default is opt out
+ok 122 - only transient HTTP and network errors are eligible; default is opt out
+  ---
+  duration_ms: 0.9153
+  type: 'test'
+  ...
+# Subtest: Retry-After respects provider hints but never exceeds 24 hours
+ok 123 - Retry-After respects provider hints but never exceeds 24 hours
+  ---
+  duration_ms: 0.4566
+  type: 'test'
+  ...
+# Subtest: recovery preserves ordinary queued, safely fails running, and shares bounded opt-in budget
+ok 124 - recovery preserves ordinary queued, safely fails running, and shares bounded opt-in budget
+  ---
+  duration_ms: 0.6416
+  type: 'test'
+  ...
+# Subtest: new queue entries take priority over due retries and future retries stay asleep
+ok 125 - new queue entries take priority over due retries and future retries stay asleep
+  ---
+  duration_ms: 0.3917
+  type: 'test'
+  ...
+# Subtest: old retries cannot follow disabled switches or changed endpoint/model/budget
+ok 126 - old retries cannot follow disabled switches or changed endpoint/model/budget
+  ---
+  duration_ms: 1.8811
+  type: 'test'
+  ...
+# Subtest: history compaction retains all early queued/running work and latest terminal history in original order
+ok 127 - history compaction retains all early queued/running work and latest terminal history in original order
+  ---
+  duration_ms: 1.8537
+  type: 'test'
+  ...
+# Subtest: injected timers wake without real sleep, unref, replace, and clear cleanly
+ok 128 - injected timers wake without real sleep, unref, replace, and clear cleanly
+  ---
+  duration_ms: 0.5872
+  type: 'test'
+  ...
+# Subtest: Japanese subtitles come from their own column and fall back per line
+ok 129 - Japanese subtitles come from their own column and fall back per line
+  ---
+  duration_ms: 1.7815
+  type: 'test'
+  ...
+# Subtest: editing a segment drops the Japanese translation as well as the English one
+ok 130 - editing a segment drops the Japanese translation as well as the English one
+  ---
+  duration_ms: 40.6123
+  type: 'test'
+  ...
+# Subtest: each target language has its own column, version and instruction
+ok 131 - each target language has its own column, version and instruction
+  ---
+  duration_ms: 3.4184
+  type: 'test'
+  ...
+# Subtest: a Japanese translation never overwrites the English column and does not reuse it
+ok 132 - a Japanese translation never overwrites the English column and does not reuse it
+  ---
+  duration_ms: 0.7667
+  type: 'test'
+  ...
+# Subtest: legacy rows without a target are read as English
+ok 133 - legacy rows without a target are read as English
+  ---
+  duration_ms: 0.507
+  type: 'test'
+  ...
+# Subtest: a recorded translation is reusable only for the same endpoint, model, instruction and source text
+ok 134 - a recorded translation is reusable only for the same endpoint, model, instruction and source text
+  ---
+  duration_ms: 2.395
+  type: 'test'
+  ...
+# Subtest: legacy bare English without provenance is never reused
+ok 135 - legacy bare English without provenance is never reused
+  ---
+  duration_ms: 0.5117
+  type: 'test'
+  ...
+# Subtest: stamping replaces prior provenance and keeps the source text untouched
+ok 136 - stamping replaces prior provenance and keeps the source text untouched
+  ---
+  duration_ms: 0.4152
+  type: 'test'
+  ...
+# Subtest: instruction and version are part of the identity hash
+ok 137 - instruction and version are part of the identity hash
+  ---
+  duration_ms: 0.4442
+  type: 'test'
+  ...
+# Subtest: settings never expose keys, preserve blanks, reject invalid endpoints and clear explicitly
+ok 138 - settings never expose keys, preserve blanks, reject invalid endpoints and clear explicitly
+  ---
+  duration_ms: 24.6642
+  type: 'test'
+  ...
+# Subtest: model discovery uses stored credentials without saving drafts or leaking keys
+ok 139 - model discovery uses stored credentials without saving drafts or leaking keys
+  ---
+  duration_ms: 48.2105
+  type: 'test'
+  ...
+# Subtest: HTTP endpoint supports saving and real model discovery without rewriting protocol
+ok 140 - HTTP endpoint supports saving and real model discovery without rewriting protocol
+  ---
+  duration_ms: 84.5483
+  type: 'test'
+  ...
+# Subtest: chunk-end overrun keeps the good rows instead of losing the whole 600s chunk
+ok 141 - chunk-end overrun keeps the good rows instead of losing the whole 600s chunk
+  ---
+  duration_ms: 0.9944
+  type: 'test'
+  ...
+# Subtest: hotword prompt is built from the glossary and sent to online ASR requests
+ok 142 - hotword prompt is built from the glossary and sent to online ASR requests
+  ---
+  duration_ms: 2.5893
+  type: 'test'
+  ...
+# Subtest: reject fabricated or invalid timestamps; SRT preserves long-hour bilingual cues
+ok 143 - reject fabricated or invalid timestamps; SRT preserves long-hour bilingual cues
+  ---
+  duration_ms: 0.813
+  type: 'test'
+  ...
+# DEBUG OUT {
+#   segments: [ { start: 0, end: 1, text: '你好' } ],
+#   chapters: [],
+#   highlights: [],
+#   fingerprint: '5318156:1793268383114.0894:https://example.test/v1:whisper-1:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945',
+#   completedSeconds: 600,
+#   duration: 602,
+#   completedRanges: [ [ 0, 600 ] ],
+#   complete: false,
+#   updatedAt: '2026-10-29T10:06:34.787Z',
+#   job: {
+#     id: '69ea4e9f-5d77-487f-be74-b170658950f5',
+#     recordingId: 'rec_1793268383117_ab9dh',
+#     kind: 'transcribe',
+#     status: 'failed',
+#     progress: 99,
+#     createdAt: '2026-10-29T10:06:23.137Z',
+#     retryCount: 0,
+#     attempts: 1,
+#     attempt: 1,
+#     configFingerprint: '3036acacf5c997b0ef9eeda70f95ddac22b55da9c918afa7bc1edea3db06c4ee',
+#     phase: null,
+#     error: '服务请求失败（HTTP 401），请检查模型、密钥、额度及接口兼容性',
+#     endedAt: '2026-10-29T10:06:35.255Z'
+#   }
+# }
+# Subtest: real audio chunks resume after provider failure; translations and chapters retain source times
+ok 144 - real audio chunks resume after provider failure; translations and chapters retain source times
+  ---
+  duration_ms: 36113.3239
+  type: 'test'
+  ...
+# Subtest: analysis routes require admin authentication
+ok 145 - analysis routes require admin authentication
+  ---
+  duration_ms: 276.8795
+  type: 'test'
+  ...
+# Subtest: manual stop immediately archives independently; automatic stop still waits
+not ok 146 - manual stop immediately archives independently; automatic stop still waits
+  ---
+  duration_ms: 18320.0534
+  type: 'test'
+  location: 'D:\\飞牛同步\\AI资料库\\AI项目空间\\shn48录制\\app\\server\\test\\archive-integration.test.js:35:1'
+  failureType: 'testCodeFailure'
+  error: 'manual archive should not wait five minutes'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (D:\飞牛同步\AI资料库\AI项目空间\shn48录制\app\server\test\archive-integration.test.js:55:12)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: archive rejects unfinished recordings and paths outside the recording root
+ok 147 - archive rejects unfinished recordings and paths outside the recording root
+  ---
+  duration_ms: 7611.9132
+  type: 'test'
+  ...
+# Subtest: mixed-size/audio reconnects merge once, validate, and retain originals
+ok 148 - mixed-size/audio reconnects merge once, validate, and retain originals
+  ---
+  duration_ms: 3783.7287
+  type: 'test'
+  ...
+# Subtest: legacy queued conversion reserves a slot before awaiting and saves one draft
+ok 149 - legacy queued conversion reserves a slot before awaiting and saves one draft
+  ---
+  duration_ms: 2634.1836
+  type: 'test'
+  ...
+# Subtest: one archive exposes six physical files; cleanup and archive deletion reclaim all originals
+ok 150 - one archive exposes six physical files; cleanup and archive deletion reclaim all originals
+  ---
+  duration_ms: 483.8469
+  type: 'test'
+  ...
+# Subtest: classifies text-only, empty and valid timestamps without claiming recognition accuracy
+ok 151 - classifies text-only, empty and valid timestamps without claiming recognition accuracy
+  ---
+  duration_ms: 1.7806
+  type: 'test'
+  ...
+# Subtest: sends one fixed audio request, uses saved key, keeps settings and reports failures
+ok 152 - sends one fixed audio request, uses saved key, keeps settings and reports failures
+  ---
+  duration_ms: 165.0801
+  type: 'test'
+  ...
+# Subtest: F03: saving a changed AI or ASR endpoint never transfers an omitted old key
+ok 153 - F03: saving a changed AI or ASR endpoint never transfers an omitted old key
+  ---
+  duration_ms: 12.0963
+  type: 'test'
+  ...
+# Subtest: F03: same normalized endpoint preserves a key; explicit replacement and clearing work
+ok 154 - F03: same normalized endpoint preserves a key; explicit replacement and clearing work
+  ---
+  duration_ms: 3.7786
+  type: 'test'
+  ...
+# Subtest: F05: clipped ASR intervals always have positive duration and stay inside the chunk
+ok 155 - F05: clipped ASR intervals always have positive duration and stay inside the chunk
+  ---
+  duration_ms: 8.8362
+  type: 'test'
+  ...
+# Subtest: F06: mixed null, primitive and missing-field candidates are discarded without TypeError
+ok 156 - F06: mixed null, primitive and missing-field candidates are discarded without TypeError
+  ---
+  duration_ms: 6.2356
+  type: 'test'
+  ...
+# Subtest: F06: explicit malformed, empty, forged and duplicate citations still reject a whole batch
+ok 157 - F06: explicit malformed, empty, forged and duplicate citations still reject a whole batch
+  ---
+  duration_ms: 1.6757
+  type: 'test'
+  ...
+# Subtest: F07: an unmatched string never becomes a subtitle citation or completes coverage
+ok 158 - F07: an unmatched string never becomes a subtitle citation or completes coverage
+  ---
+  duration_ms: 2.6164
+  type: 'test'
+  ...
+# Subtest: F07: text-matched string highlights still normalize using their actual source
+ok 159 - F07: text-matched string highlights still normalize using their actual source
+  ---
+  duration_ms: 0.6248
+  type: 'test'
+  ...
+# Subtest: F07: unsafe old-policy checkpoints are not reused as fresh validated evidence
+ok 160 - F07: unsafe old-policy checkpoints are not reused as fresh validated evidence
+  ---
+  duration_ms: 1.2637
+  type: 'test'
+  ...
+# Subtest: F15: HTTP, network, schema and evidence failures leave summarize after exactly one request
+ok 161 - F15: HTTP, network, schema and evidence failures leave summarize after exactly one request
+  ---
+  duration_ms: 3.7049
+  type: 'test'
+  ...
+# Subtest: F15: only the opted-in durable queue owns budget, HTTP classification and Retry-After
+ok 162 - F15: only the opted-in durable queue owns budget, HTTP classification and Retry-After
+  ---
+  duration_ms: 6.8158
+  type: 'test'
+  ...
+# Subtest: F14: live upstream errors are 502, while a successful empty listing stays 200
+ok 163 - F14: live upstream errors are 502, while a successful empty listing stays 200
+  ---
+  duration_ms: 3.2732
+  type: 'test'
+  ...
+# Subtest: F13: SSE close during metadata lookup allocates no resources
+ok 164 - F13: SSE close during metadata lookup allocates no resources
+  ---
+  duration_ms: 0.9379
+  type: 'test'
+  ...
+# Subtest: F13: SSE aborted during metadata lookup allocates no resources
+ok 165 - F13: SSE aborted during metadata lookup allocates no resources
+  ---
+  duration_ms: 0.3907
+  type: 'test'
+  ...
+# Subtest: F13: a pending metadata rejection after disconnect does not write an error response
+ok 166 - F13: a pending metadata rejection after disconnect does not write an error response
+  ---
+  duration_ms: 0.4393
+  type: 'test'
+  ...
+# Subtest: F13: successful request receipt does not close SSE; response closure releases exactly once
+ok 167 - F13: successful request receipt does not close SSE; response closure releases exactly once
+  ---
+  duration_ms: 0.7502
+  type: 'test'
+  ...
+# Subtest: F13: synchronous disconnect from subscription callback also releases its returned lease
+ok 168 - F13: synchronous disconnect from subscription callback also releases its returned lease
+  ---
+  duration_ms: 0.4905
+  type: 'test'
+  ...
+# Subtest: F04: actual HTML preview and JSON obey the same summary visibility policy
+ok 169 - F04: actual HTML preview and JSON obey the same summary visibility policy
+  ---
+  duration_ms: 214.8087
+  type: 'test'
+  ...
+# Subtest: F02 actual loadState -> reconnect -> archive preserves both usable segments
+ok 170 - F02 actual loadState -> reconnect -> archive preserves both usable segments
+  ---
+  duration_ms: 49.673
+  type: 'test'
+  ...
+# Subtest: F02 start schedules only restart-specific failed records and supports legacy marker
+ok 171 - F02 start schedules only restart-specific failed records and supports legacy marker
+  ---
+  duration_ms: 5.3165
+  type: 'test'
+  ...
+# Subtest: F02 does not revive arbitrary failure
+ok 172 - F02 does not revive arbitrary failure
+  ---
+  duration_ms: 7.7294
+  type: 'test'
+  ...
+# Subtest: F02 does not revive zero-length file
+ok 173 - F02 does not revive zero-length file
+  ---
+  duration_ms: 6.9145
+  type: 'test'
+  ...
+# Subtest: F02 does not revive invalid media
+ok 174 - F02 does not revive invalid media
+  ---
+  duration_ms: 11.5158
+  type: 'test'
+  ...
+# Subtest: F02 does not revive active writer
+ok 175 - F02 does not revive active writer
+  ---
+  duration_ms: 7.4489
+  type: 'test'
+  ...
+# Subtest: F02 does not revive different-ID writer on the same path
+ok 176 - F02 does not revive different-ID writer on the same path
+  ---
+  duration_ms: 4.9982
+  type: 'test'
+  ...
+# Subtest: F02 does not revive symlink
+ok 177 - F02 does not revive symlink
+  ---
+  duration_ms: 5.8414
+  type: 'test'
+  ...
+# Subtest: F02 does not revive changed media during probe
+ok 178 - F02 does not revive changed media during probe
+  ---
+  duration_ms: 7.7464
+  type: 'test'
+  ...
+# Subtest: F02 does not revive replaced realpath during probe
+ok 179 - F02 does not revive replaced realpath during probe
+  ---
+  duration_ms: 9.1517
+  type: 'test'
+  ...
+# [retention] water-level purge removed 1 fragment/cache files (400 bytes, free 400)
+# Subtest: F02 does not revive state changed during probe
+ok 180 - F02 does not revive state changed during probe
+  ---
+  duration_ms: 6.5873
+  type: 'test'
+  ...
+# Subtest: F08 sweep followed immediately by pressured purge preserves original
+ok 181 - F08 sweep followed immediately by pressured purge preserves original
+  ---
+  duration_ms: 7.5008
+  type: 'test'
+  ...
+# Subtest: F08 purge protects recent verification timestamp
+ok 182 - F08 purge protects recent verification timestamp
+  ---
+  duration_ms: 4.3839
+  type: 'test'
+  ...
+# Subtest: F08 purge protects invalid verification timestamp
+ok 183 - F08 purge protects invalid verification timestamp
+  ---
+  duration_ms: 4.124
+  type: 'test'
+  ...
+# Subtest: F08 purge protects future verification timestamp
+ok 184 - F08 purge protects future verification timestamp
+  ---
+  duration_ms: 4.2714
+  type: 'test'
+  ...
+# Subtest: F08 expired window permits reclaiming original but never main
+ok 185 - F08 expired window permits reclaiming original but never main
+  ---
+  duration_ms: 3.715
+  type: 'test'
+  ...
+# Subtest: F09 expired cached plan refreshes same live/scope and redownloads changed same-name resources
+ok 186 - F09 expired cached plan refreshes same live/scope and redownloads changed same-name resources
+  ---
+  duration_ms: 38.062
+  type: 'test'
+  ...
+# Subtest: F09 repeated expiry refreshes at most once per download
+ok 187 - F09 repeated expiry refreshes at most once per download
+  ---
+  duration_ms: 12.5332
+  type: 'test'
+  ...
+# Subtest: F09 refreshed metadata cannot substitute a different live
+ok 188 - F09 refreshed metadata cannot substitute a different live
+  ---
+  duration_ms: 13.4871
+  type: 'test'
+  ...
+# Subtest: F09 refreshed metadata is checked by URL authorization
+ok 189 - F09 refreshed metadata is checked by URL authorization
+  ---
+  duration_ms: 8.9441
+  type: 'test'
+  ...
+# Subtest: F09 server errors do not discard resumable plan or refresh metadata
+ok 190 - F09 server errors do not discard resumable plan or refresh metadata
+  ---
+  duration_ms: 11.2943
+  type: 'test'
+  ...
+# Subtest: random window, skip signed day, persist and pause on account changes
+ok 191 - random window, skip signed day, persist and pause on account changes
+  ---
+  duration_ms: 32.1283
+  type: 'test'
+  ...
+# Subtest: re-enabling after a failed attempt retries the same day instead of skipping it
+ok 192 - re-enabling after a failed attempt retries the same day instead of skipping it
+  ---
+  duration_ms: 137.7607
+  type: 'test'
+  ...
+# [auto-recorder] not starting: 磁盘可用空间不足，无法保证录完这场直播；清理空间后自动恢复
+# [auto-recorder] not starting: 磁盘可用空间不足，无法保证录完这场直播；清理空间后自动恢复
+# [auto-recorder] start gate cleared; recording can resume
+# [auto-recorder] disk space check failed; recording will not start: ENOENT
+# [auto-recorder] disk space check failed; recording will not start: ENOENT
+# [auto-recorder] disk space check failed; recording will not start: ENOENT
+# [auto-recorder] not starting: 无法读取录像目录的剩余空间，自动录制已暂停；请检查录像目录与挂载
+# [auto-recorder] disk space check failed; recording will not start: ENOENT
+# [auto-recorder] disk space check failed; recording will not start: ENOENT
+# [auto-recorder] disk space check failed; recording will not start: ENOENT
+# [auto-recorder] not starting: 磁盘可用空间不足，无法保证录完这场直播；清理空间后自动恢复
+# [auto-recorder] start gate cleared; recording can resume
+# [auto-recorder] not starting: 磁盘可用空间不足，无法保证录完这场直播；清理空间后自动恢复
+# [retention] on-demand reclaim removed 1 fragment/cache files (4096 bytes, free 4096)
+# Subtest: a small disk still records when reclaim can make room for the estimated live
+ok 193 - a small disk still records when reclaim can make room for the estimated live
+  ---
+  duration_ms: 44.0336
+  type: 'test'
+  ...
+# Subtest: space above the floor is sufficient once it covers the estimated live
+ok 194 - space above the floor is sufficient once it covers the estimated live
+  ---
+  duration_ms: 10.7465
+  type: 'test'
+  ...
+# Subtest: a live is refused and reported when nothing can be reclaimed
+ok 195 - a live is refused and reported when nothing can be reclaimed
+  ---
+  duration_ms: 27.4
+  type: 'test'
+  ...
+# Subtest: the block is cleared and recording resumes once space returns
+ok 196 - the block is cleared and recording resumes once space returns
+  ---
+  duration_ms: 15.9743
+  type: 'test'
+  ...
+# Subtest: a failing space probe is reported as its own reason, not as a full disk
+ok 197 - a failing space probe is reported as its own reason, not as a full disk
+  ---
+  duration_ms: 10.5986
+  type: 'test'
+  ...
+# Subtest: the space probe measures the directory recordings are actually written to
+ok 198 - the space probe measures the directory recordings are actually written to
+  ---
+  duration_ms: 6.6956
+  type: 'test'
+  ...
+# Subtest: the capacity limit is reported separately and does not masquerade as a disk problem
+ok 199 - the capacity limit is reported separately and does not masquerade as a disk problem
+  ---
+  duration_ms: 8.0088
+  type: 'test'
+  ...
+# Subtest: a blocked state is cleared when the operator disables automatic recording
+ok 200 - a blocked state is cleared when the operator disables automatic recording
+  ---
+  duration_ms: 12.4496
+  type: 'test'
+  ...
+# Subtest: the block is reported once per edge so a 30s poll cannot flood the log
+ok 201 - the block is reported once per edge so a 30s poll cannot flood the log
+  ---
+  duration_ms: 14.6486
+  type: 'test'
+  ...
+# Subtest: the default policy no longer demands a flat 10 GiB
+ok 202 - the default policy no longer demands a flat 10 GiB
+  ---
+  duration_ms: 0.4192
+  type: 'test'
+  ...
+# Subtest: the goal is measured from past recordings, not a fixed constant
+ok 203 - the goal is measured from past recordings, not a fixed constant
+  ---
+  duration_ms: 5.0036
+  type: 'test'
+  ...
+# Subtest: an explicit bitrate assumption overrides measurement
+ok 204 - an explicit bitrate assumption overrides measurement
+  ---
+  duration_ms: 6.3705
+  type: 'test'
+  ...
+# Subtest: low space is reclaimed from fragments before a start is refused
+ok 205 - low space is reclaimed from fragments before a start is refused
+  ---
+  duration_ms: 15.6331
+  type: 'test'
+  ...
+# Subtest: reclaimNow deletes unlocked cache files and keeps archive main files
+ok 206 - reclaimNow deletes unlocked cache files and keeps archive main files
+  ---
+  duration_ms: 7.3187
+  type: 'test'
+  ...
+# Subtest: storage stats report the recording filesystem without exposing its path
+ok 207 - storage stats report the recording filesystem without exposing its path
+  ---
+  duration_ms: 3.6143
+  type: 'test'
+  ...
+# Subtest: admin credentials are checked and session cookie is signed
+ok 208 - admin credentials are checked and session cookie is signed
+  ---
+  duration_ms: 4.0891
+  type: 'test'
+  ...
+# Subtest: remembered admin sessions expire after 30 days and can be revoked
+ok 209 - remembered admin sessions expire after 30 days and can be revoked
+  ---
+  duration_ms: 17.3774
+  type: 'test'
+  ...
+# Subtest: administrator credentials are validated, hashed, persisted atomically and reloadable
+ok 210 - administrator credentials are validated, hashed, persisted atomically and reloadable
+  ---
+  duration_ms: 543.765
+  type: 'test'
+  ...
+# Subtest: credential changes invalidate every administrator session
+ok 211 - credential changes invalidate every administrator session
+  ---
+  duration_ms: 3.5844
+  type: 'test'
+  ...
+# Subtest: public live normalization omits raw stream and credential fields
+ok 212 - public live normalization omits raw stream and credential fields
+  ---
+  duration_ms: 0.9713
+  type: 'test'
+  ...
+# Subtest: Pocket48 request headers follow the current app-shaped contract
+ok 213 - Pocket48 request headers follow the current app-shaped contract
+  ---
+  duration_ms: 0.6522
+  type: 'test'
+  ...
+# Subtest: Pocket48 login signatures match the current wire format without exposing credentials
+ok 214 - Pocket48 login signatures match the current wire format without exposing credentials
+  ---
+  duration_ms: 1.2772
+  type: 'test'
+  ...
+# Subtest: Pocket48 public account info never includes the stored token
+ok 215 - Pocket48 public account info never includes the stored token
+  ---
+  duration_ms: 0.4127
+  type: 'test'
+  ...
+# Subtest: Pocket48 account status distinguishes an invalid saved credential from an authenticated session
+ok 216 - Pocket48 account status distinguishes an invalid saved credential from an authenticated session
+  ---
+  duration_ms: 0.4928
+  type: 'test'
+  ...
+# Subtest: danmaku manager shares one room poller and emits only safe display DTOs
+ok 217 - danmaku manager shares one room poller and emits only safe display DTOs
+  ---
+  duration_ms: 33.1852
+  type: 'test'
+  ...
+# Subtest: Pocket48 SMS challenges are reduced to a bounded safe DTO
+ok 218 - Pocket48 SMS challenges are reduced to a bounded safe DTO
+  ---
+  duration_ms: 0.7118
+  type: 'test'
+  ...
+# Subtest: Pocket48 SMS routes validate codes and throttle sends by IP and mobile
+ok 219 - Pocket48 SMS routes validate codes and throttle sends by IP and mobile
+  ---
+  duration_ms: 1.3459
+  type: 'test'
+  ...
+# Subtest: Pocket48 credential persistence is atomic, mode-restricted, and never exposed by its status DTO
+ok 220 - Pocket48 credential persistence is atomic, mode-restricted, and never exposed by its status DTO
+  ---
+  duration_ms: 5.6375
+  type: 'test'
+  ...
+# Subtest: Pocket48 replay DTO normalizes assets, duration and omits private recording data
+ok 221 - Pocket48 replay DTO normalizes assets, duration and omits private recording data
+  ---
+  duration_ms: 1.0614
+  type: 'test'
+  ...
+# Subtest: Pocket48 replay danmaku parses synchronized LRC and rejects unsafe sources
+ok 222 - Pocket48 replay danmaku parses synchronized LRC and rejects unsafe sources
+  ---
+  duration_ms: 1.8194
+  type: 'test'
+  ...
+# Subtest: Pocket48 replay team metadata maps official logos to stable public filters
+ok 223 - Pocket48 replay team metadata maps official logos to stable public filters
+  ---
+  duration_ms: 0.3958
+  type: 'test'
+  ...
+# Subtest: Pocket48 replay member first page uses the mature-project cursor workaround
+ok 224 - Pocket48 replay member first page uses the mature-project cursor workaround
+  ---
+  duration_ms: 1.0327
+  type: 'test'
+  ...
+# Subtest: Pocket48 member replay search collects up to thirty recent items
+ok 225 - Pocket48 member replay search collects up to thirty recent items
+  ---
+  duration_ms: 1.1272
+  type: 'test'
+  ...
+# Subtest: Pocket48 replay team filter scans pages and keeps the upstream cursor
+ok 226 - Pocket48 replay team filter scans pages and keeps the upstream cursor
+  ---
+  duration_ms: 0.5177
+  type: 'test'
+  ...
+# Subtest: Pocket48 getLiveOne fixture normalizes assets and detects its RTMP stream
+ok 227 - Pocket48 getLiveOne fixture normalizes assets and detects its RTMP stream
+  ---
+  duration_ms: 0.5896
+  type: 'test'
+  ...
+# Subtest: live playback policy defaults to viewer direct delivery with an on-demand server fallback
+ok 228 - live playback policy defaults to viewer direct delivery with an on-demand server fallback
+  ---
+  duration_ms: 0.6029
+  type: 'test'
+  ...
+# Subtest: stream proxy rejects private targets and rewrites every HLS resource to opaque tokens
+ok 229 - stream proxy rejects private targets and rewrites every HLS resource to opaque tokens
+  ---
+  duration_ms: 8.286
+  type: 'test'
+  ...
+# Subtest: replay proxy keeps one bounded session for 540 HLS segments and late tokens remain valid
+ok 230 - replay proxy keeps one bounded session for 540 HLS segments and late tokens remain valid
+  ---
+  duration_ms: 61.9985
+  type: 'test'
+  ...
+# Subtest: replay child and session tokens expire exactly at their absolute millisecond boundary
+ok 231 - replay child and session tokens expire exactly at their absolute millisecond boundary
+  ---
+  duration_ms: 0.9368
+  type: 'test'
+  ...
+# Subtest: replay proxy rewrites Pocket48 root-relative VOD segments outside the entry manifest directory
+ok 232 - replay proxy rewrites Pocket48 root-relative VOD segments outside the entry manifest directory
+  ---
+  duration_ms: 1.1345
+  type: 'test'
+  ...
+# Subtest: replay manifest-derived path scopes are bounded and never authorize the host root
+ok 233 - replay manifest-derived path scopes are bounded and never authorize the host root
+  ---
+  duration_ms: 1.3413
+  type: 'test'
+  ...
+# Subtest: replay manifest decoding supports bounded gzip and rejects unknown encodings
+ok 234 - replay manifest decoding supports bounded gzip and rejects unknown encodings
+  ---
+  duration_ms: 1.6504
+  type: 'test'
+  ...
+# Subtest: replay proxy structured errors never log upstream URLs or exception messages
+ok 235 - replay proxy structured errors never log upstream URLs or exception messages
+  ---
+  duration_ms: 0.8848
+  type: 'test'
+  ...
+# Subtest: replay proxy rejects non-HLS sources without allocating a session
+ok 236 - replay proxy rejects non-HLS sources without allocating a session
+  ---
+  duration_ms: 0.2929
+  type: 'test'
+  ...
+# Subtest: RTMP relay shares one process and serves only scoped HLS files
+ok 237 - RTMP relay shares one process and serves only scoped HLS files
+  ---
+  duration_ms: 20.5198
+  type: 'test'
+  ...
+# Subtest: upload enqueue returns the persisted item with an id
+ok 238 - upload enqueue returns the persisted item with an id
+  ---
+  duration_ms: 3.3739
+  type: 'test'
+  ...
+# Subtest: completed Bilibili uploads cannot be enqueued or retried a second time
+ok 239 - completed Bilibili uploads cannot be enqueued or retried a second time
+  ---
+  duration_ms: 7.7156
+  type: 'test'
+  ...
+# Subtest: recording upload state prevents duplicates after its completed queue item is removed
+ok 240 - recording upload state prevents duplicates after its completed queue item is removed
+  ---
+  duration_ms: 3.4793
+  type: 'test'
+  ...
+# Subtest: recording deletion removes only regular files inside the recordings directory
+ok 241 - recording deletion removes only regular files inside the recordings directory
+  ---
+  duration_ms: 6.579
+  type: 'test'
+  ...
+# Subtest: recording playback resolves only regular files inside the recordings directory
+ok 242 - recording playback resolves only regular files inside the recordings directory
+  ---
+  duration_ms: 4.9652
+  type: 'test'
+  ...
+# Subtest: deleted recordings are hidden from the default archive list
+ok 243 - deleted recordings are hidden from the default archive list
+  ---
+  duration_ms: 3.6092
+  type: 'test'
+  ...
+# Subtest: Bilibili account status returns only the safe nav profile whitelist
+ok 244 - Bilibili account status returns only the safe nav profile whitelist
+  ---
+  duration_ms: 0.8625
+  type: 'test'
+  ...
+# Subtest: Bilibili account status distinguishes temporary upstream failure without deleting credentials
+ok 245 - Bilibili account status distinguishes temporary upstream failure without deleting credentials
+  ---
+  duration_ms: 0.3541
+  type: 'test'
+  ...
+# Subtest: Bilibili account status reports missing credentials without contacting upstream
+ok 246 - Bilibili account status reports missing credentials without contacting upstream
+  ---
+  duration_ms: 0.1745
+  type: 'test'
+  ...
+# Subtest: Bilibili queue and draft card DTOs retain compatibility while omitting raw paths and payloads
+ok 247 - Bilibili queue and draft card DTOs retain compatibility while omitting raw paths and payloads
+  ---
+  duration_ms: 0.7429
+  type: 'test'
+  ...
+# Subtest: recording filenames are safe for Windows and Linux
+ok 248 - recording filenames are safe for Windows and Linux
+  ---
+  duration_ms: 0.2696
+  type: 'test'
+  ...
+# Subtest: archive processor names recordings and joins only nearby matching segments
+ok 249 - archive processor names recordings and joins only nearby matching segments
+  ---
+  duration_ms: 23.8305
+  type: 'test'
+  ...
+# Subtest: archive processor gives only explicitly linked automatic reconnects a fifteen-minute window
+ok 250 - archive processor gives only explicitly linked automatic reconnects a fifteen-minute window
+  ---
+  duration_ms: 1.0997
+  type: 'test'
+  ...
+# Subtest: automatic recorder persists selected members and leaves finalized segments for the archive processor
+ok 251 - automatic recorder persists selected members and leaves finalized segments for the archive processor
+  ---
+  duration_ms: 35.0083
+  type: 'test'
+  ...
+# Subtest: automatic recorder accepts twenty streams, orders simultaneous lives by priority, and normalizes userInfo ids
+ok 252 - automatic recorder accepts twenty streams, orders simultaneous lives by priority, and normalizes userInfo ids
+  ---
+  duration_ms: 6.5712
+  type: 'test'
+  ...
+# Subtest: automatic recorder defaults new or incomplete configuration to twenty without rewriting saved values
+ok 253 - automatic recorder defaults new or incomplete configuration to twenty without rewriting saved values
+  ---
+  duration_ms: 0.31
+  type: 'test'
+  ...
+# Subtest: automatic recorder reconnects a failed segment with bounded exponential backoff
+ok 254 - automatic recorder reconnects a failed segment with bounded exponential backoff
+  ---
+  duration_ms: 22.2617
+  type: 'test'
+  ...
+# Subtest: member catalog joins the official active directory with Pocket48 ids and team filters
+ok 255 - member catalog joins the official active directory with Pocket48 ids and team filters
+  ---
+  duration_ms: 2.0381
+  type: 'test'
+  ...
+# Subtest: member catalog resolves an exact name before accepting an unambiguous partial name
+ok 256 - member catalog resolves an exact name before accepting an unambiguous partial name
+  ---
+  duration_ms: 0.7402
+  type: 'test'
+  ...
+# Subtest: member catalog prefers the official single-payload directory and keeps group and team
+ok 257 - member catalog prefers the official single-payload directory and keeps group and team
+  ---
+  duration_ms: 0.6447
+  type: 'test'
+  ...
+# Subtest: member catalog stays usable when the third-party room map is down
+ok 258 - member catalog stays usable when the third-party room map is down
+  ---
+  duration_ms: 0.3763
+  type: 'test'
+  ...
+# Subtest: member catalog falls back to the retired per-group directory when the official payload fails
+ok 259 - member catalog falls back to the retired per-group directory when the official payload fails
+  ---
+  duration_ms: 0.5375
+  type: 'test'
+  ...
+# Subtest: member catalog falls back to the room map when both directories are down
+ok 260 - member catalog falls back to the room map when both directories are down
+  ---
+  duration_ms: 0.7553
+  type: 'test'
+  ...
+# Subtest: member catalog still reports failure when every source is unusable
+ok 261 - member catalog still reports failure when every source is unusable
+  ---
+  duration_ms: 0.5751
+  type: 'test'
+  ...
+# Subtest: member catalog parses JSONP wrappers and rejects malformed payloads
+ok 262 - member catalog parses JSONP wrappers and rejects malformed payloads
+  ---
+  duration_ms: 0.2696
+  type: 'test'
+  ...
+# Subtest: uploads pause at a recording boundary and automatically resume without a new queue item
+ok 263 - uploads pause at a recording boundary and automatically resume without a new queue item
+  ---
+  duration_ms: 11.9504
+  type: 'test'
+  ...
+# Subtest: automatic recorder removes stale restart state and can claim an ongoing live again
+ok 264 - automatic recorder removes stale restart state and can claim an ongoing live again
+  ---
+  duration_ms: 9.7556
+  type: 'test'
+  ...
+# Subtest: credential-waiting queue entries resume as queued after a successful login
+ok 265 - credential-waiting queue entries resume as queued after a successful login
+  ---
+  duration_ms: 9.6889
+  type: 'test'
+  ...
+# Subtest: Bilibili upload queue defaults to one global concurrent upload
+ok 266 - Bilibili upload queue defaults to one global concurrent upload
+  ---
+  duration_ms: 0.1623
+  type: 'test'
+  ...
+# Subtest: graceful shutdown is idempotent and saves state before exiting
+ok 267 - graceful shutdown is idempotent and saves state before exiting
+  ---
+  duration_ms: 12.155
+  type: 'test'
+  ...
+# [retention] water-level purge removed 6 fragment/cache files (30 bytes, free 30)
+# Subtest: leases normalize paths, count independent acquisitions, and release idempotently
+ok 268 - leases normalize paths, count independent acquisitions, and release idempotently
+  ---
+  duration_ms: 22.0589
+  type: 'test'
+  ...
+# Subtest: realpath aliases share a lease; nonexistent attachments use resolved paths
+ok 269 - realpath aliases share a lease; nonexistent attachments use resolved paths
+  ---
+  duration_ms: 10.0938
+  type: 'test'
+  ...
+# Subtest: recording locks cover main, shared sources and replay, but not stale status summaries
+ok 270 - recording locks cover main, shared sources and replay, but not stale status summaries
+  ---
+  duration_ms: 23.6782
+  type: 'test'
+  ...
+# Subtest: DELETE refuses a queued shared physical lease and allows deletion after cancellation
+ok 271 - DELETE refuses a queued shared physical lease and allows deletion after cancellation
+  ---
+  duration_ms: 71.5352
+  type: 'test'
+  ...
+# Subtest: storage inventory and cleanup protect leased untracked files
+ok 272 - storage inventory and cleanup protect leased untracked files
+  ---
+  duration_ms: 42.6164
+  type: 'test'
+  ...
+# Subtest: final unlink rechecks a lease acquired after inventory
+ok 273 - final unlink rechecks a lease acquired after inventory
+  ---
+  duration_ms: 7.5472
+  type: 'test'
+  ...
+# Subtest: retention rechecks locks acquired during awaited verification
+ok 274 - retention rechecks locks acquired during awaited verification
+  ---
+  duration_ms: 14.5634
+  type: 'test'
+  ...
+# Subtest: water-level purge rechecks a lease acquired after candidate inventory
+ok 275 - water-level purge rechecks a lease acquired after candidate inventory
+  ---
+  duration_ms: 36.0544
+  type: 'test'
+  ...
+# Subtest: expired retention candidates and transient replay cache keep their physical leases
+ok 276 - expired retention candidates and transient replay cache keep their physical leases
+  ---
+  duration_ms: 31.0947
+  type: 'test'
+  ...
+# Subtest: replay replacement rechecks target lease immediately before switching the pointer
+ok 277 - replay replacement rechecks target lease immediately before switching the pointer
+  ---
+  duration_ms: 42.6728
+  type: 'test'
+  ...
+# Subtest: replay replacement rechecks a shared-path lease acquired during probe
+ok 278 - replay replacement rechecks a shared-path lease acquired during probe
+  ---
+  duration_ms: 29.7542
+  type: 'test'
+  ...
+# Subtest: backup endpoints are admin-only and do not fall through to the SPA
+ok 279 - backup endpoints are admin-only and do not fall through to the SPA
+  ---
+  duration_ms: 246.6367
+  type: 'test'
+  ...
+# Subtest: QR tokens stay private, are bound to a session, and settings reject secret fields
+ok 280 - QR tokens stay private, are bound to a session, and settings reject secret fields
+  ---
+  duration_ms: 150.2682
+  type: 'test'
+  ...
+# Subtest: backup is independent, idempotent and only succeeds after hash verification
+ok 281 - backup is independent, idempotent and only succeeds after hash verification
+  ---
+  duration_ms: 196.3635
+  type: 'test'
+  ...
+# Subtest: bad remote hashes cannot mark success and never delete the original
+ok 282 - bad remote hashes cannot mark success and never delete the original
+  ---
+  duration_ms: 92.8614
+  type: 'test'
+  ...
+# Subtest: changing the source while queued marks the old job stale
+ok 283 - changing the source while queued marks the old job stale
+  ---
+  duration_ms: 34.3087
+  type: 'test'
+  ...
+# Subtest: cancel aborts active provider and late results cannot resurrect a job
+ok 284 - cancel aborts active provider and late results cannot resurrect a job
+  ---
+  duration_ms: 58.5924
+  type: 'test'
+  ...
+# Subtest: network errors retry, authentication failures pause, attachment failures stay partial
+ok 285 - network errors retry, authentication failures pause, attachment failures stay partial
+  ---
+  duration_ms: 173.0726
+  type: 'test'
+  ...
+# Subtest: corrupt state fails closed and settings cannot contain credentials or traversal
+ok 286 - corrupt state fails closed and settings cannot contain credentials or traversal
+  ---
+  duration_ms: 8.5571
+  type: 'test'
+  ...
+# Subtest: state-write failure cannot publish success
+ok 287 - state-write failure cannot publish success
+  ---
+  duration_ms: 77.7384
+  type: 'test'
+  ...
+# Subtest: cancelled jobs retry as a new snapshot and new file versions never inherit old success
+ok 288 - cancelled jobs retry as a new snapshot and new file versions never inherit old success
+  ---
+  duration_ms: 159.9818
+  type: 'test'
+  ...
+# Subtest: automatic backup only queues new archives and does not undo explicit cancellation
+ok 289 - automatic backup only queues new archives and does not undo explicit cancellation
+  ---
+  duration_ms: 21.7587
+  type: 'test'
+  ...
+# Subtest: server restart recovers persisted jobs and rechecks cloud ids
+ok 290 - server restart recovers persisted jobs and rechecks cloud ids
+  ---
+  duration_ms: 78.9447
+  type: 'test'
+  ...
+# Subtest: Bilibili upload falls back to a backup endpoint when the primary cannot connect
+ok 291 - Bilibili upload falls back to a backup endpoint when the primary cannot connect
+  ---
+  duration_ms: 77.7932
+  type: 'test'
+  ...
+# Subtest: rejects malformed ranges, unavailable parents and files outside recording root
+ok 292 - rejects malformed ranges, unavailable parents and files outside recording root
+  ---
+  duration_ms: 21.5393
+  type: 'test'
+  ...
+# Subtest: real clipping preserves source, locks deletion, exports exact range, and keeps title for draft upload
+ok 293 - real clipping preserves source, locks deletion, exports exact range, and keeps title for draft upload
+  ---
+  duration_ms: 23590.1132
+  type: 'test'
+  ...
+# Subtest: silent multisegment output preserves selected scene order and drops the middle
+ok 294 - silent multisegment output preserves selected scene order and drops the middle
+  ---
+  duration_ms: 400.7694
+  type: 'test'
+  ...
+# Subtest: restart exposes interrupted clip as retryable rather than stuck processing
+ok 295 - restart exposes interrupted clip as retryable rather than stuck processing
+  ---
+  duration_ms: 3.4562
+  type: 'test'
+  ...
+# Subtest: correction preserves timing and first original across repeated corrections; rejects omissions and duplicate IDs
+ok 296 - correction preserves timing and first original across repeated corrections; rejects omissions and duplicate IDs
+  ---
+  duration_ms: 2.8548
+  type: 'test'
+  ...
+# Subtest: multi-batch failure leaves subtitles untouched; successful correction backs up, invalidates derived content and restores original
+ok 297 - multi-batch failure leaves subtitles untouched; successful correction backs up, invalidates derived content and restores original
+  ---
+  duration_ms: 229.5027
+  type: 'test'
+  ...
+# Subtest: manual correction preserves the first original and invalidates derived analysis
+ok 298 - manual correction preserves the first original and invalidates derived analysis
+  ---
+  duration_ms: 16.1741
+  type: 'test'
+  ...
+# Subtest: real blank video uses a 960x540 Chinese template and invalid uploads preserve its cover
+ok 299 - real blank video uses a 960x540 Chinese template and invalid uploads preserve its cover
+  ---
+  duration_ms: 27613.4269
+  type: 'test'
+  ...
+# Subtest: real face frames beat waiting frames, support member photos and original cover priority
+ok 300 - real face frames beat waiting frames, support member photos and original cover priority # SKIP
+  ---
+  duration_ms: 0.2218
+  type: 'test'
+  ...
+# Subtest: real renderer preserves complete portrait and landscape images, centers them and uses image colors on blurred sides
+ok 301 - real renderer preserves complete portrait and landscape images, centers them and uses image colors on blurred sides
+  ---
+  duration_ms: 2360.9665
+  type: 'test'
+  ...
+# Subtest: cover settings and candidates require auth, candidates belong to one recording and upload locks hold
+ok 302 - cover settings and candidates require auth, candidates belong to one recording and upload locks hold
+  ---
+  duration_ms: 273.5217
+  type: 'test'
+  ...
+# Subtest: draft cover update preserves all metadata, uses update rather than add and verifies upstream
+ok 303 - draft cover update preserves all metadata, uses update rather than add and verifies upstream
+  ---
+  duration_ms: 50.021
+  type: 'test'
+  ...
+# Subtest: smart candidates persist, reuse and cycle without losing a saved cover on invalid input
+ok 304 - smart candidates persist, reuse and cycle without losing a saved cover on invalid input
+  ---
+  duration_ms: 97.1658
+  type: 'test'
+  ...
+# Subtest: original cover is preferred and audio/missing video uses a member template
+ok 305 - original cover is preferred and audio/missing video uses a member template
+  ---
+  duration_ms: 68.283
+  type: 'test'
+  ...
+# Subtest: queues block manual cover changes, internal upload can generate, unsafe image URLs are rejected
+ok 306 - queues block manual cover changes, internal upload can generate, unsafe image URLs are rejected
+  ---
+  duration_ms: 21.4337
+  type: 'test'
+  ...
+# Subtest: member settings validate inputs and preserve state on invalid photo or theme
+ok 307 - member settings validate inputs and preserve state on invalid photo or theme
+  ---
+  duration_ms: 11.7015
+  type: 'test'
+  ...
+# Subtest: batch work skips uploaded, queued and deleted records
+ok 308 - batch work skips uploaded, queued and deleted records
+  ---
+  duration_ms: 25.4661
+  type: 'test'
+  ...
+# Subtest: cover upload sends JPEG and csrf, and rejects upstream failure
+ok 309 - cover upload sends JPEG and csrf, and rejects upstream failure
+  ---
+  duration_ms: 39.0904
+  type: 'test'
+  ...
+# Subtest: ASR without injected transport always skips without network or credentials
+ok 310 - ASR without injected transport always skips without network or credentials
+  ---
+  duration_ms: 1.6597
+  type: 'test'
+  ...
+# Subtest: ASR pending/running/succeeded transitions and transport protocol are explicit
+ok 311 - ASR pending/running/succeeded transitions and transport protocol are explicit
+  ---
+  duration_ms: 3.7573
+  type: 'test'
+  ...
+# Subtest: ASR concurrent duplicate submission issues exactly one external operation
+ok 312 - ASR concurrent duplicate submission issues exactly one external operation
+  ---
+  duration_ms: 0.8386
+  type: 'test'
+  ...
+# Subtest: ASR local cancellation is terminal even when an in-flight poll later succeeds
+ok 313 - ASR local cancellation is terminal even when an in-flight poll later succeeds
+  ---
+  duration_ms: 2.589
+  type: 'test'
+  ...
+# Subtest: ASR local cancellation during submit cannot be overwritten by its response
+ok 314 - ASR local cancellation during submit cannot be overwritten by its response
+  ---
+  duration_ms: 0.6939
+  type: 'test'
+  ...
+# Subtest: ASR transport errors and invalid/failed responses have safe explicit codes
+ok 315 - ASR transport errors and invalid/failed responses have safe explicit codes
+  ---
+  duration_ms: 1.8001
+  type: 'test'
+  ...
+# Subtest: ASR failed polls are terminal with explicit codes and no retry
+ok 316 - ASR failed polls are terminal with explicit codes and no retry
+  ---
+  duration_ms: 0.7599
+  type: 'test'
+  ...
+# Subtest: ASR queued poll does not send after synchronous local cancellation
+ok 317 - ASR queued poll does not send after synchronous local cancellation
+  ---
+  duration_ms: 0.601
+  type: 'test'
+  ...
+# Subtest: ASR invalid inputs are rejected before invoking a transport
+ok 318 - ASR invalid inputs are rejected before invoking a transport
+  ---
+  duration_ms: 1.5044
+  type: 'test'
+  ...
+# Subtest: vocabulary CRUD persists content-hash versions and ignores order
+ok 319 - vocabulary CRUD persists content-hash versions and ignores order
+  ---
+  duration_ms: 22.8898
+  type: 'test'
+  ...
+# Subtest: vocabulary admission rejects malformed/duplicate/oversized terms without changing data
+ok 320 - vocabulary admission rejects malformed/duplicate/oversized terms without changing data
+  ---
+  duration_ms: 9.1483
+  type: 'test'
+  ...
+# Subtest: vocabulary atomic rename failure preserves old JSON and cleans its temporary file
+ok 321 - vocabulary atomic rename failure preserves old JSON and cleans its temporary file
+  ---
+  duration_ms: 9.2397
+  type: 'test'
+  ...
+# Subtest: vocabulary corrupt JSON does not silently overwrite an existing table
+ok 322 - vocabulary corrupt JSON does not silently overwrite an existing table
+  ---
+  duration_ms: 3.0652
+  type: 'test'
+  ...
+# Subtest: draft deletion validates confirmation, identity, upstream success, deduplication and preserves recordings
+ok 323 - draft deletion validates confirmation, identity, upstream success, deduplication and preserves recordings
+  ---
+  duration_ms: 429.5945
+  type: 'test'
+  ...
+# Subtest: landscape resolves an isolated recommendation
+ok 324 - landscape resolves an isolated recommendation
+  ---
+  duration_ms: 2.5917
+  type: 'test'
+  ...
+# Subtest: portrait resolves an isolated recommendation
+ok 325 - portrait resolves an isolated recommendation
+  ---
+  duration_ms: 1.5942
+  type: 'test'
+  ...
+# Subtest: audio resolves an isolated recommendation
+ok 326 - audio resolves an isolated recommendation
+  ---
+  duration_ms: 0.2473
+  type: 'test'
+  ...
+# Subtest: omission means no override and invalid profile is a clear 400 error
+ok 327 - omission means no override and invalid profile is a clear 400 error
+  ---
+  duration_ms: 0.9663
+  type: 'test'
+  ...
+# Subtest: summary and subtitle exports preserve defaults; optional profiles are metadata only
+ok 328 - summary and subtitle exports preserve defaults; optional profiles are metadata only
+  ---
+  duration_ms: 420.8494
+  type: 'test'
+  ...
+# Subtest: offline queue needs installed model, waits during recording and cancels without API calls
+not ok 329 - offline queue needs installed model, waits during recording and cancels without API calls
+  ---
+  duration_ms: 10065.5618
+  type: 'test'
+  location: 'D:\\飞牛同步\\AI资料库\\AI项目空间\\shn48录制\\app\\server\\test\\offline.test.js:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(Date.now()<end)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    waitFor (D:\飞牛同步\AI资料库\AI项目空间\shn48录制\app\server\test\offline.test.js:7:75)
+    async TestContext.<anonymous> (D:\飞牛同步\AI资料库\AI项目空间\shn48录制\app\server\test\offline.test.js:15:55)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# Subtest: the offline catalogue offers three pinned tiers and rejects anything else before spawning
+ok 330 - the offline catalogue offers three pinned tiers and rejects anything else before spawning
+  ---
+  duration_ms: 10.6114
+  type: 'test'
+  ...
+# [analysis] queue persistence/ownership failure: ANALYSIS_OWNER
+# Subtest: a half-configured OSS is disabled and says exactly what is missing
+ok 331 - a half-configured OSS is disabled and says exactly what is missing
+  ---
+  duration_ms: 3.3321
+  type: 'test'
+  ...
+# Subtest: endpoint, bucket and prefix must agree before the adapter turns on
+ok 332 - endpoint, bucket and prefix must agree before the adapter turns on
+  ---
+  duration_ms: 1.161
+  type: 'test'
+  ...
+# Subtest: network endpoints require the exact HTTPS bucket.region.aliyuncs.com boundary
+ok 333 - network endpoints require the exact HTTPS bucket.region.aliyuncs.com boundary
+  ---
+  duration_ms: 0.3991
+  type: 'test'
+  ...
+# Subtest: object keys are prefixed and refuse traversal or odd characters
+ok 334 - object keys are prefixed and refuse traversal or odd characters
+  ---
+  duration_ms: 0.7972
+  type: 'test'
+  ...
+# Subtest: the V1 signature matches an independently computed HMAC-SHA1
+ok 335 - the V1 signature matches an independently computed HMAC-SHA1
+  ---
+  duration_ms: 0.8152
+  type: 'test'
+  ...
+# Subtest: expiry outside one second to seven days is refused
+ok 336 - expiry outside one second to seven days is refused
+  ---
+  duration_ms: 0.3357
+  type: 'test'
+  ...
+# Subtest: a signed URL keeps the path readable and never leaks the secret
+ok 337 - a signed URL keeps the path readable and never leaks the secret
+  ---
+  duration_ms: 0.5267
+  type: 'test'
+  ...
+# Subtest: missing or invalid configuration skips synchronization without touching files or transport
+ok 338 - missing or invalid configuration skips synchronization without touching files or transport
+  ---
+  duration_ms: 4.0451
+  type: 'test'
+  ...
+# Subtest: PUT streams media with exact URL, MD5, content type and independent V1 authorization
+ok 339 - PUT streams media with exact URL, MD5, content type and independent V1 authorization
+  ---
+  duration_ms: 41.581
+  type: 'test'
+  ...
+# Subtest: recording sync uses a fixed recordings/id.mp4 key and does not modify recording metadata
+ok 340 - recording sync uses a fixed recordings/id.mp4 key and does not modify recording metadata
+  ---
+  duration_ms: 31.1173
+  type: 'test'
+  ...
+# Subtest: provider 5xx has a safe upload code and never reads or leaks response XML
+ok 341 - provider 5xx has a safe upload code and never reads or leaks response XML
+  ---
+  duration_ms: 11.25
+  type: 'test'
+  ...
+# Subtest: transport and filesystem exceptions are replaced without keys, signatures, paths or causes
+ok 342 - transport and filesystem exceptions are replaced without keys, signatures, paths or causes
+  ---
+  duration_ms: 4.8452
+  type: 'test'
+  ...
+# Subtest: DELETE signs an empty MD5/type request and treats missing objects as idempotent success
+ok 343 - DELETE signs an empty MD5/type request and treats missing objects as idempotent success
+  ---
+  duration_ms: 1.8845
+  type: 'test'
+  ...
+# Subtest: DELETE failures are safe oss_delete_failed and never delete local media
+ok 344 - DELETE failures are safe oss_delete_failed and never delete local media
+  ---
+  duration_ms: 1.9483
+  type: 'test'
+  ...
+# Subtest: HEAD returns safe metadata or exists:false on 404 without downloading content
+ok 345 - HEAD returns safe metadata or exists:false on 404 without downloading content
+  ---
+  duration_ms: 2.9753
+  type: 'test'
+  ...
+# Subtest: redirects are never followed or retried, for PUT DELETE and HEAD
+ok 346 - redirects are never followed or retried, for PUT DELETE and HEAD
+  ---
+  duration_ms: 4.6333
+  type: 'test'
+  ...
+# Subtest: invalid signing configuration and traversal keys fail before any transport call
+ok 347 - invalid signing configuration and traversal keys fail before any transport call
+  ---
+  duration_ms: 1.894
+  type: 'test'
+  ...
+# Subtest: default 60s timeout aborts a stalled PUT even when fake transport ignores the signal
+ok 348 - default 60s timeout aborts a stalled PUT even when fake transport ignores the signal
+  ---
+  duration_ms: 3.9654
+  type: 'test'
+  ...
+# Subtest: file mutation between checksum and upload is detected before sending a PUT
+ok 349 - file mutation between checksum and upload is detected before sending a PUT
+  ---
+  duration_ms: 4.9632
+  type: 'test'
+  ...
+# Subtest: file changes during transport cannot be reported as a successful upload
+ok 350 - file changes during transport cannot be reported as a successful upload
+  ---
+  duration_ms: 3.7542
+  type: 'test'
+  ...
+# Subtest: recording validation refuses traversal, unfinished media and paths outside the archive
+ok 351 - recording validation refuses traversal, unfinished media and paths outside the archive
+  ---
+  duration_ms: 3.7407
+  type: 'test'
+  ...
+# Subtest: safe status contains only config identifiers and last error code, never a complete endpoint URL
+ok 352 - safe status contains only config identifiers and last error code, never a complete endpoint URL
+  ---
+  duration_ms: 0.8041
+  type: 'test'
+  ...
+# Subtest: read-only GET /oss/status returns safe state without invoking transport or uploading
+ok 353 - read-only GET /oss/status returns safe state without invoking transport or uploading
+  ---
+  duration_ms: 259.1937
+  type: 'test'
+  ...
+# Subtest: sliding queue starts third request before slow first finishes; commits independently
+ok 354 - sliding queue starts third request before slow first finishes; commits independently
+  ---
+  duration_ms: 67.881
+  type: 'test'
+  ...
+# Subtest: failure preserves later successes and resume requests only missing range
+ok 355 - failure preserves later successes and resume requests only missing range
+  ---
+  duration_ms: 2.005
+  type: 'test'
+  ...
+# Subtest: oversized files split before upload; all temp inputs cleaned
+ok 356 - oversized files split before upload; all temp inputs cleaned
+  ---
+  duration_ms: 0.868
+  type: 'test'
+  ...
+# Subtest: 524 splits failed part without duplicating successful sibling
+ok 357 - 524 splits failed part without duplicating successful sibling
+  ---
+  duration_ms: 0.9228
+  type: 'test'
+  ...
+# Subtest: 429 reduces concurrency and retries within budget
+ok 358 - 429 reduces concurrency and retries within budget
+  ---
+  duration_ms: 1005.9047
+  type: 'test'
+  ...
+# Subtest: cancellation prevents commit
+ok 359 - cancellation prevents commit
+  ---
+  duration_ms: 0.675
+  type: 'test'
+  ...
+# Subtest: resume accepts legacy prefix and new chunk size without overlap
+ok 360 - resume accepts legacy prefix and new chunk size without overlap
+  ---
+  duration_ms: 0.2649
+  type: 'test'
+  ...
+# Subtest: minimum sized 524 fails instead of splitting forever
+ok 361 - minimum sized 524 fails instead of splitting forever
+  ---
+  duration_ms: 0.3639
+  type: 'test'
+  ...
+# Subtest: reject upstream business errors and redact profile credentials
+ok 362 - reject upstream business errors and redact profile credentials
+  ---
+  duration_ms: 2.1375
+  type: 'test'
+  ...
+# Subtest: account routes reject missing credentials and invalid room ids
+ok 363 - account routes reject missing credentials and invalid room ids
+  ---
+  duration_ms: 337.3805
+  type: 'test'
+  ...
+# Subtest: follow endpoints mutate the account follow list through the friendship API
+ok 364 - follow endpoints mutate the account follow list through the friendship API
+  ---
+  duration_ms: 103.6006
+  type: 'test'
+  ...
+# Subtest: linked account DTO removes credentials and switch rejects unrelated users
+ok 365 - linked account DTO removes credentials and switch rejects unrelated users
+  ---
+  duration_ms: 1.6826
+  type: 'test'
+  ...
+# Subtest: external password, SMS and token refusals retain 401 but identify their authentication domain
+ok 366 - external password, SMS and token refusals retain 401 but identify their authentication domain
+  ---
+  duration_ms: 370.8263
+  type: 'test'
+  ...
+# Subtest: administrator guard refuses the same external login paths before any credential call, without rejection marker
+ok 367 - administrator guard refuses the same external login paths before any credential call, without rejection marker
+  ---
+  duration_ms: 100.4834
+  type: 'test'
+  ...
+# Subtest: room state separates readable channels from revoked ones and survives a cache round trip
+ok 368 - room state separates readable channels from revoked ones and survives a cache round trip
+  ---
+  duration_ms: 6.6222
+  type: 'test'
+  ...
+# Subtest: conversation IDs resolve by member to chat channels; scopes and pagination stay separate
+ok 369 - conversation IDs resolve by member to chat channels; scopes and pagination stay separate
+  ---
+  duration_ms: 10.1617
+  type: 'test'
+  ...
+# Subtest: room diagnosis probes every message endpoint and reports which one has rows
+ok 370 - room diagnosis probes every message endpoint and reports which one has rows
+  ---
+  duration_ms: 3.5331
+  type: 'test'
+  ...
+# Subtest: directory rows are openable: roomId falls back to channelId when the directory has none
+ok 371 - directory rows are openable: roomId falls back to channelId when the directory has none
+  ---
+  duration_ms: 1.353
+  type: 'test'
+  ...
+# Subtest: directory parses both live shapes (bare array and {roomId:[...]})
+ok 372 - directory parses both live shapes (bare array and {roomId:[...]})
+  ---
+  duration_ms: 0.3206
+  type: 'test'
+  ...
+# Subtest: 直播通知 resolves the conversation room from the channel id used by the member list
+ok 373 - 直播通知 resolves the conversation room from the channel id used by the member list
+  ---
+  duration_ms: 3.0754
+  type: 'test'
+  ...
+# Subtest: a quiet channel is a complete answer for 仅成员, not a reason to fall back
+ok 374 - a quiet channel is a complete answer for 仅成员, not a reason to fall back
+  ---
+  duration_ms: 3.5057
+  type: 'test'
+  ...
+# Subtest: real recorder launches ffmpeg, writes playable media and finalizes
+ok 375 - real recorder launches ffmpeg, writes playable media and finalizes
+  ---
+  duration_ms: 20309.424
+  type: 'test'
+  ...
+# Subtest: manual start reaches ffmpeg and persists a normalized live claim
+ok 376 - manual start reaches ffmpeg and persists a normalized live claim
+  ---
+  duration_ms: 36.818
+  type: 'test'
+  ...
+# Subtest: automatic poll uses the real recorder start path and tracks the child
+ok 377 - automatic poll uses the real recorder start path and tracks the child
+  ---
+  duration_ms: 21.5118
+  type: 'test'
+  ...
+# Subtest: concurrent starts share the successful launch result and spawn once
+ok 378 - concurrent starts share the successful launch result and spawn once
+  ---
+  duration_ms: 6.9866
+  type: 'test'
+  ...
+# Subtest: concurrent failed starts share rejection, release the claim and permit retry
+ok 379 - concurrent failed starts share rejection, release the claim and permit retry
+  ---
+  duration_ms: 8.5451
+  type: 'test'
+  ...
+# Subtest: remembered login survives process replacement; ordinary login and forged cookies do not
+not ok 380 - remembered login survives process replacement; ordinary login and forged cookies do not
+  ---
+  duration_ms: 364.1069
+  type: 'test'
+  location: 'D:\\飞牛同步\\AI资料库\\AI项目空间\\shn48录制\\app\\server\\test\\remembered-sessions.test.js:45:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    401 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 401
+  operator: 'strictEqual'
+  stack: |-
+    Object.login (D:\飞牛同步\AI资料库\AI项目空间\shn48录制\app\server\test\remembered-sessions.test.js:40:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async TestContext.<anonymous> (D:\飞牛同步\AI资料库\AI项目空间\shn48录制\app\server\test\remembered-sessions.test.js:46:46)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+  ...
+# [auth] remembered session store unavailable; saved sessions rejected
+# [auth] remembered session store unavailable; saved sessions rejected
+# Subtest: logout persists per-device revocation; credential changes revoke all remembered devices after restart
+not ok 381 - logout persists per-device revocation; credential changes revoke all remembered devices after restart
+  ---
+  duration_ms: 245.4871
+  type: 'test'
+  location: 'D:\\飞牛同步\\AI资料库\\AI项目空间\\shn48录制\\app\\server\\test\\remembered-sessions.test.js:65:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    401 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 401
+  operator: 'strictEqual'
+  stack: |-
+    Object.login (D:\飞牛同步\AI资料库\AI项目空间\shn48录制\app\server\test\remembered-sessions.test.js:40:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async TestContext.<anonymous> (D:\飞牛同步\AI资料库\AI项目空间\shn48录制\app\server\test\remembered-sessions.test.js:66:41)
+    async Test.run (node:internal/test_runner/test:1409:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+  ...
+# Subtest: saved-session corruption fails closed and failed writes never grant a remembered session
+ok 382 - saved-session corruption fails closed and failed writes never grant a remembered session
+  ---
+  duration_ms: 10.8655
+  type: 'test'
+  ...
+# Subtest: audit finds official duration by exact live ID in the member replay list
+ok 383 - audit finds official duration by exact live ID in the member replay list
+  ---
+  duration_ms: 2.9346
+  type: 'test'
+  ...
+# Subtest: historical audit classifies a posted 1498s recording against a 9237s replay
+ok 384 - historical audit classifies a posted 1498s recording against a 9237s replay
+  ---
+  duration_ms: 16.3161
+  type: 'test'
+  ...
+# Subtest: audit immediately queues a confirmed gap after legacy lookup backoff, including a previously rescanned item
+ok 385 - audit immediately queues a confirmed gap after legacy lookup backoff, including a previously rescanned item
+  ---
+  duration_ms: 21.1478
+  type: 'test'
+  ...
+# Subtest: audit preserves real repair failure backoff across repeated scans and a transient lookup failure
+ok 386 - audit preserves real repair failure backoff across repeated scans and a transient lookup failure
+  ---
+  duration_ms: 33.1163
+  type: 'test'
+  ...
+# Subtest: posted detection includes completed queue entries without enabling reupload
+ok 387 - posted detection includes completed queue entries without enabling reupload
+  ---
+  duration_ms: 6.613
+  type: 'test'
+  ...
+# Subtest: audit follows archive lifecycle and refuses repair after archive deletion
+ok 388 - audit follows archive lifecycle and refuses repair after archive deletion
+  ---
+  duration_ms: 36.5265
+  type: 'test'
+  ...
+# Subtest: posted repair updates only local archive version and preserves Bilibili draft
+ok 389 - posted repair updates only local archive version and preserves Bilibili draft
+  ---
+  duration_ms: 25.7402
+  type: 'test'
+  ...
+# Subtest: unposted autoUpload repair queues exactly one Bilibili draft after replacement
+ok 390 - unposted autoUpload repair queues exactly one Bilibili draft after replacement
+  ---
+  duration_ms: 25.2449
+  type: 'test'
+  ...
+# Subtest: downloads all resources before offline mux/decode; cached replay survives upstream deletion
+ok 391 - downloads all resources before offline mux/decode; cached replay survives upstream deletion
+  ---
+  duration_ms: 14209.3245
+  type: 'test'
+  ...
+# Subtest: public download becomes ready after fast checks, then full validation promotes the same cache
+ok 392 - public download becomes ready after fast checks, then full validation promotes the same cache
+  ---
+  duration_ms: 729.0452
+  type: 'test'
+  ...
+# Subtest: deletion partway through download never yields a completed replacement; completed resources resume
+ok 393 - deletion partway through download never yields a completed replacement; completed resources resume
+  ---
+  duration_ms: 219.5028
+  type: 'test'
+  ...
+# Subtest: truncated segment and wrong manifest duration cannot be accepted
+ok 394 - truncated segment and wrong manifest duration cannot be accepted
+  ---
+  duration_ms: 126.8358
+  type: 'test'
+  ...
+# Subtest: unfinalized, missing, cross-host, unsupported and malformed playlists fail closed
+ok 395 - unfinalized, missing, cross-host, unsupported and malformed playlists fail closed
+  ---
+  duration_ms: 1.1122
+  type: 'test'
+  ...
+# Subtest: a cached replay with altered bytes fails checksum verification
+ok 396 - a cached replay with altered bytes fails checksum verification
+  ---
+  duration_ms: 181.452
+  type: 'test'
+  ...
+# Subtest: the same live id submitted twice yields one job, not two downloads
+ok 397 - the same live id submitted twice yields one job, not two downloads
+  ---
+  duration_ms: 4.9834
+  type: 'test'
+  ...
+# Subtest: a manual retry can still ask for the old throwing behaviour
+ok 398 - a manual retry can still ask for the old throwing behaviour
+  ---
+  duration_ms: 0.5564
+  type: 'test'
+  ...
+# Subtest: an archived live id is refused even when the submission is idempotent
+ok 399 - an archived live id is refused even when the submission is idempotent
+  ---
+  duration_ms: 0.391
+  type: 'test'
+  ...
+# Subtest: manual replay import archives a verified official replay and queues draft after download
+ok 400 - manual replay import archives a verified official replay and queues draft after download
+  ---
+  duration_ms: 89.7725
+  type: 'test'
+  ...
+# Subtest: an import without member metadata takes them from the replay list, not today's date
+ok 401 - an import without member metadata takes them from the replay list, not today's date
+  ---
+  duration_ms: 21.4048
+  type: 'test'
+  ...
+# Subtest: manual replay import rejects a second valid archive for the same live ID
+ok 402 - manual replay import rejects a second valid archive for the same live ID
+  ---
+  duration_ms: 3.1807
+  type: 'test'
+  ...
+# Subtest: done is published only after a failed auto upload enqueue is recorded
+ok 403 - done is published only after a failed auto upload enqueue is recorded
+  ---
+  duration_ms: 17.9892
+  type: 'test'
+  ...
+# Subtest: preview requires the exact public reviewed replay and never enqueues by itself
+ok 404 - preview requires the exact public reviewed replay and never enqueues by itself
+  ---
+  duration_ms: 3.2792
+  type: 'test'
+  ...
+# Subtest: existing archive and active import are reused without a second download
+ok 405 - existing archive and active import are reused without a second download
+  ---
+  duration_ms: 1.142
+  type: 'test'
+  ...
+# Subtest: confirmation is explicitly bound to an unexpired preview and rejects duplicates
+ok 406 - confirmation is explicitly bound to an unexpired preview and rejects duplicates
+  ---
+  duration_ms: 0.4977
+  type: 'test'
+  ...
+# Subtest: routes expose preview, require explicit confirmation and hide provider errors
+ok 407 - routes expose preview, require explicit confirmation and hide provider errors
+  ---
+  duration_ms: 309.9568
+  type: 'test'
+  ...
+# Subtest: the review gate stays an internal rule, never a field on the public replay DTO
+ok 408 - the review gate stays an internal rule, never a field on the public replay DTO
+  ---
+  duration_ms: 2.9533
+  type: 'test'
+  ...
+# Subtest: the DTO keeps normalized public fields and drops private recording data
+ok 409 - the DTO keeps normalized public fields and drops private recording data
+  ---
+  duration_ms: 0.5304
+  type: 'test'
+  ...
+# Subtest: duration parsing rejects malformed clock strings
+ok 410 - duration parsing rejects malformed clock strings
+  ---
+  duration_ms: 0.199
+  type: 'test'
+  ...
+# Subtest: a public replay summary is a whitelist DTO without model, endpoint or segment text
+ok 411 - a public replay summary is a whitelist DTO without model, endpoint or segment text
+  ---
+  duration_ms: 282.0673
+  type: 'test'
+  ...
+# Subtest: without a summary the endpoint says so instead of returning an empty page
+ok 412 - without a summary the endpoint says so instead of returning an empty page
+  ---
+  duration_ms: 26.8599
+  type: 'test'
+  ...
+# Subtest: an archive that is not finished is not published
+ok 413 - an archive that is not finished is not published
+  ---
+  duration_ms: 11.2042
+  type: 'test'
+  ...
+# Subtest: turning the public summary off hides it even when one exists
+ok 414 - turning the public summary off hides it even when one exists
+  ---
+  duration_ms: 18.0007
+  type: 'test'
+  ...
+# Subtest: chapters and highlights are published only when their switches are on
+ok 415 - chapters and highlights are published only when their switches are on
+  ---
+  duration_ms: 27.4802
+  type: 'test'
+  ...
+# Subtest: chapters-only mode publishes titles and times without the prose
+ok 416 - chapters-only mode publishes titles and times without the prose
+  ---
+  duration_ms: 14.5165
+  type: 'test'
+  ...
+# Subtest: download completes before original is inspected or pointer replaced; backup persists across restart
+ok 417 - download completes before original is inspected or pointer replaced; backup persists across restart
+  ---
+  duration_ms: 12269.9973
+  type: 'test'
+  ...
+# Subtest: download failure, short replay, missing audio and lower resolution retain original
+ok 418 - download failure, short replay, missing audio and lower resolution retain original
+  ---
+  duration_ms: 163.827
+  type: 'test'
+  ...
+# Subtest: existing draft, subtitles or clips block replacement even if added during download
+ok 419 - existing draft, subtitles or clips block replacement even if added during download
+  ---
+  duration_ms: 49.2572
+  type: 'test'
+  ...
+# Subtest: atomic recording persistence failure cannot switch in-memory or persisted file pointer
+ok 420 - atomic recording persistence failure cannot switch in-memory or persisted file pointer
+  ---
+  duration_ms: 4.3884
+  type: 'test'
+  ...
+# Subtest: automatic failure waits and blocks upload; retry exhaustion releases original
+ok 421 - automatic failure waits and blocks upload; retry exhaustion releases original
+  ---
+  duration_ms: 93.0423
+  type: 'test'
+  ...
+# Subtest: distinct live IDs never merge just because member and title match
+ok 422 - distinct live IDs never merge just because member and title match
+  ---
+  duration_ms: 0.4282
+  type: 'test'
+  ...
+# Subtest: upload quality gate requires persisted replay review and explicit local confirmation
+ok 423 - upload quality gate requires persisted replay review and explicit local confirmation
+  ---
+  duration_ms: 6.0121
+  type: 'test'
+  ...
+# Subtest: upload queue item captures archive version and file fingerprint
+ok 424 - upload queue item captures archive version and file fingerprint
+  ---
+  duration_ms: 2.7583
+  type: 'test'
+  ...
+# Subtest: automatic complete local archive uses metadata and decode validation without replay download
+ok 425 - automatic complete local archive uses metadata and decode validation without replay download
+  ---
+  duration_ms: 1749.5651
+  type: 'test'
+  ...
+# Subtest: manual endpoint returns immediately, locks deletion/upload, and exposes progress
+ok 426 - manual endpoint returns immediately, locks deletion/upload, and exposes progress
+  ---
+  duration_ms: 142.218
+  type: 'test'
+  ...
+# Subtest: only the upstream canonical h5.48.cn share form yields the numeric live id
+ok 427 - only the upstream canonical h5.48.cn share form yields the numeric live id
+  ---
+  duration_ms: 1.9202
+  type: 'test'
+  ...
+# Subtest: ambiguous, short, bare, foreign, credentialed or fragment links are refused
+ok 428 - ambiguous, short, bare, foreign, credentialed or fragment links are refused
+  ---
+  duration_ms: 0.7802
+  type: 'test'
+  ...
+# Subtest: only replays inside the window, belonging to the member and not yet archived are picked
+ok 429 - only replays inside the window, belonging to the member and not yet archived are picked
+  ---
+  duration_ms: 2.0137
+  type: 'test'
+  ...
+# Subtest: a replay is never queued twice inside one decision
+ok 430 - a replay is never queued twice inside one decision
+  ---
+  duration_ms: 0.2268
+  type: 'test'
+  ...
+# Subtest: the watch refuses to arm without a numeric member id
+ok 431 - the watch refuses to arm without a numeric member id
+  ---
+  duration_ms: 0.5047
+  type: 'test'
+  ...
+# Subtest: arming starts the window now and disarming clears the attempt clock
+ok 432 - arming starts the window now and disarming clears the attempt clock
+  ---
+  duration_ms: 6.9855
+  type: 'test'
+  ...
+# Subtest: an attempt is stamped before the request so a crash cannot hot-loop
+ok 433 - an attempt is stamped before the request so a crash cannot hot-loop
+  ---
+  duration_ms: 7.7052
+  type: 'test'
+  ...
+# [retention] removed 1 duplicate/cache files (2048 bytes)
+# [retention] on-demand reclaim removed 1 fragment/cache files (1024 bytes, free 1024)
+# Subtest: sweep never deletes the verified main file of an official_replay archive
+ok 434 - sweep never deletes the verified main file of an official_replay archive
+  ---
+  duration_ms: 32.2064
+  type: 'test'
+  ...
+# Subtest: sweep still reclaims genuine source fragments of an archived recording
+ok 435 - sweep still reclaims genuine source fragments of an archived recording
+  ---
+  duration_ms: 22.9476
+  type: 'test'
+  ...
+# Subtest: water-level purge never deletes an archive main file either
+ok 436 - water-level purge never deletes an archive main file either
+  ---
+  duration_ms: 5.5134
+  type: 'test'
+  ...
+# Subtest: reclaimNow refuses any path that is a record main file
+ok 437 - reclaimNow refuses any path that is a record main file
+  ---
+  duration_ms: 6.095
+  type: 'test'
+  ...
+# [retention] water-level purge removed 1 fragment/cache files (400 bytes, free 107240563088)
+# [retention] water-level purge removed 1 fragment/cache files (400 bytes, free 107240534416)
+# [retention] water-level purge removed 1 fragment/cache files (400 bytes, free 107240530320)
+# [retention] water-level purge removed 4 fragment/cache files (2300 bytes, free 107240511740)
+# (node:25028) [DEP0187] DeprecationWarning: Passing invalid argument types to fs.existsSync is deprecated
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: archive main files are never removed by the purge
+ok 438 - archive main files are never removed by the purge
+  ---
+  duration_ms: 27.4878
+  type: 'test'
+  ...
+# Subtest: a fragment referenced by an active upload is kept
+ok 439 - a fragment referenced by an active upload is kept
+  ---
+  duration_ms: 13.7999
+  type: 'test'
+  ...
+# Subtest: fragments of an archive that failed verification are kept
+ok 440 - fragments of an archive that failed verification are kept
+  ---
+  duration_ms: 18.4399
+  type: 'test'
+  ...
+# Subtest: reclaimed fragments drop their references from every owner
+ok 441 - reclaimed fragments drop their references from every owner
+  ---
+  duration_ms: 23.6009
+  type: 'test'
+  ...
+# Subtest: stray and residual files are reclaimable, live archive main files are not
+ok 442 - stray and residual files are reclaimable, live archive main files are not
+  ---
+  duration_ms: 39.9934
+  type: 'test'
+  ...
+# Subtest: nothing is reclaimed while free space is above the reserve line
+ok 443 - nothing is reclaimed while free space is above the reserve line
+  ---
+  duration_ms: 2.7467
+  type: 'test'
+  ...
+# Subtest: the config target never sits below the reserve line
+ok 444 - the config target never sits below the reserve line
+  ---
+  duration_ms: 0.1751
+  type: 'test'
+  ...
+# [retention] removed 1 duplicate/cache files (5 bytes)
+# [retention] removed 1 duplicate/cache files (8 bytes)
+# Subtest: existing archives start a verified 24-hour window; expiry removes only duplicate and its references
+ok 445 - existing archives start a verified 24-hour window; expiry removes only duplicate and its references
+  ---
+  duration_ms: 43.4093
+  type: 'test'
+  ...
+# Subtest: other main files, active uploads, invalid media, and files outside root remain
+ok 446 - other main files, active uploads, invalid media, and files outside root remain
+  ---
+  duration_ms: 35.9191
+  type: 'test'
+  ...
+# Subtest: expired inactive replay fragments clear while recent resume data stays
+ok 447 - expired inactive replay fragments clear while recent resume data stays
+  ---
+  duration_ms: 25.6003
+  type: 'test'
+  ...
+# Subtest: manual reupload retry bypasses historical completed guard only for the current job
+ok 448 - manual reupload retry bypasses historical completed guard only for the current job
+  ---
+  duration_ms: 15.6321
+  type: 'test'
+  ...
+# Subtest: reject non-media protocols
+ok 449 - reject non-media protocols
+  ---
+  duration_ms: 0.9928
+  type: 'test'
+  ...
+# Subtest: manual stop archives real audio immediately, persists messages and pauses watch
+ok 450 - manual stop archives real audio immediately, persists messages and pauses watch
+  ---
+  duration_ms: 13107.488
+  type: 'test'
+  ...
+# Subtest: a second start for the same live attaches as a segment instead of a new archive
+ok 451 - a second start for the same live attaches as a segment instead of a new archive
+  ---
+  duration_ms: 6.6345
+  type: 'test'
+  ...
+# Subtest: segments inherit the owner session across a restart-shaped state
+ok 452 - segments inherit the owner session across a restart-shaped state
+  ---
+  duration_ms: 5.7508
+  type: 'test'
+  ...
+# Subtest: a deleted owner does not block a fresh archive
+ok 453 - a deleted owner does not block a fresh archive
+  ---
+  duration_ms: 5.9385
+  type: 'test'
+  ...
+# Subtest: explicit segments are recognised as an auto-reconnect pair
+ok 454 - explicit segments are recognised as an auto-reconnect pair
+  ---
+  duration_ms: 4.6401
+  type: 'test'
+  ...
+# Subtest: different lives are never merged
+ok 455 - different lives are never merged
+  ---
+  duration_ms: 4.0606
+  type: 'test'
+  ...
+# Subtest: clips sharing a liveId are not treated as session owners
+ok 456 - clips sharing a liveId are not treated as session owners
+  ---
+  duration_ms: 5.7278
+  type: 'test'
+  ...
+# Subtest: only a published replay page gets its own tags
+ok 457 - only a published replay page gets its own tags
+  ---
+  duration_ms: 1.6115
+  type: 'test'
+  ...
+# Subtest: titles and descriptions are truncated and HTML-escaped
+ok 458 - titles and descriptions are truncated and HTML-escaped
+  ---
+  duration_ms: 0.8337
+  type: 'test'
+  ...
+# Subtest: injection replaces the generic title and adds one card
+ok 459 - injection replaces the generic title and adds one card
+  ---
+  duration_ms: 0.3944
+  type: 'test'
+  ...
+# Subtest: the served page carries the card for a published replay only
+ok 460 - the served page carries the card for a published replay only
+  ---
+  duration_ms: 257.0402
+  type: 'test'
+  ...
+# Subtest: a shared replay file does not block deleting a duplicate archive
+ok 461 - a shared replay file does not block deleting a duplicate archive
+  ---
+  duration_ms: 180.6871
+  type: 'test'
+  ...
+# Subtest: two archives sharing one main file can be deleted one at a time
+ok 462 - two archives sharing one main file can be deleted one at a time
+  ---
+  duration_ms: 46.0989
+  type: 'test'
+  ...
+# Subtest: a segment shared with another archive is detached, not unlinked
+ok 463 - a segment shared with another archive is detached, not unlinked
+  ---
+  duration_ms: 32.6394
+  type: 'test'
+  ...
+# Subtest: a code is returned once and only its hash is stored
+ok 464 - a code is returned once and only its hash is stored
+  ---
+  duration_ms: 9.7485
+  type: 'test'
+  ...
+# Subtest: codes expire, resolve only while valid and can be revoked
+ok 465 - codes expire, resolve only while valid and can be revoked
+  ---
+  duration_ms: 11.5057
+  type: 'test'
+  ...
+# Subtest: one code per member is kept and input is validated
+ok 466 - one code per member is kept and input is validated
+  ---
+  duration_ms: 7.01
+  type: 'test'
+  ...
+# Subtest: the guest payload carries only that member's public account fields
+ok 467 - the guest payload carries only that member's public account fields
+  ---
+  duration_ms: 0.2818
+  type: 'test'
+  ...
+# Subtest: the public route refuses a bad code and answers with no-store
+ok 468 - the public route refuses a bad code and answers with no-store
+  ---
+  duration_ms: 309.1943
+  type: 'test'
+  ...
+# Subtest: every successful visit is counted and time-stamped, without storing who
+ok 469 - every successful visit is counted and time-stamped, without storing who
+  ---
+  duration_ms: 11.546
+  type: 'test'
+  ...
+# Subtest: Weibo known homepage reuses parser, checks UID and returns the lookup contract
+ok 470 - Weibo known homepage reuses parser, checks UID and returns the lookup contract
+  ---
+  duration_ms: 26.8062
+  type: 'test'
+  ...
+# Subtest: Weibo falls back only to the second fixed official public endpoint
+ok 471 - Weibo falls back only to the second fixed official public endpoint
+  ---
+  duration_ms: 1.1279
+  type: 'test'
+  ...
+# Subtest: Bilibili accepts a known profile URL and exact official card identity
+ok 472 - Bilibili accepts a known profile URL and exact official card identity
+  ---
+  duration_ms: 0.633
+  type: 'test'
+  ...
+# Subtest: missing users, mismatched IDs, failure envelopes and untrusted nickname fields never produce recognition
+ok 473 - missing users, mismatched IDs, failure envelopes and untrusted nickname fields never produce recognition
+  ---
+  duration_ms: 7.5754
+  type: 'test'
+  ...
+# Subtest: restricted platforms and manual Weibo handles degrade locally without any network
+ok 474 - restricted platforms and manual Weibo handles degrade locally without any network
+  ---
+  duration_ms: 0.5636
+  type: 'test'
+  ...
+# Subtest: invalid inputs and SSRF-shaped targets fail before the injected transport
+ok 475 - invalid inputs and SSRF-shaped targets fail before the injected transport
+  ---
+  duration_ms: 2.4506
+  type: 'test'
+  ...
+# Subtest: redirects, non-JSON, failures and network exceptions are safe, uncached and never followed
+ok 476 - redirects, non-JSON, failures and network exceptions are safe, uncached and never followed
+  ---
+  duration_ms: 2.7396
+  type: 'test'
+  ...
+# Subtest: declared and streamed response-size limits cancel bodies
+ok 477 - declared and streamed response-size limits cancel bodies
+  ---
+  duration_ms: 1.779
+  type: 'test'
+  ...
+# Subtest: wall-clock deadline includes both fetch and body, aborts transport, and releases slots
+ok 478 - wall-clock deadline includes both fetch and body, aborts transport, and releases slots
+  ---
+  duration_ms: 67.1172
+  type: 'test'
+  ...
+# Subtest: Weibo deadline prevents fallback, ignores late evidence and does not cache a timed-out lookup
+ok 479 - Weibo deadline prevents fallback, ignores late evidence and does not cache a timed-out lookup
+  ---
+  duration_ms: 31.1872
+  type: 'test'
+  ...
+# Subtest: failed lookups consume the same finite request budget
+ok 480 - failed lookups consume the same finite request budget
+  ---
+  duration_ms: 0.641
+  type: 'test'
+  ...
+# Subtest: successful cache expires, has a finite capacity and cannot be mutated by a caller
+ok 481 - successful cache expires, has a finite capacity and cannot be mutated by a caller
+  ---
+  duration_ms: 1.6806
+  type: 'test'
+  ...
+# Subtest: concurrent duplicate lookups coalesce, independent lookups are bounded and calls are throttled
+ok 482 - concurrent duplicate lookups coalesce, independent lookups are bounded and calls are throttled
+  ---
+  duration_ms: 1.0308
+  type: 'test'
+  ...
+# Subtest: lookup route enforces real admin middleware, contract, origin guard and never accesses storage
+ok 483 - lookup route enforces real admin middleware, contract, origin guard and never accesses storage
+  ---
+  duration_ms: 261.3345
+  type: 'test'
+  ...
+# Subtest: new Weibo accounts use free-form notes without a default subtype
+ok 484 - new Weibo accounts use free-form notes without a default subtype
+  ---
+  duration_ms: 2.0129
+  type: 'test'
+  ...
+# Subtest: legacy subtype is preserved in notes and can be retired by editing without duplication
+ok 485 - legacy subtype is preserved in notes and can be retired by editing without duplication
+  ---
+  duration_ms: 0.5705
+  type: 'test'
+  ...
+# Subtest: legacy subtype retirement without a note preserves both labels and all 300 characters
+ok 486 - legacy subtype retirement without a note preserves both labels and all 300 characters
+  ---
+  duration_ms: 1.5398
+  type: 'test'
+  ...
+# Subtest: bare handles, names and group text keep their previous semantics
+ok 487 - bare handles, names and group text keep their previous semantics
+  ---
+  duration_ms: 0.5435
+  type: 'test'
+  ...
+# Subtest: a new store lists every platform with Weibo split into main and secondary
+ok 488 - a new store lists every platform with Weibo split into main and secondary
+  ---
+  duration_ms: 0.7659
+  type: 'test'
+  ...
+# Subtest: Weibo keeps a main and a secondary account for the same member
+ok 489 - Weibo keeps a main and a secondary account for the same member
+  ---
+  duration_ms: 0.2371
+  type: 'test'
+  ...
+# Subtest: Weibo rejects an unknown size and other platforms ignore it
+ok 490 - Weibo rejects an unknown size and other platforms ignore it
+  ---
+  duration_ms: 0.516
+  type: 'test'
+  ...
+# Subtest: a group row records its kind, join count and note, with a free-typed kind kept
+ok 491 - a group row records its kind, join count and note, with a free-typed kind kept
+  ---
+  duration_ms: 0.2899
+  type: 'test'
+  ...
+# Subtest: profile URLs extract path IDs locally and discard tracking without changing fields
+ok 492 - profile URLs extract path IDs locally and discard tracking without changing fields
+  ---
+  duration_ms: 1.4128
+  type: 'test'
+  ...
+# Subtest: ambiguous, foreign, malformed and short links fail closed without guessing an ID
+ok 493 - ambiguous, foreign, malformed and short links fail closed without guessing an ID
+  ---
+  duration_ms: 1.1999
+  type: 'test'
+  ...
+# Subtest: URL normalization works on update and import; invalid updates do not alter stored rows
+ok 494 - URL normalization works on update and import; invalid updates do not alter stored rows
+  ---
+  duration_ms: 0.8041
+  type: 'test'
+  ...
+# Subtest: an account can be edited and removed by id only
+ok 495 - an account can be edited and removed by id only
+  ---
+  duration_ms: 0.364
+  type: 'test'
+  ...
+# Subtest: importing the directory twice adds each account once and honours bans
+ok 496 - importing the directory twice adds each account once and honours bans
+  ---
+  duration_ms: 0.4128
+  type: 'test'
+  ...
+# Subtest: a banned member does not swallow accounts they already own
+ok 497 - a banned member does not swallow accounts they already own
+  ---
+  duration_ms: 0.1574
+  type: 'test'
+  ...
+# Subtest: unbanning removes the link instead of keeping a dead flag
+ok 498 - unbanning removes the link instead of keeping a dead flag
+  ---
+  duration_ms: 0.1503
+  type: 'test'
+  ...
+# Subtest: the route is registered behind admin authentication
+ok 499 - the route is registered behind admin authentication
+  ---
+  duration_ms: 314.1864
+  type: 'test'
+  ...
+# Subtest: custom group labels stay canonical across create, no-op edits and import
+ok 500 - custom group labels stay canonical across create, no-op edits and import
+  ---
+  duration_ms: 0.5334
+  type: 'test'
+  ...
+# Subtest: group count remains unset unless provided and can be explicitly cleared
+ok 501 - group count remains unset unless provided and can be explicitly cleared
+  ---
+  duration_ms: 0.1788
+  type: 'test'
+  ...
+# Subtest: file persistence survives a new repository and removes flags without resurrection
+ok 502 - file persistence survives a new repository and removes flags without resurrection
+  ---
+  duration_ms: 10.5311
+  type: 'test'
+  ...
+# Subtest: write failure cannot mutate an injected read snapshot
+ok 503 - write failure cannot mutate an injected read snapshot
+  ---
+  duration_ms: 0.3589
+  type: 'test'
+  ...
+# Subtest: special member names are stored as own keys without prototype mutation
+ok 504 - special member names are stored as own keys without prototype mutation
+  ---
+  duration_ms: 0.1277
+  type: 'test'
+  ...
+# [social] operation failed
+# [social] operation failed
+# Subtest: route parameters decode once; unexpected read/write errors stay private
+ok 505 - route parameters decode once; unexpected read/write errors stay private
+  ---
+  duration_ms: 32.8869
+  type: 'test'
+  ...
+# Subtest: parses BOM CRLF multiline and rejects malformed, oversized and out-of-range subtitles
+ok 506 - parses BOM CRLF multiline and rejects malformed, oversized and out-of-range subtitles
+  ---
+  duration_ms: 2.947
+  type: 'test'
+  ...
+# Subtest: imports without ASR credentials, protects existing analysis and backs up confirmed replacement
+ok 507 - imports without ASR credentials, protects existing analysis and backs up confirmed replacement
+  ---
+  duration_ms: 29773.2991
+  type: 'test'
+  ...
+# Subtest: text connection probe sends one chat request and distinguishes reply, empty, auth, quota and invalid responses
+ok 508 - text connection probe sends one chat request and distinguishes reply, empty, auth, quota and invalid responses
+  ---
+  duration_ms: 70.6705
+  type: 'test'
+  ...
+1..508
+# tests 508
+# suites 0
+# pass 503
+# fail 4
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 135290.6042

@@ -1,0 +1,8 @@
+[
+  {
+    "name": "node_probe",
+    "exit": 0,
+    "stdout": "{\"sampledAt\":\"2026-10-29T12:34:51.419Z\",\"rows\":[{\"dir\":\"/app/data/recovery-20261026-29/1321966661005021184\",\"exists\":true,\"assets\":1612,\"assetBytes\":3476821992,\"segmentsDone\":1612,\"segmentsTotal\":1659,\"hasComplete\":false,\"hasVerified\":false,\"hasProcessing\":false,\"mtime\":\"2026-10-29T11:56:46.330Z\"},{\"dir\":\"/app/data/recovery-20261026-29/1322332610476445696\",\"exists\":false,\"assets\":0,\"assetBytes\":0,\"segmentsDone\":null,\"segmentsTotal\":null,\"hasComplete\":false,\"hasVerified\":false,\"hasProcessing\":false,\"mtime\":null},{\"dir\":\"/app/data/recovery-staging/recordings/recovery-import-staging/1321966661005021184\",\"exists\":false,\"assets\":0,\"assetBytes\":0,\"segmentsDone\":null,\"segmentsTotal\":null,\"hasComplete\":false,\"hasVerified\":false,\"hasProcessing\":false,\"mtime\":null}],\"recoveryDirBytes\":5969521558,\"fsFree\":{\"bavailGiB\":7.98455810546875,\"totalGiB\":39.199642181396484}}\n",
+    "stderr": ""
+  }
+]

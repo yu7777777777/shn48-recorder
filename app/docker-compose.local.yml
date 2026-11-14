@@ -1,0 +1,10 @@
+services:
+  shn48:
+    container_name: ${CONTAINER_NAME:-shn48-recorder-local}
+    environment:
+      COOKIE_SECURE: "false"
+      TRUST_PROXY: "false"
+    ports:
+      # Local-only diagnostic access. Production should use docker-compose.yml
+      # without this override and put a TLS reverse proxy on the web network.
+      - "127.0.0.1:${HOST_PORT:-3000}:3000"

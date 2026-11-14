@@ -1,0 +1,19 @@
+// 网站整体布局模板
+doctype html
+html.w-full.h-full
+  head
+    meta(charset='utf-8')
+    link(rel='stylesheet' href='./style/common.css')
+    block head
+
+  body.m-0.w-full.h-full
+    div.flex.w-full.h-full.overflow-hidden
+      include _aside
+
+      div.grow
+        div.box-border.p-4.h-full.overflow-auto
+          article.prose.prose-stone
+            block article
+
+    script(src='./script/common.js')
+    block script

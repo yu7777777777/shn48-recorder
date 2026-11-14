@@ -1,0 +1,528 @@
+[
+  {
+    "name": "local-home",
+    "url": "http://127.0.0.1:53704",
+    "pageErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    ],
+    "httpErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      }
+    ],
+    "blockedRequests": [
+      "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    ],
+    "status": 200,
+    "finalUrl": "http://127.0.0.1:53704/",
+    "title": "48tools 1.31.1 - Recording Hub",
+    "bodyText": "48tools\n1.31.1\n直播服务在线\n正在直播\n往期重播\nNOW STREAMING\n当前正在直播\n刷新\n当前没有正在进行的直播\n\n成员开播后会自动出现在这里；本页每 30 秒刷新一次。\n\n立即刷新\n页面自动同步开播状态",
+    "screenshot": "local-home.png",
+    "links": [
+      {
+        "text": "正在直播",
+        "href": "/"
+      },
+      {
+        "text": "往期重播",
+        "href": "/replays"
+      }
+    ],
+    "horizontalOverflow": false
+  },
+  {
+    "name": "local-replays",
+    "url": "http://127.0.0.1:53704/replays",
+    "pageErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    ],
+    "httpErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      }
+    ],
+    "blockedRequests": [
+      "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    ],
+    "status": 200,
+    "finalUrl": "http://127.0.0.1:53704/replays",
+    "title": "48tools 1.31.1 - Recording Hub",
+    "bodyText": "48tools\n1.31.1\n服务在线\n正在直播\n往期重播\nMEMBER REPLAYS\n往期公开重播\n全部团体\nSNH48\nBEJ48\nGNZ48\nCKG48\nCGT48\n暂时没有可观看的往期重播\n\n口袋48有成员公开回放后会显示在这里。\n\n刷新重播\n仅展示口袋48官方成员公开重播",
+    "screenshot": "local-replays.png",
+    "links": [
+      {
+        "text": "正在直播",
+        "href": "/"
+      },
+      {
+        "text": "往期重播",
+        "href": "/replays"
+      }
+    ],
+    "horizontalOverflow": false
+  },
+  {
+    "name": "local-admin-login",
+    "url": "http://127.0.0.1:53704/admin/login",
+    "pageErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    ],
+    "httpErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      }
+    ],
+    "blockedRequests": [
+      "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    ],
+    "status": 200,
+    "finalUrl": "http://127.0.0.1:53704/admin/login",
+    "title": "48tools 1.31.1 - Recording Hub",
+    "bodyText": "48tools\nCONSOLE\nADMIN CONSOLE\n管理登录\n\n录制、自动监控与 B站草稿发布仅限管理员访问。\n\n管理员账号\n密码\n记住登录 （30 天）\n进入管理后台\n返回公开直播页",
+    "screenshot": "local-admin-login.png",
+    "links": [],
+    "horizontalOverflow": false
+  },
+  {
+    "name": "local-admin-protected",
+    "url": "http://127.0.0.1:53704/admin/archive",
+    "pageErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    ],
+    "httpErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      }
+    ],
+    "blockedRequests": [
+      "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    ],
+    "status": 200,
+    "finalUrl": "http://127.0.0.1:53704/admin/login",
+    "title": "48tools 1.31.1 - Recording Hub",
+    "bodyText": "48tools\nCONSOLE\nADMIN CONSOLE\n管理登录\n\n录制、自动监控与 B站草稿发布仅限管理员访问。\n\n管理员账号\n密码\n记住登录 （30 天）\n进入管理后台\n返回公开直播页",
+    "screenshot": "local-admin-protected.png",
+    "links": [],
+    "horizontalOverflow": false
+  },
+  {
+    "name": "production-home",
+    "url": "http://<SERVER_IP>:3000",
+    "pageErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    ],
+    "httpErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/184483902xrd7og47u18p990qi80hencr.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0921/184483902x93y42xoy4z4c2i036944uzh.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      }
+    ],
+    "blockedRequests": [
+      "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap",
+      "https://source3.48.cn/2026/1029/184483902xrd7og47u18p990qi80hencr.jpg",
+      "https://source3.48.cn/avatar/2026/0921/184483902x93y42xoy4z4c2i036944uzh.jpg"
+    ],
+    "status": 200,
+    "finalUrl": "http://<SERVER_IP>:3000/",
+    "title": "48tools 1.31.1 - Recording Hub",
+    "bodyText": "48tools\n1.31.1\n直播服务在线\n正在直播\n1\n往期重播\nNOW STREAMING\n当前正在直播\n刷新\nG\nLIVE\n1\nG\n晚上好\nGNZ48-向吴怡轩 · 正在直播\n页面自动同步开播状态",
+    "screenshot": "production-home.png",
+    "links": [
+      {
+        "text": "正在直播1",
+        "href": "/"
+      },
+      {
+        "text": "往期重播",
+        "href": "/replays"
+      }
+    ],
+    "horizontalOverflow": false
+  },
+  {
+    "name": "production-replays",
+    "url": "http://<SERVER_IP>:3000/replays",
+    "pageErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    ],
+    "httpErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/184483902x3iyfnw5apxa6n3daszn56np.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0921/184483902x93y42xoy4z4c2i036944uzh.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/175308886xaq8df84vrl0mxta500gwvup.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0920/175308886xidt7bxvdmddlp3u7r33aeky.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/95552277xoljjywa6l6647a108sxf9hn.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/1018/95552277xdw2b95ajnlqxsel95kdxoan.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/711741xq3llk9o17ungluediaahe7e.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2024/0913/711741x38a0igfrt918syy1h7ylf96.gif",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/128581635x8m3rm093oy84mo21n24huwh.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2024/1226/128581635xfcsk94no3bh5no9kx8mrw4m.gif",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/161808454x27pr2wnu5a9gis0yepzo0n9.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0929/161808454x3hbjr1ks7zft6l8d2e7ylou.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/161808468xwdzuon58rxpoc5s61g38aba.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/1001/161808468x3rto6ihr1qmo96maxc72zs1.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/64487703xkwx2e7ko9jddjz8b78vr7hc.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0928/64487703xtai4lft7b6fuvug79yl2oty.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/113443141xmg1mf2kj9h4bdq1j5sqbmco.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0318/113443141xz497kgwiyv0xobw0oyr6d03.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/161153115xmft1dsdockq586r1tbr4d24.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0318/161153115x442yviixib44nt7uz9zjwa8.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/136446099xgr5hoqi4r5xbesl6fv8mn2f.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0816/136446099xogbvdhisheeo4tom5nt3o9o.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/135463877xus9op9dhsqet9rgygzi4jg2.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/1029/135463877xkmjgx6vq1ory3qkz7opxfde.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/175308883xw12hx1zkq08xi0uky15rjqc.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0920/175308883x3idxlbqv4wnizh7e7vy9zdh.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/175308883x91qemxp0yx5ajd8c6s8fu3j.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/42402741x2l3reqjnp6z69i7brm2rt3m.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0810/42402741x8s17ha4nau0fzk33lpr2i1n.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/184483901xzye22sceb7rlf4u4hou8wkp.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/530390xoux6hn4ieoirov6lipt072e.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/105710015xhowkxbylr5ct0w1il80eufe.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      }
+    ],
+    "blockedRequests": [
+      "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap",
+      "https://source3.48.cn/2026/1029/184483902x3iyfnw5apxa6n3daszn56np.jpg",
+      "https://source3.48.cn/avatar/2026/0921/184483902x93y42xoy4z4c2i036944uzh.jpg",
+      "https://source3.48.cn/2026/1029/175308886xaq8df84vrl0mxta500gwvup.jpg",
+      "https://source3.48.cn/avatar/2026/0920/175308886xidt7bxvdmddlp3u7r33aeky.jpg",
+      "https://source3.48.cn/2026/1029/95552277xoljjywa6l6647a108sxf9hn.jpg",
+      "https://source3.48.cn/avatar/2026/1018/95552277xdw2b95ajnlqxsel95kdxoan.jpg",
+      "https://source3.48.cn/2026/1029/711741xq3llk9o17ungluediaahe7e.jpg",
+      "https://source3.48.cn/avatar/2024/0913/711741x38a0igfrt918syy1h7ylf96.gif",
+      "https://source3.48.cn/2026/1029/128581635x8m3rm093oy84mo21n24huwh.jpg",
+      "https://source3.48.cn/avatar/2024/1226/128581635xfcsk94no3bh5no9kx8mrw4m.gif",
+      "https://source3.48.cn/2026/1029/161808454x27pr2wnu5a9gis0yepzo0n9.jpg",
+      "https://source3.48.cn/avatar/2026/0929/161808454x3hbjr1ks7zft6l8d2e7ylou.jpg",
+      "https://source3.48.cn/2026/1029/161808468xwdzuon58rxpoc5s61g38aba.jpg",
+      "https://source3.48.cn/avatar/2026/1001/161808468x3rto6ihr1qmo96maxc72zs1.jpg",
+      "https://source3.48.cn/2026/1028/64487703xkwx2e7ko9jddjz8b78vr7hc.jpg",
+      "https://source3.48.cn/avatar/2026/0928/64487703xtai4lft7b6fuvug79yl2oty.jpg",
+      "https://source3.48.cn/2026/1028/113443141xmg1mf2kj9h4bdq1j5sqbmco.jpg",
+      "https://source3.48.cn/avatar/2026/0318/113443141xz497kgwiyv0xobw0oyr6d03.jpg",
+      "https://source3.48.cn/2026/1028/161153115xmft1dsdockq586r1tbr4d24.jpg",
+      "https://source3.48.cn/avatar/2026/0318/161153115x442yviixib44nt7uz9zjwa8.jpg",
+      "https://source3.48.cn/2026/1028/136446099xgr5hoqi4r5xbesl6fv8mn2f.jpg",
+      "https://source3.48.cn/avatar/2026/0816/136446099xogbvdhisheeo4tom5nt3o9o.jpg",
+      "https://source3.48.cn/2026/1028/135463877xus9op9dhsqet9rgygzi4jg2.jpg",
+      "https://source3.48.cn/avatar/2026/1029/135463877xkmjgx6vq1ory3qkz7opxfde.jpg",
+      "https://source3.48.cn/2026/1028/175308883xw12hx1zkq08xi0uky15rjqc.jpg",
+      "https://source3.48.cn/avatar/2026/0920/175308883x3idxlbqv4wnizh7e7vy9zdh.jpg",
+      "https://source3.48.cn/2026/1028/175308883x91qemxp0yx5ajd8c6s8fu3j.jpg",
+      "https://source3.48.cn/2026/1028/42402741x2l3reqjnp6z69i7brm2rt3m.jpg",
+      "https://source3.48.cn/avatar/2026/0810/42402741x8s17ha4nau0fzk33lpr2i1n.jpg",
+      "https://source3.48.cn/2026/1028/184483901xzye22sceb7rlf4u4hou8wkp.jpg",
+      "https://source3.48.cn/2026/1028/530390xoux6hn4ieoirov6lipt072e.jpg",
+      "https://source3.48.cn/2026/1028/105710015xhowkxbylr5ct0w1il80eufe.jpg"
+    ],
+    "status": 200,
+    "finalUrl": "http://<SERVER_IP>:3000/replays",
+    "title": "48tools 1.31.1 - Recording Hub",
+    "bodyText": "48tools\n1.31.1\n服务在线\n正在直播\n往期重播\nMEMBER REPLAYS\n往期公开重播\n全部团体\nSNH48\nBEJ48\nGNZ48\nCKG48\nCGT48\nG\n视频直播\n09:02\nG\n晚上好\nGNZ48-向吴怡轩 · 2026/10/29 17:45\n下载视频\nS\n视频直播\n02:02:56\nS\n小马陪你看嗯啊嗯\nSNH48-吉雅楠 · 2026/10/29 07:19\n下载视频\nB\n电台直播\n28:12\nB\n谁不睡觉👀\nBEJ48-马欣宇 · 2026/10/29 02:54\n下载视频\nS\n视频直播\n22:47\nS\n咩😗\nSNH48-杨宇馨 · 2026/10/29 01:42\n下载视频\nG\n电台直播\n01:29:11\nG\n来袭\nGNZ48-许涵婧 · 2026/10/29 01:26\n下载视频\nS\n电台直播\n01:33:02\nS\n晚上好！\nSNH48-黄子欣 · 2026/10/29 01:07\n下载视频\nS\n电台直播\n01:22:13\nS\n嘎\nSNH48-徐佳琳 · 2026/10/29 00:06\n下载视频\nS\n视频直播\n01:39:38\nS\n祝我生日快乐🎂～\nSNH48-芦馨怡 · 2026/10/28 23:51\n下载视频\nC\n视频直播\n49:20\nC\n文诞日～🎂\nCKG48-谭景文 · 2026/10/28 23:50\n下载视频\nG\n电台直播\n01:07:52\nG\nhi\nGNZ48-韩梓轩 · 2026/10/28 23:44\n下载视频\nG\n电台直播\n01:58:22\nG\n⚡️Live\nGNZ48-雷瑞妍 · 2026/10/28 23:34\n下载视频\nS\n视频直播\n02:56:29\nS\n过生日！\nSNH48-李子忻 · 2026/10/28 23:30\n下载视频\nS\n电台直播\n01:22:22\nS\n😜\nSNH48-何绮多 · 2026/10/28 23:27\n下载视频\nS\n视频直播\n00:07\nS\n😜\nSNH48-何绮多 · 2026/10/28 23:25\n下载视频\nS\n视频直播\n44:14\nS\n🌠\nSNH48-闫娜 · 2026/10/28 23:20\n下载视频\nG\n视频直播\n01:24:32\n带货go\nGNZ48-王唯祎 · 2026/10/28 23:18\n下载视频\nS\n视频直播\n17:56\n哈niu\nSNH48-王睿琦 · 2026/10/28 23:12\n下载视频\nC\n电台直播\n41:19\noi( ´ ▽ ` )ﾉ\nCGT48-王艺霖 · 2026/10/28 23:07\n下载视频\n视频直播\n19:18\n每天直播25小时\nCKG48-朱瑞缘 · 2026/10/28 22:57\n下载视频\n视频直播\n01:31:36\n咩😗\nSNH48-杨宇馨 · 2026/10/28 22:52\n下载视频\n加载更多重播\n仅展示口袋48官方成员公开重播",
+    "screenshot": "production-replays.png",
+    "links": [
+      {
+        "text": "正在直播",
+        "href": "/"
+      },
+      {
+        "text": "往期重播",
+        "href": "/replays"
+      }
+    ],
+    "horizontalOverflow": false
+  },
+  {
+    "name": "production-replay-detail",
+    "url": "http://<SERVER_IP>:3000/replays/1322464033778765824",
+    "pageErrors": [],
+    "consoleErrors": [
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector",
+      "Failed to load resource: net::ERR_BLOCKED_BY_CLIENT.Inspector"
+    ],
+    "httpErrors": [
+      {
+        "url": "http://<SERVER_IP>:3000/api/public/replays/1322464033778765824/summary",
+        "status": 404
+      }
+    ],
+    "failedRequests": [
+      {
+        "url": "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/175308886xaq8df84vrl0mxta500gwvup.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/184483902x3iyfnw5apxa6n3daszn56np.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0921/184483902x93y42xoy4z4c2i036944uzh.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/175308886xaq8df84vrl0mxta500gwvup.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0920/175308886xidt7bxvdmddlp3u7r33aeky.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/95552277xoljjywa6l6647a108sxf9hn.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/1018/95552277xdw2b95ajnlqxsel95kdxoan.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/711741xq3llk9o17ungluediaahe7e.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2024/0913/711741x38a0igfrt918syy1h7ylf96.gif",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/128581635x8m3rm093oy84mo21n24huwh.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2024/1226/128581635xfcsk94no3bh5no9kx8mrw4m.gif",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/161808454x27pr2wnu5a9gis0yepzo0n9.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/avatar/2026/0929/161808454x3hbjr1ks7zft6l8d2e7ylou.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1029/161808468xwdzuon58rxpoc5s61g38aba.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/64487703xkwx2e7ko9jddjz8b78vr7hc.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      },
+      {
+        "url": "https://source3.48.cn/2026/1028/113443141xmg1mf2kj9h4bdq1j5sqbmco.jpg",
+        "error": "net::ERR_BLOCKED_BY_CLIENT.Inspector"
+      }
+    ],
+    "blockedRequests": [
+      "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap",
+      "https://source3.48.cn/2026/1029/175308886xaq8df84vrl0mxta500gwvup.jpg",
+      "https://source3.48.cn/2026/1029/184483902x3iyfnw5apxa6n3daszn56np.jpg",
+      "https://source3.48.cn/avatar/2026/0921/184483902x93y42xoy4z4c2i036944uzh.jpg",
+      "https://source3.48.cn/2026/1029/175308886xaq8df84vrl0mxta500gwvup.jpg",
+      "https://source3.48.cn/avatar/2026/0920/175308886xidt7bxvdmddlp3u7r33aeky.jpg",
+      "https://source3.48.cn/2026/1029/95552277xoljjywa6l6647a108sxf9hn.jpg",
+      "https://source3.48.cn/avatar/2026/1018/95552277xdw2b95ajnlqxsel95kdxoan.jpg",
+      "https://source3.48.cn/2026/1029/711741xq3llk9o17ungluediaahe7e.jpg",
+      "https://source3.48.cn/avatar/2024/0913/711741x38a0igfrt918syy1h7ylf96.gif",
+      "https://source3.48.cn/2026/1029/128581635x8m3rm093oy84mo21n24huwh.jpg",
+      "https://source3.48.cn/avatar/2024/1226/128581635xfcsk94no3bh5no9kx8mrw4m.gif",
+      "https://source3.48.cn/2026/1029/161808454x27pr2wnu5a9gis0yepzo0n9.jpg",
+      "https://source3.48.cn/avatar/2026/0929/161808454x3hbjr1ks7zft6l8d2e7ylou.jpg",
+      "https://source3.48.cn/2026/1029/161808468xwdzuon58rxpoc5s61g38aba.jpg",
+      "https://source3.48.cn/2026/1028/64487703xkwx2e7ko9jddjz8b78vr7hc.jpg",
+      "https://source3.48.cn/2026/1028/113443141xmg1mf2kj9h4bdq1j5sqbmco.jpg"
+    ],
+    "status": 200,
+    "finalUrl": "http://<SERVER_IP>:3000/replays/1322464033778765824",
+    "title": "48tools 1.31.1 - Recording Hub",
+    "bodyText": "48tools\n1.31.1\n服务在线\n正在直播\n往期重播\n返回重播列表\n观看版式\n竖屏\n横屏\n时间轴弹幕\n跟随播放进度同步\n开启弹幕\n密度\n清爽\n标准\n丰富\n弹幕已关闭\n开启后在此查看跟随时间轴同步的弹幕\n同步偏移\n0.0s\n当前进度\n00:00\n视频直播\n小马陪你看嗯啊嗯\n\n口袋48成员\n·\n时间待更新\n·\n02:02:56\n\n下载视频\n首次下载会先整理完整回放，可能需要一些时间\n多版本导出\n横屏\n竖屏\n仅音频\n导出所选版本\n\n横屏、竖屏及仅音频转码尚未接入后端，暂不可导出；上方下载视频保留原始 MP4，不受观看版式影响。\n\n复制回放链接\nMEMBER REPLAYS\n往期公开重播\n全部团体\nSNH48\nBEJ48\nGNZ48\nCKG48\nCGT48\nG\n视频直播\n09:02\nG\n晚上好\nGNZ48-向吴怡轩 · 2026/10/29 17:45\n下载视频\nS\n视频直播\n02:02:56\nS\n小马陪你看嗯啊嗯\nSNH48-吉雅楠 · 2026/10/29 07:19\n下载视频\nB\n电台直播\n28:12\nB\n谁不睡觉👀\nBEJ48-马欣宇 · 2026/10/29 02:54\n下载视频\nS\n视频直播\n22:47\nS\n咩😗\nSNH48-杨宇馨 · 2026/10/29 01:42\n下载视频\nG\n电台直播\n01:29:11\nG\n来袭\nGNZ48-许涵婧 · 2026/10/29 01:26\n下载视频\nS\n电台直播\n01:33:02\nS\n晚上好！\nSNH48-黄子欣 · 2026/10/29 01:07\n下载视频\nS\n电台直播\n01:22:13\n嘎\nSNH48-徐佳琳 · 2026/10/29 00:06\n下载视频\nS\n视频直播\n01:39:38\n祝我生日快乐🎂～\nSNH48-芦馨怡 · 2026/10/28 23:51\n下载视频\nC\n视频直播\n49:20\n文诞日～🎂\nCKG48-谭景文 · 2026/10/28 23:50\n下载视频\n电台直播\n01:07:52\nhi\nGNZ48-韩梓轩 · 2026/10/28 23:44\n下载视频\n电台直播\n01:58:22\n⚡️Live\nGNZ48-雷瑞妍 · 2026/10/28 23:34\n下载视频\n视频直播\n02:56:29\n过生日！\nSNH48-李子忻 · 2026/10/28 23:30\n下载视频\n电台直播\n01:22:22\n😜\nSNH48-何绮多 · 2026/10/28 23:27\n下载视频\n视频直播\n00:07\n😜\nSNH48-何绮多 · 2026/10/28 23:25\n下载视频\n视频直播\n44:14\n🌠\nSNH48-闫娜 · 2026/10/28 23:20\n下载视频\n视频直播\n01:24:32\n带货go\nGNZ48-王唯祎 · 2026/10/28 23:18\n下载视频\n视频直播\n17:56\n哈niu\nSNH48-王睿琦 · 2026/10/28 23:12\n下载视频\n电台直播\n41:19\noi( ´ ▽ ` )ﾉ\nCGT48-王艺霖 · 2026/10/28 23:07\n下载视频\n视频直播\n19:18\n每天直播25小时\nCKG48-朱瑞缘 · 2026/10/28 22:57\n下载视频\n视频直播\n01:31:36\n咩😗\nSNH48-杨宇馨 · 2026/10/28 22:52\n下载视频\n加载更多重播\n仅展示口袋48官方成员公开重播",
+    "screenshot": "production-replay-detail.png",
+    "links": [
+      {
+        "text": "正在直播",
+        "href": "/"
+      },
+      {
+        "text": "往期重播",
+        "href": "/replays"
+      }
+    ],
+    "horizontalOverflow": false
+  }
+]

@@ -1,0 +1,2 @@
+﻿testExit=1
+root=C:\Users\ADMINI~1\AppData\Local\Temp\shn48-audit-backend-33853af594a24960af3bdf724e72bc5a

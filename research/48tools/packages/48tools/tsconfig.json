@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "jsx": "react-jsxdev",
+    "importHelpers": true,
+    "paths": {
+      "@48tools-types/*": ["./src/types/*"],
+      "@48tools-api/*": ["./src/services/*"],
+      "__mocks__/*": ["./src/__mocks__/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "../main"
+  ]
+}

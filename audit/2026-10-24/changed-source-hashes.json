@@ -1,0 +1,392 @@
+[
+  {
+    "path": "app/server/modules/analysis/insights.js",
+    "before": "cf6d4b4c90df5f35b1ab7c16f2e0f06bb37be41e3f4014963357462db00a83db",
+    "after": "459148f556634745090e3d4584739290be43fb7f71228291f4763d591a7fc830",
+    "changed": true
+  },
+  {
+    "path": "app/server/modules/analysis/queue.js",
+    "before": "ec11689f5e7c360623d52cbf80a1b67844160bcc8eaa35fd48b440952fe68364",
+    "after": "0e7b0e69e1ce1d710032ba3b1a7c848eebd9353c696e8db8929c243d8fe83892",
+    "changed": true
+  },
+  {
+    "path": "app/server/modules/analysis/service.js",
+    "before": "ff1d14d3e71220012aac3d08ac7396a28d1bbb0bc51567a5aa092e891f45d319",
+    "after": "f400c7c5ee9c901e6c8f9d2f2b07f308a9ac93a0003c350743134f549140291d",
+    "changed": true
+  },
+  {
+    "path": "app/server/modules/analysis/settings.js",
+    "before": "df60a5399730eb89a3c8740c4f3aaf13b0a9f93b96654c240eabf3fdc1bec6eb",
+    "after": "0643bfd9bc4e9ec131f0b08f116862e86085bf3ca710c3be831412c894b73863",
+    "changed": true
+  },
+  {
+    "path": "app/server/test/analysis-insights-service.test.js",
+    "before": "72eb682dc9b365a1686f12194add3dd1eb30805594251900dc451d85098c29b1",
+    "after": "4af9a48a9667616661083dd3845e80faf1bf8a1d6b695adbf2aa9e3ce4a070e4",
+    "changed": true
+  },
+  {
+    "path": "app/server/test/analysis-insights.test.js",
+    "before": "c5e5def05f092d8a15a4808187cbe5f82503d96dbda0f100fe13e5197691bfdf",
+    "after": "ae6575e247818c7c69a39a26a9a5b95bfdf7ba08847fa15e8b073f2ccc5cc604",
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/AdminLogin-7hce9mp-.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/AnalysisPanel-BkQ8dXnA.css",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/AnalysisSettings-D81RFfco.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/AutoRecord-TX2GGUxe.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/Backup115-EI98zjVG.css",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/Badge-DkvgeXE1.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/Bilibili-B0EHqDOG.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/Config-aE97IUwf.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/ConfirmModal-DiD-DPu2.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/CoverPicker-BCfen5px.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/Dashboard-pIJDWEbS.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/EmptyState-CdfQLKix.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/flv-CwS9Olga.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/hls-bsuTaLC4.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/index-BNOVxFIP.css",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/index-DSP0cXTF.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/Live-BHi5x5c9.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/PlatformIcon-B6krSZ4-.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/Pocket48-1WTYQRH1.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/Pocket48-DknBhtid.css",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/pocket48-message-56SyfPP3.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/ProgressBar-CWbzFSLF.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/PublicLive-BJFe1wdg.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/PublicMediaTabs-en3W-jMI.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/PublicReplay-BNUVdUW0.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/PublicReplay-DL9DTqPo.css",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/PublicSocial-DxXxzPK5.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/RecordingDetail-34FAXwMZ.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/RecordingDetail-mbL4JAjz.css",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/ReplayAnalysisImport-Cv6EXZeu.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/ReplayAnalysisImport-Dd1tXUgP.css",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/ReplayAudit-BJr3-GM5.css",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/ReplayAudit-CBTLqRiE.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/ReplayRecovery-D9tPCPyJ.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/SafeImage-BW8xs7Pb.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/Security-F2KQ95vl.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/SocialAccounts-DgmigfAS.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/SocialAccounts-DRTAAXZm.css",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/usePolling-BAQwvtF_.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/vendor-react-CUnftwWn.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/Video-BA5XYIvP.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/assets/VideoPlayer-DV9v6Wmm.js",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/favicon.svg",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/client/dist/index.html",
+    "before": null,
+    "after": null,
+    "changed": true
+  },
+  {
+    "path": "app/CHANGELOG.md",
+    "before": "bd63f32fc82fab0cd9a1be192026498172b4cebe2b7677aaf5d8828729acad24",
+    "after": "f4a96d19e05900c9c6497b479a753e621c36120fc64ee74602c9fd7cef26f966",
+    "changed": true
+  },
+  {
+    "path": "app/server/index.js",
+    "before": "f192d10b9665a420864b926847461d5f29e34ada216f94eb8a195352c72159ed",
+    "after": "f192d10b9665a420864b926847461d5f29e34ada216f94eb8a195352c72159ed",
+    "changed": false
+  },
+  {
+    "path": "app/server/routes/public.js",
+    "before": "7340ba4adf3a6aa621fd711e6744439ece3d06e02edc463e4dbdd93b7f5f654f",
+    "after": "9776c5b65a33fd412a2ca7c4d528188405a4004e62d02fd08ecf0d1eff8c0860",
+    "changed": true
+  },
+  {
+    "path": "README.md",
+    "before": "d4df137b70fdba88d6b89ec21fa50f8cf82a48a15d092caa65adcf8a2c520630",
+    "after": "48d17707f1c1a3b95aeaaa413556a30805d10d5bfb93fc97a846c40a6292eed8",
+    "changed": true
+  },
+  {
+    "path": "app/server/modules/recorder/archive-processor.js",
+    "before": "ffc4d4fb13e8eaf0ed2702fc8b326b99ddae3967185a296e67dea3441476e87c",
+    "after": "d10c61c238dabf5f7de38de151a50a13e4fb6c69eb9f14c0345a0246ae888c91",
+    "changed": true
+  },
+  {
+    "path": "app/server/modules/recorder/manager.js",
+    "before": "da3958539fc54fbb1c7c34fe3a1aeb5d2e4ab8d4a693c095276797b72e77c124",
+    "after": "8034b9c3417cc15f96f76f7464ec513c1181862e67fac7517d52bdf89b3d97d4",
+    "changed": true
+  },
+  {
+    "path": "app/server/modules/recorder/replay-download.js",
+    "before": "459c4177081e5b5c77648dbdbba3edba4516a604a3630eeff480dbad1cfdbbf7",
+    "after": "745747186cfa53684989162c3ea08ffda526fec4f18c4f9d26954ca4cd5db600",
+    "changed": true
+  },
+  {
+    "path": "app/server/modules/recorder/retention.js",
+    "before": "71a23569fe64f39e826c482aadc57b366cf68b0b82f95f3256b3d364fc5cb597",
+    "after": "1de2f0eb6b7288a3baef39b1948b8ef379549688ddfde86c1ae31c2d922af83c",
+    "changed": true
+  },
+  {
+    "path": "app/client/src/components/ReplayDanmakuOverlay.jsx",
+    "before": "9dfef7f431678face51c5411764d26366990d3ac527aeeb23f9afd153741f279",
+    "after": "4fe2b1ad0f8ffe026f9bf302b7d9dfd4d85cb88942872e52579bbffff02621e3",
+    "changed": true
+  },
+  {
+    "path": "app/client/src/pages/PublicLive.jsx",
+    "before": "f90123c7a1657173e3314b07182708e5bf6d20af1b1ff03d8b6f83868da25d09",
+    "after": "5a3cc466872d428a5fce353b0e5886b869911656d6b6c93af2eb72281adf46a1",
+    "changed": true
+  },
+  {
+    "path": "app/client/src/pages/PublicReplay.jsx",
+    "before": "fc06e04c8ec0c1a898cb9292efd86c1c3c3f24cd3f1b59fc6f35be8cf738b72a",
+    "after": "7e28034fbafe1043958ca59ea661e64f760bd3d25ba98f2a328d94904566ac9e",
+    "changed": true
+  },
+  {
+    "path": "app/server/test/audit-public-regressions.test.js",
+    "before": null,
+    "after": "261278788558ee711f94d52129f69d5717c0632dc3745f0f76cd97639928c36e",
+    "changed": true
+  },
+  {
+    "path": "app/server/test/audit-analysis-regressions.test.js",
+    "before": null,
+    "after": "77ba5e74b8cda3fc8b29b3fc55f9445deb06113e08bdbd58083b33239142d893",
+    "changed": true
+  },
+  {
+    "path": "app/server/test/audit-recorder-regressions.test.js",
+    "before": null,
+    "after": "c7fe866c1ee4abd933fe727dae3e9ea6ce4e2ed0d4d3268ca4ef39ae2f53d023",
+    "changed": true
+  },
+  {
+    "path": "app/client/test/audit-web-regressions.test.js",
+    "before": null,
+    "after": "c968b8d182abf31474d9a7d0bc733730ee5f59037b36a7093dda0dc4c4e0a279",
+    "changed": true
+  }
+]

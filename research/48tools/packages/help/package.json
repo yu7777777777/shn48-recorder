@@ -1,0 +1,31 @@
+{
+  "name": "@48tools/help",
+  "version": "0.0.0",
+  "description": "48tools本地帮助文件",
+  "license": "GPL-3.0",
+  "scripts": {
+    "start": "cross-env NODE_ENV=development gulp",
+    "build": "rimraf ./dist && gulp"
+  },
+  "dependencies": {
+    "@tailwindcss/typography": "^0.5.16",
+    "daisyui": "^5.0.0-beta.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.1",
+    "cross-env": "^7.0.3",
+    "cssnano": "^7.0.4",
+    "gulp": "^5.0.0",
+    "gulp-memory-fs": "^4.0.0",
+    "gulp-plumber": "^1.2.1",
+    "gulp-postcss": "^10.0.0",
+    "gulp-pug": "^5.0.0",
+    "gulp-sass": "^5.1.0",
+    "postcss": "^8.4.39",
+    "rimraf": "*",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.4.5",
+    "vinyl-named": "^1.1.0",
+    "webpack-stream": "^7.0.0"
+  }
+}

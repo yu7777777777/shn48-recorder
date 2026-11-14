@@ -1,0 +1,1539 @@
+--- before/app/server/modules/analysis/insights.js
++++ after/app/server/modules/analysis/insights.js
+@@ -4,7 +4,9 @@
+ // Copyright (c) 2026 Ruoke Zhang; see adjacent pocket48-summarizer.LICENSE.txt.
+ // This attribution does not change the license of the surrounding project.
+ const { createHash } = require('crypto');
+-const VERSION = 1;
++// Old checkpoints may contain evidence manufactured by the string fallback.
++// Revalidate fresh provider output under the corrected evidence policy.
++const VERSION = 2;
+ // 两条不同的时间上限，不能混用：
+ //  - MAX_SEGMENT_SECONDS：单条字幕本身最长多久（超了要求先拆分）；
+ //  - MAX_SECONDS：一次请求喂给模型的分片跨度。
+@@ -58,8 +60,6 @@
+ // 于是静音也被当成"必须被章节覆盖"的区域；真实录像里每个分片都有十几处静音，
+ // AI 不可能也不应该为它们写章节，覆盖校验便必然失败。
+ // 这里只要求"真正有字幕的时间段"被覆盖，静音不计缺口。
+-// 单个分片生成失败时的尝试次数。模型偶尔漏写或复述输入，重来一次多半能过。
+-const GENERATE_ATTEMPTS = 3;
+ const SPEECH_GAP_SECONDS = 3;
+ // 相邻章节没接上的细缝，在这个长度以内视为接缝而不是漏写。
+ const SEAM_SECONDS = 1;
+@@ -142,7 +142,10 @@
+         }
+         return best ? [best.id] : undefined;
+       };
+-      const ids = row.evidenceIds ?? row.evidence_ids ?? numericId ?? closest();
++      // Preserve explicitly invalid references (including null) for rejection;
++      // only a genuinely absent citation may use a text-matched source.
++      const ids = row.evidenceIds !== undefined ? row.evidenceIds
++        : row.evidence_ids !== undefined ? row.evidence_ids : numericId ?? closest();
+       const title = row.title ?? row.text ?? row.name ?? row.heading;
+       const summary = row.summary ?? row.reason ?? row.description ?? row.text ?? title;
+       // 只保留内部约定的四个字段：校验对多余字段是零容忍的，
+@@ -158,7 +161,9 @@
+       for (let k = 0; k < row.length - 3; k++) if (seg.text.includes(row.slice(k, k + 4))) score++;
+       if (score > bestScore) { bestScore = score; best = seg; }
+     }
+-    if (!best) return { start: batch[0]?.start ?? 0, end: batch[0]?.end ?? 1, title, summary: row.trim(), evidenceIds: [batch[0]?.id].filter(v => v !== undefined) };
++    // No matching source means no evidence. Never invent a first-subtitle anchor
++    // for an unrelated string; the per-candidate pass will discard this entry.
++    if (!best) return null;
+     return { start: best.start, end: best.end, title, summary: row.trim(), evidenceIds: [best.id] };
+   });
+ }
+@@ -216,11 +221,12 @@
+   function ranges(rows, chapter) {
+     if (!Array.isArray(rows) || rows.length > 1000) throw fail('AI 片段 schema 无效');
+     // 引用伪造是安全红线：整批拒绝，不参与逐条清洗。
+-    if (rows.some(row => row && typeof row === 'object' && Array.isArray(row.evidenceIds))) {
+-      for (const row of rows) {
+-        const ids = row.evidenceIds;
+-        if (!ids.length || ids.length > batch.length || new Set(ids).size !== ids.length || ids.some(id => !Number.isInteger(id) || !map.has(id))) throw fail('AI evidenceIds 引用无效或伪造');
+-      }
++    for (const row of rows) {
++      const ids = row?.evidenceIds;
++      // Missing evidence belongs to an unusable candidate, not a TypeError.
++      // Explicit malformed/forged references still reject the entire batch.
++      if (ids === undefined) continue;
++      if (!Array.isArray(ids) || !ids.length || ids.length > batch.length || new Set(ids).size !== ids.length || ids.some(id => !Number.isInteger(id) || !map.has(id))) throw fail('AI evidenceIds 引用无效或伪造');
+     }
+     // 出现未知键说明输出结构已经跑偏（模型在自创字段），不是单条格式偏差，
+     // 整批拒绝比悄悄吞掉更安全。
+@@ -343,16 +349,10 @@
+       try {out=validate(completed[i],chunks[i]);} catch { completed.length=i; }
+     }
+     if(!out) {
+-      // 模型输出不稳定：同一个分片，这一轮可能漏写一段台词、下一轮就写全了。
+-      // 单次失败就让整场直播的总结作废代价太大，这里在每个分片内部重试，
+-      // 拿到合格结果才落盘断点。
+-      let lastError;
+-      for(let attempt=0; attempt<GENERATE_ATTEMPTS && !out; attempt++) {
+-        signal?.throwIfAborted();
+-        try { out=validate(await generate(chunks[i],instruction),chunks[i]); }
+-        catch(error) { lastError=error; }
+-      }
+-      if(!out) throw lastError;
++      // Exactly one provider request per unfinished chunk in this attempt.
++      // All failures go back to the durable queue, where opt-in, total budget,
++      // HTTP classification and Retry-After are enforced in one place.
++      out=validate(await generate(chunks[i],instruction),chunks[i]);
+       signal?.throwIfAborted();
+       completed[i]=out;
+       await saveCheckpoint({version:VERSION,fingerprint:hash,completed:completed.slice(0,i+1)});
+--- before/app/server/modules/analysis/queue.js
++++ after/app/server/modules/analysis/queue.js
+@@ -7,8 +7,11 @@
+ // 模型这一次少写了一小段（覆盖校验报"遗漏"），下一次重新生成大概率能补齐。
+ // 这类失败以前不算可重试，于是一旦模型手滑整段任务就失败了。
+ function retryable(error) {
+-  const status=Number(error.httpStatus);
+-  if(status===408||status===429||(status>=500&&status<=599)||error.networkError===true) return true;
++  const status=Number(error?.httpStatus);
++  // An explicit HTTP status takes precedence over message heuristics: a 401
++  // cannot become retryable just because its message mentions invalid JSON.
++  if(Number.isFinite(status) && status>0) return status===408||status===429||(status>=500&&status<=599);
++  if(error?.networkError===true) return true;
+   const message=String(error&&error.message||'');
+   return /遗漏字幕时间窗口|返回格式无效|章节时间、长度或 schema 无效/.test(message);
+ }
+--- before/app/server/modules/analysis/service.js
++++ after/app/server/modules/analysis/service.js
+@@ -138,8 +138,11 @@
+     // 起点或终点都远超出分片长度时，这条数据不可信（例如 end 是整段录像时长），
+     // 直接丢弃；起点仍在片内、end 略超的属于裁切误差，下面用 Math.min 收口。
+     if (start >= duration + CHUNK_END_TOLERANCE || end > duration + CHUNK_END_TOLERANCE && end - start > CHUNK_END_TOLERANCE) { rejected += 1; continue; }
++    const clippedEnd = Math.min(end, duration);
++    // Tolerate a slightly long tail, never an interval starting after the clip.
++    if (clippedEnd <= start) { rejected += 1; continue; }
+     if (!text) continue;
+-    kept.push({ start:start+offset, end:Math.min(end,duration)+offset, text:text.slice(0,10000) });
++    kept.push({ start:start+offset, end:clippedEnd+offset, text:text.slice(0,10000) });
+   }
+   if (rows.length && !kept.length) throw fail(`识别服务返回了无效时间戳（${rejected} 条均不可用），可重试本片`);
+   return kept.sort((a,b)=>a.start-b.start);
+--- before/app/server/modules/analysis/settings.js
++++ after/app/server/modules/analysis/settings.js
+@@ -4,12 +4,12 @@
+   store.atomicWrite(store.filePath(name), data);
+ }
+ const queueDefaults = { autoRetry: false, maxRetries: 3, resumeInterrupted: false };
+-const defaults = { asr: { url: '', model: 'whisper-1', key: '' }, ai: { url: '', model: '', key: '' }, typesafe: { key: '' }, glossary: [], offline: { enabled: false, model: 'tiny' }, queue: queueDefaults,
+-  // Off by default: a summary is only shown on a public replay page after an
+-  // administrator turns this on. Chapter and highlight titles are part of it.
+-  publish: { summary: false, chapters: true, highlights: true },
+-  // How much of an AI-generated summary a visitor sees; 'full' keeps the text,
+-  // 'chapters' shows titles/times only. Either way no subtitle or provenance goes out.
++const defaults = { asr: { url: '', model: 'whisper-1', key: '' }, ai: { url: '', model: '', key: '' }, typesafe: { key: '' }, glossary: [], offline: { enabled: false, model: 'tiny' }, queue: queueDefaults,
++  // Off by default: a summary is only shown on a public replay page after an
++  // administrator turns this on. Chapter and highlight titles are part of it.
++  publish: { summary: false, chapters: true, highlights: true },
++  // How much of an AI-generated summary a visitor sees; 'full' keeps the text,
++  // 'chapters' shows titles/times only. Either way no subtitle or provenance goes out.
+   publicDetail: { mode: 'full' } };
+ function normalizedQueue(input) {
+   return { autoRetry: input?.autoRetry === true, maxRetries: Number.isInteger(input?.maxRetries) && input.maxRetries >= 0 && input.maxRetries <= 3 ? input.maxRetries : 3, resumeInterrupted: input?.resumeInterrupted === true };
+@@ -28,7 +28,10 @@
+       let parsed; try { parsed = new URL(url); } catch { throw new Error('服务地址无效'); }
+       if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password || parsed.search || parsed.hash) throw new Error('服务地址须为 HTTP 或 HTTPS 基础地址，不能包含密钥或查询参数');
+     }
+-    const key = item.clearKey ? '' : String(item.key || value[kind].key || '');
++    // A saved credential belongs to the endpoint where it was supplied. Saving
++    // another URL without a new key must not silently move the old Bearer there.
++    const previousUrl = String(value[kind].url || '').trim().replace(/\/+$/, '');
++    const key = item.clearKey ? '' : String(item.key || (url === previousUrl ? value[kind].key : '') || '');
+     if (key.length > 4096 || /[\r\n]/.test(key)) throw new Error('密钥格式无效');
+     value[kind] = { url, key, model: String(item.model ?? value[kind].model).trim().slice(0, 120) };
+   }
+@@ -46,18 +49,18 @@
+     value.glossary = glossary.value;
+     value.glossaryConflicts = glossary.conflicts;
+   }
+-  if (input.publicDetail !== undefined) {
+-    const detail = input.publicDetail;
+-    if (!detail || typeof detail !== 'object' || Array.isArray(detail) || Object.keys(detail).some(k => k !== 'mode')) throw new Error('公开详略设置无效');
+-    if (detail.mode !== undefined && !['full', 'chapters'].includes(detail.mode)) throw new Error('公开详略只能选择完整或仅分级');
+-    value.publicDetail = { mode: detail.mode ?? (value.publicDetail?.mode || 'full') };
+-  }
+-  if (input.publish !== undefined) {
+-    const publish = input.publish;
+-    if (!publish || typeof publish !== 'object' || Array.isArray(publish) || Object.keys(publish).some(k => !Object.hasOwn(defaults.publish, k))) throw new Error('公开设置无效');
+-    for (const name of Object.keys(defaults.publish)) if (publish[name] !== undefined && typeof publish[name] !== 'boolean') throw new Error('公开开关必须为布尔值');
+-    value.publish = { ...(value.publish || defaults.publish), ...publish };
+-  }
++  if (input.publicDetail !== undefined) {
++    const detail = input.publicDetail;
++    if (!detail || typeof detail !== 'object' || Array.isArray(detail) || Object.keys(detail).some(k => k !== 'mode')) throw new Error('公开详略设置无效');
++    if (detail.mode !== undefined && !['full', 'chapters'].includes(detail.mode)) throw new Error('公开详略只能选择完整或仅分级');
++    value.publicDetail = { mode: detail.mode ?? (value.publicDetail?.mode || 'full') };
++  }
++  if (input.publish !== undefined) {
++    const publish = input.publish;
++    if (!publish || typeof publish !== 'object' || Array.isArray(publish) || Object.keys(publish).some(k => !Object.hasOwn(defaults.publish, k))) throw new Error('公开设置无效');
++    for (const name of Object.keys(defaults.publish)) if (publish[name] !== undefined && typeof publish[name] !== 'boolean') throw new Error('公开开关必须为布尔值');
++    value.publish = { ...(value.publish || defaults.publish), ...publish };
++  }
+   if(input.offline){
+     if(!['tiny','base','small'].includes(input.offline.model))throw new Error('请选择有效离线模型');
+     value.offline={enabled:input.offline.enabled===true,model:input.offline.model};
+--- before/app/server/test/analysis-insights-service.test.js
++++ after/app/server/test/analysis-insights-service.test.js
+@@ -15,10 +15,10 @@
+ const old={segments,summary:'旧成功',chapters:[{start:0,end:1,title:'旧章',summary:'旧说明'}],highlights:[],fingerprint:'asr-untouched',completedSeconds:610};
+ function response(options){const batch=JSON.parse(JSON.parse(options.body).messages[1].content);return Response.json({choices:[{message:{content:JSON.stringify({summary:'新概述',chapters:batch.map(s=>({start:s.start,end:s.end,title:'主题',summary:'内容',evidenceIds:[s.id]})),highlights:[]})}}]});}
+ async function settled(id){const end=Date.now()+5000;while(service.busy(id)){if(Date.now()>end)throw Error('queue timeout');await new Promise(r=>setTimeout(r,5));}return service.result(id);}
+-test.after(()=>{service.stop();global.fetch=originalFetch;fs.rmSync(root,{recursive:true,force:true});});
++test.after(async()=>{await service.stop();global.fetch=originalFetch;fs.rmSync(root,{recursive:true,force:true});});
+ test('queue failure keeps old result, atomically checkpoints and manual retry commits whole success',async()=>{
+  settings.save({ai:{url:'https://example.test/v1',model:'m',key:'test'}});settings.write('analysis_resume',old);
+- // 分片内会重试，所以要让"这一段"持续失败才能验证失败路径：第 2 次起连续失败。
++ // Fail the second chunk and verify that the provider is not called again internally.
+  let calls=0, failing=false;
+  global.fetch=async(_url,options)=>{
+    calls++;
+@@ -29,8 +29,8 @@
+  service.start();service.enqueue('resume','summarize');let out=await settled('resume');assert.equal(out.job.status,'failed');assert.equal(out.summary,'旧成功');assert.deepEqual(out.chapters,old.chapters);assert.equal(out.fingerprint,'asr-untouched');
+  failing=false;
+  service.enqueue('resume','summarize');out=await settled('resume');assert.equal(out.job.status,'done',out.job.error);
+- // 分片内部有重试，HTTP 调用次数不再固定为 3；这里只校验最终产物正确。
+- assert.ok(calls>=3);assert.equal(out.summary,'新概述\n\n新概述');assert.deepEqual(out.chapters.map(r=>r.evidenceIds),[[0],[1]]);assert.equal(out.summaryCoverage.complete,true);assert.equal(out.summaryModel,'m');assert.equal(out.fingerprint,'asr-untouched');
++ // Two initial requests plus only the failed chunk on manual retry.
++ assert.equal(calls,3);assert.equal(out.summary,'新概述\n\n新概述');assert.deepEqual(out.chapters.map(r=>r.evidenceIds),[[0],[1]]);assert.equal(out.summaryCoverage.complete,true);assert.equal(out.summaryModel,'m');assert.equal(out.fingerprint,'asr-untouched');
+ });
+ test('cancellation after a completed block preserves old successful result and retained checkpoint',async()=>{
+  settings.write('analysis_cancel',old);let calls=0;
+@@ -51,3 +51,56 @@
+  settings.write('analysis_bad',old);global.fetch=async()=>Response.json({choices:[{message:{content:JSON.stringify({summary:'伪造',chapters:[{start:0,end:10,title:'伪造',summary:'伪造',evidenceIds:[999]}],highlights:[]})}}]});
+  service.enqueue('bad','summarize');const out=await settled('bad');assert.equal(out.job.status,'failed');assert.match(out.job.error,/引用/);assert.equal(out.summary,'旧成功');assert.equal(store.load('analysis_bad_summary_checkpoint',null),null);
+ });
++test('F03: saving another endpoint without a key prevents enqueue before any provider request',()=>{
++ settings.write('analysis_scope',old);
++ let calls=0;global.fetch=async()=>{calls++;throw Error('must not reach provider');};
++ try {
++  settings.save({ai:{url:'https://new-service.example/v1'}});
++  assert.equal(settings.publicSettings().ai.configured,false);
++  assert.throws(()=>service.enqueue('scope','summarize'),/填写服务地址、模型和密钥/);
++  assert.equal(calls,0);
++ } finally {settings.save({ai:{url:'https://example.test/v1',model:'m',key:'test'}});}
++});
++test('F15: disabled queue retries issue exactly one HTTP request, including 401, 429 and 503',async()=>{
++ settings.save({queue:{autoRetry:false,maxRetries:0}});
++ for(const status of [401,429,503]) {
++  const id='no-retry-'+status;settings.write('analysis_'+id,old);let calls=0;
++  global.fetch=async()=>{calls++;return new Response('',{status,headers:{'Retry-After':'600'}});};
++  service.enqueue(id,'summarize');const out=await settled(id);
++  assert.equal(out.job.status,'failed');assert.equal(calls,1);assert.equal(out.job.retryCount,0);
++  assert.equal(out.summary,'旧成功');
++ }
++});
++test('F15: opted-in HTTP 401 still fails without scheduling or internal requests',async()=>{
++ settings.save({queue:{autoRetry:true,maxRetries:1}});
++ settings.write('analysis_no-retry-auth',old);let calls=0;
++ global.fetch=async()=>{calls++;return new Response('',{status:401});};
++ try {
++  service.enqueue('no-retry-auth','summarize');const out=await settled('no-retry-auth');
++  assert.equal(out.job.status,'failed');assert.equal(calls,1);assert.equal(out.job.retryCount,0);
++  assert.equal(out.job.nextAttemptAt,undefined);
++ } finally {settings.save({queue:{autoRetry:false,maxRetries:3}});}
++});
++test('F15: HTTP 429 is durable, obeys Retry-After and consumes exactly the queue retry budget',async()=>{
++ await service._internals.idle();
++ let now=1000000,calls=0;const timers=new Map();
++ service._internals.setClock({now:()=>now,setTimer:(fn,ms)=>{const token={unref(){}};timers.set(token,{fn,at:now+ms});return token;},clearTimer:token=>timers.delete(token)});
++ settings.save({queue:{autoRetry:true,maxRetries:1}});settings.write('analysis_rate-limit',old);
++ global.fetch=async()=>{calls++;return new Response('',{status:429,headers:{'Retry-After':'600'}});};
++ try {
++  service.enqueue('rate-limit','summarize');
++  await new Promise(resolve=>setImmediate(resolve));await service._internals.idle();
++  let out=service.result('rate-limit');
++  assert.equal(out.job.status,'queued');assert.equal(out.job.retryCount,1);assert.equal(out.job.attempts,1);assert.equal(calls,1);
++  assert.equal(Date.parse(out.job.nextAttemptAt),now+600000);assert.equal(timers.size,1);
++  const [token,timer]=[...timers][0];assert.equal(timer.at,now+600000);
++  now+=599999;assert.equal(calls,1);assert.equal(out.summary,'旧成功');
++  now++;timers.delete(token);timer.fn();await service._internals.idle();out=service.result('rate-limit');
++  assert.equal(out.job.status,'failed');assert.equal(out.job.retryCount,1);assert.equal(out.job.attempts,2);assert.equal(calls,2);
++  assert.equal(out.job.nextAttemptAt,undefined);assert.equal(timers.size,0);assert.equal(out.summary,'旧成功');
++ } finally {
++  await service._internals.idle();
++  service._internals.setClock({now:Date.now,setTimer:setTimeout,clearTimer:clearTimeout});
++  settings.save({queue:{autoRetry:false,maxRetries:3}});
++ }
++});
+--- before/app/server/test/analysis-insights.test.js
++++ after/app/server/test/analysis-insights.test.js
+@@ -53,12 +53,12 @@
+  let checkpoint, calls=[];
+  const saveCheckpoint=async value=>{checkpoint=structuredClone(value);};
+  await assert.rejects(()=>summarize({segments,config,saveCheckpoint,generate:async batch=>{calls.push(batch[0].id);if(batch[0].id===1){assert.equal(checkpoint.completed.length,1);throw Error('provider');}return valid(batch);}}),/provider/);
+- // 分片内部有重试，同一分片可能被调用多次；这里只关心"从哪个分片续跑"。
+- assert.deepEqual([...new Set(calls)],[0,1]); calls=[];
++ // Each unfinished chunk is requested once; paid retries belong to the queue.
++ assert.deepEqual(calls,[0,1]); calls=[];
+  const out=await summarize({segments,config,checkpoint,saveCheckpoint,generate:async batch=>{calls.push(batch[0].id);return valid(batch);}});
+- assert.deepEqual([...new Set(calls)],[1]);assert.equal(out.summaryCoverage.complete,true);assert.deepEqual(out.summaryCoverage.gaps,[{start:10,end:600}]);assert.equal(out.summaryCoverage.scope,'subtitle-timeline');
++ assert.deepEqual(calls,[1]);assert.equal(out.summaryCoverage.complete,true);assert.deepEqual(out.summaryCoverage.gaps,[{start:10,end:600}]);assert.equal(out.summaryCoverage.scope,'subtitle-timeline');
+  checkpoint.completed[0].chapters[0].evidenceIds=[99];calls=[];
+- await summarize({segments,config,checkpoint,saveCheckpoint,generate:async batch=>{calls.push(batch[0].id);return valid(batch);}});assert.deepEqual([...new Set(calls)],[0,1]);
++ await summarize({segments,config,checkpoint,saveCheckpoint,generate:async batch=>{calls.push(batch[0].id);return valid(batch);}});assert.deepEqual(calls,[0,1]);
+ });
+ test('text, timestamps, model and endpoint invalidate old checkpoints; translation does not',async()=>{
+  let checkpoint;await summarize({segments,config,generate:async b=>valid(b),saveCheckpoint:v=>{checkpoint=structuredClone(v);}});
+--- before/app/CHANGELOG.md
++++ after/app/CHANGELOG.md
+@@ -1,4 +1,16 @@
+ # 更新记录
++
++## [Unreleased] - 2026-10-24 审计缺陷修复
++
++本轮按 2026-10-23 审计结果修复当前维护分支，仅本地开发与验证；未部署、未重启生产，正式版本仍为 1.28.11。历史 Unreleased 条目保留原位，不据此重复认定其是否已发布。
++
++### 修复范围
++
++- 公开前端：直播数字类型搜索白屏、特殊回放类型分类错误、弹幕加载期间关闭再开启卡住，以及切换回放后旧下载请求继续轮询或跳转。
++- 录制与存储：重启前原片恢复归档、低水位清理遵守原片校验保留窗口、过期回放资源计划有限刷新。
++- 分析与凭据：更换服务端点不得沿用旧密钥；ASR 裁剪后保证正向时间区间；混合无效候选逐条清洗而不绕过引用校验；无依据字符串高光不能强配首条字幕；HTTP 错误不再被内部循环即时重试，重试统一受队列策略约束。
++- 公开接口：JSON 与分享 HTML 统一公开详略策略；SSE 在元信息等待期间断开也正确回收；直播上游故障返回明确失败而非正常空列表。
++- 为上述缺陷补充隔离行为/浏览器回归。具体覆盖、运行结果及残留限制以本轮修复报告为准；历史审计探针保留不改，不作为修复后“全绿”测试。
+ 
+ ## [1.28.11] - 2026-10-23
+ 
+--- before/app/server/routes/public.js
++++ after/app/server/routes/public.js
+@@ -91,7 +91,7 @@
+     // `liveList` preserves the established frontend shape; `list` is the concise alias.
+     res.json({ success: true, data: { ...data, liveList: data.list || [] } });
+   } catch (err) {
+-    res.json({ success: true, data: { list: [], liveList: [], next: "0" } });
++    res.status(502).json({ success: false, error: "Unable to load live list" });
+   }
+ });
+ 
+@@ -139,10 +139,29 @@
+ router.get("/live/:liveId/danmaku", async (req, res) => {
+   let unsubscribe = null;
+   let heartbeat = null;
+-  try {
++  let closed = Boolean(req.aborted || res.destroyed || res.writableEnded);
++  const cleanup = () => {
++    closed = true;
++    if (heartbeat) clearInterval(heartbeat);
++    heartbeat = null;
++    const release = unsubscribe;
++    unsubscribe = null;
++    release?.();
++    req.removeListener("aborted", cleanup);
++    res.removeListener("close", cleanup);
++    res.removeListener("finish", cleanup);
++  };
++  // A response can close while metadata is still pending. Request 'close' also
++  // means a fully received request on modern Node, so observe response closure.
++  req.once("aborted", cleanup);
++  res.once("close", cleanup);
++  res.once("finish", cleanup);
++  try {
++    if (closed) { cleanup(); return; }
+     const liveId = numericQuery(req.params.liveId, "liveId");
+     const { roomId } = await liveService.getLive(liveId);
+-    if (!roomId) return res.status(404).json({ success: false, error: "Live danmaku is unavailable" });
++    if (closed || req.aborted || res.destroyed || res.writableEnded) { cleanup(); return; }
++    if (!roomId) { cleanup(); return res.status(404).json({ success: false, error: "Live danmaku is unavailable" }); }
+ 
+     res.writeHead(200, {
+       "Content-Type": "text/event-stream; charset=utf-8",
+@@ -152,19 +171,20 @@
+     });
+     res.flushHeaders?.();
+     const send = (event, data) => {
+-      if (!res.writableEnded) res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
++      if (!closed && !res.destroyed && !res.writableEnded) res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+     };
+     unsubscribe = danmakuManager.subscribe(roomId, send);
+-    heartbeat = setInterval(() => { if (!res.writableEnded) res.write(": keepalive\n\n"); }, 20_000);
++    // subscribe may synchronously deliver a message and trigger a disconnect.
++    if (closed || res.destroyed || res.writableEnded) { cleanup(); return; }
++    heartbeat = setInterval(() => {
++      if (res.destroyed || res.writableEnded) cleanup();
++      else if (!closed) res.write(": keepalive\n\n");
++    }, 20_000);
+     heartbeat.unref?.();
+-    req.on("close", () => {
+-      if (heartbeat) clearInterval(heartbeat);
+-      unsubscribe?.();
+-      unsubscribe = null;
+-    });
+-  } catch (err) {
+-    if (heartbeat) clearInterval(heartbeat);
+-    unsubscribe?.();
++  } catch (err) {
++    const disconnected = closed || req.aborted || res.destroyed || res.writableEnded;
++    cleanup();
++    if (disconnected) return;
+     if (!res.headersSent) {
+       res.status(err.statusCode || 502).json({ success: false, error: err.statusCode === 400 ? err.message : "Live danmaku is unavailable" });
+     } else {
+@@ -374,19 +394,20 @@
+   if (config.publish.summary !== true) return null;
+   const analysis = analysisService.result(archive.id);
+   if (typeof analysis.summary !== "string" || !analysis.summary.trim()) return null;
+-  return { ...analysis, recordingId: archive.id, title: String(archive.title || archive.name || "") };
++  // Both JSON and HTML previews consume the same public DTO, never raw analysis.
++  return {
++    ...publicSummary({ ...analysis, recordingId: archive.id }, config.publish, config.publicDetail?.mode),
++    title: String(archive.title || archive.name || ""),
++  };
+ }
+ router.get("/replays/:liveId/summary", async (req, res) => {
+   try {
+     const liveId = numericQuery(req.params.liveId, "liveId");
+-    const archive = manager.getRecordings().find(rec => rec && String(rec.liveId || '') === String(liveId) && rec.source === 'pocket48' && rec.mediaType !== 'audio' && rec.segment !== true && rec.source !== 'clip' && rec.status === 'done');
+-    if (!archive) return res.status(404).json({ success: false, error: "Replay summary is unavailable" });
+-    const config = analysisSettings.get(), publish = config.publish;
+-    if (publish.summary !== true) return res.status(404).json({ success: false, error: "Replay summary is unavailable" });
+-    const analysis = analysisService.result(archive.id);
+-    if (typeof analysis.summary !== 'string' || !analysis.summary.trim()) return res.status(404).json({ success: false, error: "Replay summary is unavailable" });
++    const published = publishedSummaryFor(liveId);
++    if (!published) return res.status(404).json({ success: false, error: "Replay summary is unavailable" });
++    const { title: _previewTitle, ...data } = published;
+     res.setHeader('Cache-Control', 'public, max-age=60');
+-    res.json({ success: true, data: publicSummary({ ...analysis, recordingId: archive.id }, publish, config.publicDetail?.mode) });
++    res.json({ success: true, data });
+   } catch (err) {
+     // A missing archive or an analysis that cannot be read is indistinguishable to a
+     // visitor on purpose: neither should reveal whether an admin is preparing one.
+--- before/README.md
++++ after/README.md
+@@ -1,6 +1,8 @@
+ # 48tools 录制服务
+ 
+-当前正式版本：**1.27.7**（以 `app/VERSION` 为准；恢复直播录制启动。Summarizer 迁移仍在 Unreleased，尚未随本会话发布）。当前维护目录为 [app](app/README.md)，后续版本以该目录的 VERSION 为准，不再复制整套源码目录。
++当前正式版本：**1.28.11**（以 [VERSION](app/VERSION) 为准）。当前维护目录为 [app](app/README.md)，后续版本以该目录的 VERSION 为准，不再复制整套源码目录。2026-10-23 只读审计时公网健康接口同为 1.28.11；本轮修复不代表重新发布或核验了后端运行镜像。
++
++**2026-10-24 未发布修复**：正在依据 [审计报告](audit/2026-10-23/审计报告.md) 修复公开直播/回放、录制与存储、分析及公开接口缺陷，并补充回归。变更记入 [Unreleased](app/CHANGELOG.md)，正式版本暂不升号；不部署、不重启、不操作生产录像或账户。
+ 
+ **2026-10-22 线上发布（故障修复）**：1.27.7 已部署到阿里云 `/opt/shn48`（镜像 `shn48-shn48:1.27.7`）。镜像内 116 项 Linux 回归通过，健康接口与 162 个运行文件哈希一致，发布后容器内 `start failed` 与 `poll error` 为零。同次用官方回放补录北京时间 **10 月 20 日、21 日** 已启用录制成员的漏录场次共 **5 场**（刘小涵 2 场，陈琳、熊紫轶、禹佳蔚各 1 场），全部完整下载、解码校验与 SHA-256 复核通过，未自动投稿；杨晔两日无场次。详见[发布核对](app/docs/releases/1.27.7-audit.md)与[补录报告](app/docs/releases/1.27.7-replay-backfill.md)。
+ 
+--- before/app/server/modules/recorder/archive-processor.js
++++ after/app/server/modules/recorder/archive-processor.js
+@@ -238,6 +238,43 @@
+   }
+ }
+ 
++function restartInterrupted(item) {
++  // The legacy exact error supports interrupted records saved before this marker
++  // existed; arbitrary failed recordings must never be revived automatically.
++  return item?.source === "pocket48" && item.status === "failed" && !item.manualStop
++    && !item.draftId && item.uploadStatus !== "done" && item.mediaType !== "audio"
++    && (item.interruptedByRestart === true || item.error === "Server restarted before recording completed");
++}
++
++async function restoreInterruptedSegments(seed) {
++  for (const item of manager.getRecordings({ includeMerged: true })) {
++    if (!restartInterrupted(item) || !compatible(seed, item)) continue;
++    const filePath = item.filePath;
++    const physicalPath = file => {
++      if (!file) return null;
++      try { return fs.realpathSync(file); } catch { return path.resolve(file); }
++    };
++    const active = () => recorder.listActive().some(entry => String(entry.recordingId) === String(item.id)
++      || [entry.filePath, manager.getRecording(entry.recordingId)?.filePath]
++        .some(file => file && physicalPath(file) === physicalPath(filePath)));
++    if (active()) continue;
++    try {
++      const source = resolveSource(filePath);
++      const stat = fs.statSync(source);
++      if (stat.size <= 0 || require("../backup115/leases").lockedPath(source)) continue;
++      await probe(source);
++      // Probe yielded: deletion, replacement, active writers and changed bytes win
++      // over recovery, including a writer registered under another recording ID.
++      const latest = manager.getRecording(item.id);
++      if (!restartInterrupted(latest) || latest.filePath !== filePath || active()
++        || resolveSource(filePath) !== source || require("../backup115/leases").lockedPath(source)) continue;
++      const after = fs.statSync(source);
++      if (["size", "mtimeMs", "ino", "dev"].some(key => after[key] !== stat[key])) continue;
++      manager.updateRecording(item.id, { status: "waiting_merge", size: stat.size, error: null });
++    } catch { /* Missing, unsafe, empty or unprobeable partials stay failed. */ }
++  }
++}
++
+ function candidatesFor(seed) {
+   return manager.getRecordings({ includeMerged: true })
+     .filter((item) => item.source !== "clip")
+@@ -266,7 +303,7 @@
+ }
+ 
+ function schedule(item, delay) {
+-  if (!item?.id || item.status === "failed") return;
++  if (!item?.id || (item.status === "failed" && !restartInterrupted(item))) return;
+   const existing = timers.get(item.id);
+   if (existing) clearTimeout(existing);
+   const wait = item.manualStop ? 0 : delay === undefined ? Math.max(0, readyAt([item]) - Date.now()) : Math.max(0, delay);
+@@ -288,10 +325,15 @@
+ }
+ 
+ async function processSerial(id, { immediate = false, autoEnqueue = true, merge = true } = {}) {
+-  const seed = manager.getRecording(id);
++  let seed = manager.getRecording(id);
+   if (!seed) throw new Error("Recording not found");
+   if (seed.manualStop) { immediate = true; merge = false; }
+   if (seed.status === "merged" && seed.mergedInto) return processSerial(seed.mergedInto, { immediate, autoEnqueue, merge });
++  if (merge && seed.source === "pocket48") {
++    await restoreInterruptedSegments(seed);
++    seed = manager.getRecording(id);
++    if (!seed) throw new Error("Recording not found");
++  }
+   if (!["done", "waiting_merge", "processing", "archive_failed"].includes(seed.status)) {
+     throw new Error("该录像尚未结束或已删除，不能归档");
+   }
+@@ -398,7 +440,7 @@
+       const title = archiveTitle(item);
+       if (item.title !== title || !item.liveTitle) manager.updateRecording(item.id, { title, liveTitle: topicOf(item) });
+     }
+-    if (["waiting_merge", "processing"].includes(item.status)) schedule(item, 1_000);
++    if (["waiting_merge", "processing"].includes(item.status) || restartInterrupted(item)) schedule(item, 1_000);
+     if (item.status === "done" && (require("./replay-recovery").holdsUpload(item)
+       || (item.autoUpload && !item.draftId && item.uploadStatus !== "done"
+         && require("./replay-recovery").uploadReadiness(item, { autoUpload: true }).code === "REPLAY_RECOVERY_REQUIRED"))) schedule(item, 1000);
+--- before/app/server/modules/recorder/manager.js
++++ after/app/server/modules/recorder/manager.js
+@@ -18,6 +18,7 @@
+   for (const recording of recordings) {
+     if (recording.status === "recording") {
+       recording.status = "failed";
++      recording.interruptedByRestart = true;
+       recording.error = "Server restarted before recording completed";
+       recording.endedAt = new Date().toISOString();
+       changed = true;
+--- before/app/server/modules/recorder/replay-download.js
++++ after/app/server/modules/recorder/replay-download.js
+@@ -102,7 +102,10 @@
+   return removed;
+ }
+ 
+-async function download({ liveId, directory, onProgress = () => {}, getReplay = replay.getReplay, request = proxy.upstreamRequest, verify = true }) {
++function download(options) { return downloadAttempt(options); }
++
++async function downloadAttempt(options, refreshRemaining = 1, refreshPlan = false) {
++  const { liveId, directory, onProgress = () => {}, getReplay = replay.getReplay, request = proxy.upstreamRequest, verify = true } = options;
+   if (!/^\d{1,30}$/.test(String(liveId))) throw new Error("无效直播 ID");
+   fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
+   const final = path.join(directory, "verified.mp4");
+@@ -122,7 +125,7 @@
+   requireSpace(directory);
+   const planFile = path.join(directory, "plan.json");
+   let plan;
+-  if (fs.existsSync(planFile)) plan = JSON.parse(fs.readFileSync(planFile));
++  if (!refreshPlan && fs.existsSync(planFile)) plan = JSON.parse(fs.readFileSync(planFile));
+   else {
+     const detail = await getReplay(String(liveId));
+     if (String(detail.replay?.liveId) !== String(liveId) || !detail.streamUrl) throw new Error("同场官方回放暂不可用");
+@@ -170,7 +173,12 @@
+         try {
+           requireSpace(directory);
+           const { response } = await request(resource.url, {}, { scope });
+-          if (response.statusCode !== 200) { response.resume(); throw new Error("官方回放分片失效或下载失败，原录像已保留"); }
++          if (response.statusCode !== 200) {
++            response.resume();
++            const error = new Error("官方回放分片失效或下载失败，原录像已保留");
++            if ([401, 403, 404, 410].includes(response.statusCode)) error.code = "REPLAY_RESOURCE_EXPIRED";
++            throw error;
++          }
+           const expected = Number(response.headers["content-length"]);
+           const hash = crypto.createHash("sha256"); let bytes = 0, checked = 0;
+           await pipeline(response, new Transform({ transform(chunk, _, done) {
+@@ -192,7 +200,16 @@
+   }
+   const outcomes = await Promise.allSettled(Array.from({ length: 4 }, worker));
+   const rejected = outcomes.find(outcome => outcome.status === "rejected");
+-  if (rejected) throw rejected.reason;
++  if (rejected) {
++    if (refreshRemaining > 0 && outcomes.filter(outcome => outcome.status === "rejected")
++      .every(outcome => outcome.reason?.code === "REPLAY_RESOURCE_EXPIRED")) {
++      // All old workers have settled before replacing the plan. Refetch the same
++      // live's metadata and reauthorize its manifest/scope. A fresh completed map
++      // intentionally redownloads even same-named assets: their bytes may differ.
++      return downloadAttempt(options, refreshRemaining - 1, true);
++    }
++    throw rejected.reason;
++  }
+   if (completed !== plan.resources.length) throw new Error("回放分片未全部下载，不能替换");
+   // All resources are now persisted. No further requests to Pocket48 are needed.
+   onProgress({ completed, total: plan.resources.length, bytes: totalBytes, verifying: true });
+--- before/app/server/modules/recorder/retention.js
++++ after/app/server/modules/recorder/retention.js
+@@ -125,7 +125,8 @@
+     // An archive that has not served its verified retention window yet keeps its
+     // fragments: only the main file is known good, and deleting the source is
+     // sweep()'s decision, made after that window elapses.
+-    if (!rec.retentionVerifiedAt) { heldArchives.add(rec.id); continue; }
++    const verifiedAt = Date.parse(rec.retentionVerifiedAt || "");
++    if (!Number.isFinite(verifiedAt) || Date.now() - verifiedAt < DAY) { heldArchives.add(rec.id); continue; }
+     const state = rec.replayRecovery?.status;
+     if (["pending", "downloading", "verifying", "waiting_replay", "awaiting_archive"].includes(state)) continue;
+     const fingerprint = `${rec.filePath}|${rec.size || 0}`;
+--- before/app/client/src/components/ReplayDanmakuOverlay.jsx
++++ after/app/client/src/components/ReplayDanmakuOverlay.jsx
+@@ -21,7 +21,7 @@
+   const [enabled, setEnabled] = useState(false);
+   const [status, setStatus] = useState(available === false ? "unavailable" : "idle");
+   const [records, setRecords] = useState([]);
+-  const [currentMs, setCurrentMs] = useState(0);
++  const [currentMs, setCurrentMs] = useState(0);
+   const [offsetMs, setOffsetMs] = useState(0);
+   const [density, setDensity] = useState("normal");
+   const listRef = useRef(null);
+@@ -53,10 +53,13 @@
+   }, [videoRef, normalizedReplayId]);
+ 
+   useEffect(() => {
+-    if (!enabled || !normalizedReplayId || available === false || status !== "idle") return undefined;
++    // A toggle can cancel the first fetch while status is still loading. Reopening
++    // must start a replacement request, not wait forever for the canceled effect.
++    if (!enabled || !normalizedReplayId || available === false || !["idle", "loading"].includes(status)) return undefined;
+     let active = true;
++    const controller = new AbortController();
+     setStatus("loading");
+-    publicApi.get(`/replays/${encodeURIComponent(normalizedReplayId)}/danmaku`, { timeout: 20000 })
++    publicApi.get(`/replays/${encodeURIComponent(normalizedReplayId)}/danmaku`, { timeout: 20000, signal: controller.signal })
+       .then(response => {
+         if (!active) return;
+         const body = payload(response, {});
+@@ -68,7 +71,7 @@
+         if (!active) return;
+         setStatus(error?.response?.status === 404 ? "unavailable" : "error");
+       });
+-    return () => { active = false; };
++    return () => { active = false; controller.abort(); };
+   }, [enabled, normalizedReplayId, available]);
+ 
+   const visibleRecords = useMemo(() => {
+@@ -165,7 +168,7 @@
+           </article>
+         ))}
+       </div>
+-      <div className="replay-danmaku-offset"><label>同步偏移 <output>{(offsetMs / 1000).toFixed(1)}s</output></label><input type="range" min="-3000" max="3000" step="100" value={offsetMs} onChange={event => setOffsetMs(Number(event.target.value))} aria-label="弹幕同步偏移" /></div>
++      <div className="replay-danmaku-offset"><label>同步偏移 <output>{(offsetMs / 1000).toFixed(1)}s</output></label><input type="range" min="-3000" max="3000" step="100" value={offsetMs} onChange={event => setOffsetMs(Number(event.target.value))} aria-label="弹幕同步偏移" /></div>
+       <footer className="replay-danmaku-foot">
+         <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+           <IconClock size={12} />
+--- before/app/client/src/pages/PublicLive.jsx
++++ after/app/client/src/pages/PublicLive.jsx
+@@ -27,7 +27,7 @@
+     memberName: user.nickname || user.name || source.memberName || source.nickname || text.members,
+     avatar: user.avatar || user.avatarUrl || source.avatar || source.cover || "",
+     cover: source.cover || source.coverUrl || source.thumb || source.image || "",
+-    category: source.liveTypeName || source.category || source.typeName || source.liveType || "直播",
++    category: String(source.liveTypeName || source.category || source.typeName || source.liveType || "直播"),
+     startedAt: source.startTime || source.startedAt || source.ctime || null,
+   };
+ }
+@@ -173,7 +173,7 @@
+       ]);
+       setLives(
+         listPayload(liveResponse, ["liveList", "lives", "items", "content"])
+-          .map(normalizeLive)
++          .map((item) => normalizeLive(item, t))
+           .filter((item) => item.liveId)
+       );
+       setHealth(healthResponse ? payload(healthResponse, {}) : null);
+--- before/app/client/src/pages/PublicReplay.jsx
++++ after/app/client/src/pages/PublicReplay.jsx
+@@ -101,7 +101,7 @@
+   if (type === 2 || named.includes("电台")) return "电台直播";
+   if (type === 1 || named.includes("视频") || named.includes("直播")) return "视频直播";
+   if (named) return named.replace(/重播$/, "直播");
+-  return text.types[type] || text.category.fallback;
++  return t.types[type] || t.category.fallback;
+ }
+ 
+ function normalizeReplay(item = {}, t = TEXT.zh) {
+@@ -114,7 +114,7 @@
+     memberName: user.nickname || user.name || source.memberName || source.nickname || t.detail.member,
+     avatar: user.avatar || user.avatarUrl || source.avatar || "",
+     cover: source.cover || source.coverUrl || source.thumb || source.image || "",
+-    category: replayCategory(source),
++    category: replayCategory(source, t),
+     startedAt: source.startTime || source.startedAt || source.ctime || source.createdAt || null,
+     duration: source.duration ?? source.durationSeconds ?? source.liveDuration ?? source.timeLength ?? null,
+     teamId: String(source.team?.id || source.teamId || ""),
+@@ -130,7 +130,7 @@
+   const hasNextCursor = next !== null && next !== undefined && String(next) !== "" && String(next) !== "0";
+   const hasMore = Array.isArray(page) ? false : typeof page?.hasMore === "boolean" ? page.hasMore && hasNextCursor : hasNextCursor;
+   return {
+-    items: Array.isArray(items) ? items.map(normalizeReplay).filter((item) => item.replayId) : [],
++    items: Array.isArray(items) ? items.map((item) => normalizeReplay(item)).filter((item) => item.replayId) : [],
+     next,
+     hasMore,
+     search: Array.isArray(page) ? null : page?.search || null,
+@@ -175,37 +175,84 @@
+   return t.download.fetchingHint;
+ }
+ 
++// The card and detail player share the same route-scoped download lifecycle.
++// Aborting transport alone is insufficient: a response may already be queued, so
++// every continuation also checks ownership before state, timers or navigation.
++function useReplayDownload(replayId, t) {
++  const { replayId: routeReplayId } = useParams();
++  const [download, setDownload] = useState({ status: "idle", progress: 0, error: "" });
++  const timerRef = useRef(null);
++  const requestRef = useRef(null);
++  const scopeRef = useRef(null);
++
++  useEffect(() => {
++    const scope = {};
++    scopeRef.current = scope;
++    setDownload({ status: "idle", progress: 0, error: "" });
++    return () => {
++      scopeRef.current = null;
++      requestRef.current?.abort();
++      requestRef.current = null;
++      window.clearTimeout(timerRef.current);
++      timerRef.current = null;
++    };
++  }, [replayId, routeReplayId]);
++
++  const startDownload = useCallback(async () => {
++    const scope = scopeRef.current;
++    if (!replayId || !scope || requestRef.current) return;
++    const controller = new AbortController();
++    requestRef.current = controller;
++    const ownsRequest = () => scopeRef.current === scope && !controller.signal.aborted && requestRef.current === controller;
++    const finish = () => { if (ownsRequest()) requestRef.current = null; };
++    const fail = (error, fallback) => {
++      if (!ownsRequest()) return;
++      setDownload({ status: "failed", progress: 0, error: errorMessage(error, fallback) });
++      finish();
++    };
++    window.clearTimeout(timerRef.current);
++    setDownload({ status: "preparing", progress: 0, error: "" });
++    try {
++      await publicApi.post(`/replays/${encodeURIComponent(replayId)}/download`, {}, { signal: controller.signal });
++      if (!ownsRequest()) return;
++      const poll = async () => {
++        if (!ownsRequest()) return;
++        try {
++          const response = await publicApi.get(`/replays/${encodeURIComponent(replayId)}/download/status`, { signal: controller.signal });
++          if (!ownsRequest()) return;
++          const state = payload(response, {});
++          setDownload(state);
++          if (state.status === "ready") {
++            finish();
++            window.location.href = `/api/public/replays/${encodeURIComponent(replayId)}/download`;
++          } else if (state.status === "failed") {
++            finish();
++          } else {
++            timerRef.current = window.setTimeout(poll, 1000);
++          }
++        } catch (error) {
++          fail(error, t.download.statusError);
++        }
++      };
++      await poll();
++    } catch (error) {
++      fail(error, t.download.unavailable);
++    }
++  }, [replayId, t]);
++
++  return [download, startDownload];
++}
++
+ function ReplayCard({ replay, onSelect, t = TEXT.zh }) {
+-  const [download, setDownload] = useState({ status: "idle", progress: 0, error: "" });
+-  const downloadTimer = useRef(null);
++  const [download, requestDownload] = useReplayDownload(replay.replayId, t);
+   const duration = formatDuration(replay.duration);
+   const isRadio = replay.category.includes("电台");
+   const isVideo = replay.category.includes("视频");
+   const typeClass = isRadio ? "radio" : isVideo ? "video" : "other";
+ 
+-  useEffect(() => () => window.clearTimeout(downloadTimer.current), []);
+-
+-  async function startDownload(event) {
++  function startDownload(event) {
+     event.stopPropagation();
+-    if (["preparing", "verifying"].includes(download.status)) return;
+-    setDownload({ status: "preparing", progress: 0, error: "" });
+-    try {
+-      await publicApi.post(`/replays/${encodeURIComponent(replay.replayId)}/download`);
+-      const poll = async () => {
+-        try {
+-          const response = await publicApi.get(`/replays/${encodeURIComponent(replay.replayId)}/download/status`);
+-          const state = payload(response, {});
+-          setDownload(state);
+-          if (state.status === "ready") window.location.href = `/api/public/replays/${encodeURIComponent(replay.replayId)}/download`;
+-          else if (state.status !== "failed") downloadTimer.current = window.setTimeout(poll, 1000);
+-        } catch (error) {
+-          setDownload({ status: "failed", progress: 0, error: errorMessage(error, t.download.statusError) });
+-        }
+-      };
+-      await poll();
+-    } catch (error) {
+-      setDownload({ status: "failed", progress: 0, error: errorMessage(error, t.download.unavailable) });
+-    }
++    void requestDownload();
+   }
+ 
+   return (
+@@ -354,20 +401,13 @@
+   }
+   const [playerLoading, setPlayerLoading] = useState(false);
+   const [playerError, setPlayerError] = useState("");
+-  const [downloadState, setDownloadState] = useState({ status: "idle", progress: 0, error: "" });
++  const [downloadState, requestDownload] = useReplayDownload(replayId, t);
+   const [groupId, setGroupId] = useState("all");
+   const [teamId, setTeamId] = useState("all");
+   const [searchQuery, setSearchQuery] = useState("");
+   const listRequestRef = useRef(0);
+   const detailRequestRef = useRef(0);
+   const playerRequestRef = useRef(0);
+-  const downloadTimerRef = useRef(null);
+-
+-  useEffect(() => () => window.clearTimeout(downloadTimerRef.current), []);
+-  useEffect(() => {
+-    window.clearTimeout(downloadTimerRef.current);
+-    setDownloadState({ status: "idle", progress: 0, error: "" });
+-  }, [replayId]);
+ 
+   const loadReplays = useCallback(
+     async ({ append = false, cursor = null, group = "all", team = "all", memberName = "" } = {}) => {
+@@ -563,31 +603,6 @@
+ 
+   const selectedDuration = selected ? formatDuration(selected.duration) : "";
+ 
+-  const requestDownload = useCallback(async () => {
+-    if (!selected?.replayId || ["preparing", "verifying"].includes(downloadState.status)) return;
+-    window.clearTimeout(downloadTimerRef.current);
+-    setDownloadState({ status: "preparing", progress: 0, error: "" });
+-    try {
+-      await publicApi.post(`/replays/${encodeURIComponent(selected.replayId)}/download`);
+-      const poll = async () => {
+-        try {
+-          const response = await publicApi.get(`/replays/${encodeURIComponent(selected.replayId)}/download/status`);
+-          const state = payload(response, {});
+-          setDownloadState(state);
+-          if (state.status === "ready") {
+-            window.location.href = `/api/public/replays/${encodeURIComponent(selected.replayId)}/download`;
+-          } else if (state.status !== "failed") {
+-            downloadTimerRef.current = window.setTimeout(poll, 1000);
+-          }
+-        } catch (error) {
+-          setDownloadState({ status: "failed", progress: 0, error: errorMessage(error, t.download.statusError) });
+-        }
+-      };
+-      await poll();
+-    } catch (error) {
+-      setDownloadState({ status: "failed", progress: 0, error: errorMessage(error, t.download.unavailable) });
+-    }
+-  }, [downloadState.status, selected]);
+ 
+   const filteredReplays = useMemo(() => {
+     const q = searchQuery.trim().toLowerCase();
+--- /dev/null
++++ after/app/server/test/audit-public-regressions.test.js
+@@ -0,0 +1,105 @@
++'use strict';
++const test = require('node:test');
++const assert = require('node:assert/strict');
++const fs = require('node:fs');
++const os = require('node:os');
++const path = require('node:path');
++const { EventEmitter } = require('node:events');
++const root = fs.mkdtempSync(path.join(os.tmpdir(), '48-audit-public-'));
++for (const name of ['DATA_DIR', 'POCKET48_DATA_DIR', 'RECORDINGS_DIR', 'COVERS_DIR']) process.env[name] = root;
++process.env.CONFIG_PATH = path.join(root, 'config.yaml');
++const live = require('../modules/pocket48/live');
++const manager = require('../modules/recorder/manager');
++const settings = require('../modules/analysis/settings');
++const service = require('../modules/analysis/service');
++const { danmakuManager } = require('../modules/pocket48/danmaku');
++const router = require('../routes/public');
++const { createApp } = require('../index');
++test.after(() => { service.stop(); fs.rmSync(root, { recursive: true, force: true }); });
++function handler(route) { return router.stack.find(layer => layer.route?.path === route).route.stack[0].handle; }
++function response() {
++  const res = new EventEmitter();
++  Object.assign(res, { statusCode: 200, headersSent: false, writableEnded: false, destroyed: false, writes: [],
++    status(code) { this.statusCode = code; return this; },
++    json(body) { this.body = body; this.writableEnded = true; this.emit('finish'); return this; },
++    writeHead(code) { this.statusCode = code; this.headersSent = true; }, flushHeaders() {},
++    write(value) { this.writes.push(value); }, end() { this.writableEnded = true; this.emit('finish'); },
++  });
++  return res;
++}
++function request() { const req = new EventEmitter(); req.params = { liveId: '123' }; req.query = {}; return req; }
++function deferred() { let resolve, reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; }
++
++test('F14: live upstream errors are 502, while a successful empty listing stays 200', async t => {
++  t.mock.method(live, 'listLives', async () => { throw Error('private token must not leave server'); });
++  const failed = response(); await handler('/live')(request(), failed);
++  assert.equal(failed.statusCode, 502); assert.equal(failed.body.success, false);
++  assert.equal(JSON.stringify(failed.body).includes('private token'), false);
++  live.listLives = async () => ({ list: [], next: '0' });
++  const empty = response(); await handler('/live')(request(), empty);
++  assert.equal(empty.statusCode, 200); assert.equal(empty.body.success, true); assert.deepEqual(empty.body.data.liveList, []);
++});
++
++for (const closeKind of ['close', 'aborted']) test(`F13: SSE ${closeKind} during metadata lookup allocates no resources`, async t => {
++  const metadata = deferred(); const req = request(), res = response(); let subscriptions = 0, timers = 0;
++  t.mock.method(live, 'getLive', () => metadata.promise);
++  t.mock.method(danmakuManager, 'subscribe', () => { subscriptions++; return () => {}; });
++  t.mock.method(global, 'setInterval', () => { timers++; return { unref() {} }; });
++  const pending = handler('/live/:liveId/danmaku')(req, res);
++  if (closeKind === 'aborted') { req.aborted = true; req.emit('aborted'); }
++  else { res.destroyed = true; res.emit('close'); }
++  metadata.resolve({ roomId: '456' }); await pending;
++  assert.equal(subscriptions, 0); assert.equal(timers, 0); assert.equal(res.headersSent, false);
++  assert.equal(req.listenerCount('aborted'), 0); assert.equal(res.listenerCount('close'), 0);
++});
++
++test('F13: a pending metadata rejection after disconnect does not write an error response', async t => {
++  const metadata = deferred(), req = request(), res = response();
++  t.mock.method(live, 'getLive', () => metadata.promise);
++  const pending = handler('/live/:liveId/danmaku')(req, res);
++  res.destroyed = true; res.emit('close'); metadata.reject(Error('offline'));
++  await pending; assert.equal(res.body, undefined); assert.equal(res.headersSent, false);
++});
++
++test('F13: successful request receipt does not close SSE; response closure releases exactly once', async t => {
++  const metadata = deferred(), req = request(), res = response(); let subscriptions = 0, releases = 0, timers = 0, cleared = 0;
++  t.mock.method(live, 'getLive', () => metadata.promise);
++  t.mock.method(danmakuManager, 'subscribe', (_id, send) => { subscriptions++; send('message', { text: 'safe' }); return () => { releases++; }; });
++  t.mock.method(global, 'setInterval', () => { timers++; return { unref() {} }; });
++  t.mock.method(global, 'clearInterval', () => { cleared++; });
++  const pending = handler('/live/:liveId/danmaku')(req, res);
++  req.emit('close'); // Node's request is fully received, not a response disconnect.
++  metadata.resolve({ roomId: '456' }); await pending;
++  assert.equal(subscriptions, 1); assert.equal(timers, 1); assert.equal(releases, 0); assert.equal(res.writes.length, 1);
++  res.emit('close'); res.emit('finish'); req.emit('aborted');
++  assert.equal(releases, 1); assert.equal(cleared, 1);
++});
++
++test('F13: synchronous disconnect from subscription callback also releases its returned lease', async t => {
++  const req = request(), res = response(); let releases = 0, timers = 0;
++  t.mock.method(live, 'getLive', async () => ({ roomId: '456' }));
++  t.mock.method(danmakuManager, 'subscribe', () => { res.destroyed = true; res.emit('close'); return () => { releases++; }; });
++  t.mock.method(global, 'setInterval', () => { timers++; return { unref() {} }; });
++  await handler('/live/:liveId/danmaku')(req, res);
++  assert.equal(releases, 1); assert.equal(timers, 0);
++});
++
++test('F04: actual HTML preview and JSON obey the same summary visibility policy', async t => {
++  t.mock.method(manager, 'getRecordings', () => [{ id: 'audit-summary', liveId: '900009', source: 'pocket48', mediaType: 'video', status: 'done', title: 'Fixture' }]);
++  let mode = 'chapters', enabled = true;
++  t.mock.method(settings, 'get', () => ({ publish: { summary: enabled, chapters: true, highlights: true }, publicDetail: { mode } }));
++  t.mock.method(service, 'result', () => ({ summary: 'HIDDEN_PROSE_SENTINEL', segments: [{ text: 'PRIVATE_SUBTITLE' }], summaryModel: 'PRIVATE_MODEL', summaryEndpoint: 'https://private.invalid', chapters: [{ start: 0, end: 1, title: 'Chapter', summary: 'caption' }], highlights: [] }));
++  const server = createApp().listen(0, '127.0.0.1'); await new Promise(resolve => server.once('listening', resolve));
++  try {
++    const base = `http://127.0.0.1:${server.address().port}`;
++    const read = async () => ({ html: await (await fetch(base + '/replays/900009')).text(), api: await fetch(base + '/api/public/replays/900009/summary') });
++    let result = await read(), data = await result.api.json();
++    assert.match(result.html, /og:description/); assert.equal(result.html.includes('HIDDEN_PROSE_SENTINEL'), false);
++    assert.equal(data.data.summary, ''); assert.equal(data.data.detail, 'chapters');
++    assert.equal(JSON.stringify(router.publishedSummaryFor('900009')).includes('PRIVATE_'), false);
++    mode = 'full'; result = await read(); data = await result.api.json();
++    assert.ok(result.html.includes('HIDDEN_PROSE_SENTINEL')); assert.equal(data.data.summary, 'HIDDEN_PROSE_SENTINEL');
++    enabled = false; result = await read();
++    assert.equal(result.api.status, 404); assert.equal(result.html.includes('HIDDEN_PROSE_SENTINEL'), false);
++  } finally { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
++});
+--- /dev/null
++++ after/app/server/test/audit-analysis-regressions.test.js
+@@ -0,0 +1,166 @@
++'use strict';
++// Audit regressions use only pure functions and source VMs with in-memory stores.
++// No media processes, real endpoints, credentials, worker startup or runtime data.
++const test = require('node:test');
++const assert = require('node:assert/strict');
++const fs = require('node:fs');
++const path = require('node:path');
++const vm = require('node:vm');
++const insights = require('../modules/analysis/insights');
++const queue = require('../modules/analysis/queue');
++const config = { url: 'https://model.example/v1', model: 'mock' };
++const segments = [{ start: 0, end: 10, text: '今天大家一起吃苹果' }];
++const batch = insights.chunkSegments(segments)[0];
++const row = () => ({ start: 0, end: 10, title: '吃苹果', summary: '大家一起吃苹果', evidenceIds: [0] });
++const valid = () => ({ summary: '概述', chapters: [row()], highlights: [] });
++const source = name => fs.readFileSync(path.join(__dirname, '../modules/analysis', name), 'utf8');
++function isolatedSettings() {
++  let saved = {
++    ai: { url: 'https://old.example/v1', model: 'm', key: 'mock-old-ai-key' },
++    asr: { url: 'https://old.example/v1', model: 'w', key: 'mock-old-asr-key' },
++  };
++  const store = { load: (_name, fallback) => structuredClone(saved || fallback), filePath: name => name,
++    atomicWrite: (_name, value) => { saved = structuredClone(value); } };
++  const module = { exports: {} };
++  vm.runInNewContext(source('settings.js'), {
++    module, exports: module.exports, URL,
++    require: id => { assert.equal(id, '../../lib/store'); return store; },
++  });
++  return { settings: module.exports, saved: () => saved };
++}
++function isolatedNormalizer() {
++  const module = { exports: {} };
++  const dependencies = {
++    fs, path, child_process: { spawn() { throw Error('No external process in audit tests'); } },
++    '../recorder/manager': {}, '../recorder/archive-processor': { _internals: {} },
++    '../../lib/store': { load: () => [], dataDir: 'unused' }, './settings': {},
++    './queue': { createWakeup: () => ({}) }, './queue-lease': () => ({}),
++    './parsing': require('../modules/analysis/parsing'),
++  };
++  vm.runInNewContext(source('service.js'), {
++    module, exports: module.exports, process: { env: {} }, setTimeout, clearTimeout,
++    require: id => { assert.ok(id in dependencies, id); return dependencies[id]; },
++  });
++  return module.exports._internals.normalizeSegments;
++}
++test('F03: saving a changed AI or ASR endpoint never transfers an omitted old key', () => {
++  for (const kind of ['ai', 'asr']) {
++    for (const key of [undefined, '']) {
++      const { settings, saved } = isolatedSettings();
++      const displayed = settings.publicSettings()[kind];
++      assert.equal(displayed.key, undefined);
++      settings.save({ [kind]: { ...displayed, url: 'https://new.example/v1', key } });
++      assert.equal(saved()[kind].key, '');
++      assert.equal(settings.publicSettings()[kind].configured, false);
++      assert.throws(() => settings.connection(kind), /API 密钥/);
++    }
++  }
++});
++test('F03: same normalized endpoint preserves a key; explicit replacement and clearing work', () => {
++  for (const kind of ['ai', 'asr']) {
++    const { settings, saved } = isolatedSettings();
++    const oldKey = saved()[kind].key;
++    settings.save({ [kind]: { url: ' https://old.example/v1/ ', model: 'new-model' } });
++    assert.equal(saved()[kind].key, oldKey);
++    settings.save({ [kind]: { url: 'https://new.example/v1', key: 'mock-new-key' } });
++    assert.equal(settings.connection(kind).key, 'mock-new-key');
++    settings.save({ [kind]: { clearKey: true, key: 'mock-ignored-key' } });
++    assert.equal(saved()[kind].key, '');
++  }
++});
++test('F05: clipped ASR intervals always have positive duration and stay inside the chunk', () => {
++  const normalize = isolatedNormalizer();
++  const good = { start: 599, end: 602, text: 'valid tail' };
++  for (const start of [600, 601, 604.99]) {
++    const bad = { start, end: start + 1, text: 'outside the clip' };
++    assert.throws(() => normalize([bad], 1200, 600), /无效时间戳/);
++    const out = normalize([bad, good], 1200, 600);
++    assert.equal(out.length, 1);
++    assert.equal(out[0].start, 1799);
++    assert.equal(out[0].end, 1800);
++    assert.ok(out.every(s => s.start >= 1200 && s.end <= 1800 && s.end > s.start));
++  }
++});
++test('F06: mixed null, primitive and missing-field candidates are discarded without TypeError', () => {
++  for (const bad of [null, {}, 'bad', [], 42, { start: 1 }]) {
++    const data = valid();
++    data.chapters.push(bad);
++    data.highlights = [row(), bad];
++    const out = insights.validate(data, batch);
++    assert.deepEqual(out.chapters, [row()]);
++    assert.deepEqual(out.highlights, [row()]);
++  }
++});
++test('F06: explicit malformed, empty, forged and duplicate citations still reject a whole batch', () => {
++  for (const evidenceIds of [null, '0', [], [99], [0, 99], [0, 0], [0.5], ['0']]) {
++    for (const field of ['chapters', 'highlights']) {
++      const data = valid();
++      data[field].push({ ...row(), evidenceIds });
++      assert.throws(() => insights.validate(data, batch), /引用无效或伪造/);
++    }
++  }
++  const extra = valid(); extra.chapters[0].unexpected = true;
++  assert.throws(() => insights.validate(extra, batch), /schema/);
++});
++test('F07: an unmatched string never becomes a subtitle citation or completes coverage', async () => {
++  const unrelated = '她宣布退团并且遭遇重大事故';
++  assert.deepEqual(insights.validate({ ...valid(), highlights: [unrelated] }, batch).highlights, []);
++  let calls = 0, checkpoints = 0;
++  await assert.rejects(() => insights.summarize({ segments, config,
++    generate: async () => { calls++; return { summary: '概述', chapters: [], highlights: [unrelated] }; },
++    saveCheckpoint: () => { checkpoints++; },
++  }), /遗漏字幕时间窗口/);
++  assert.equal(calls, 1);
++  assert.equal(checkpoints, 0);
++});
++test('F07: text-matched string highlights still normalize using their actual source', () => {
++  const out = insights.validate({ summary: '概述', chapters: [], highlights: ['今天大家一起吃苹果'] }, batch);
++  assert.deepEqual(out.highlights[0].evidenceIds, [0]);
++  assert.deepEqual(out.chapters[0].evidenceIds, [0]);
++});
++test('F07: unsafe old-policy checkpoints are not reused as fresh validated evidence', async () => {
++  let calls = 0;
++  const checkpoint = { version: 1, fingerprint: insights.fingerprint(segments, config),
++    completed: [{ summary: 'old', chapters: [{ ...row(), title: 'fabricated old anchor' }], highlights: [] }] };
++  const out = await insights.summarize({ segments, config, checkpoint,
++    generate: async () => { calls++; return valid(); }, saveCheckpoint: () => {},
++  });
++  assert.equal(calls, 1);
++  assert.equal(out.chapters[0].title, '吃苹果');
++});
++test('F15: HTTP, network, schema and evidence failures leave summarize after exactly one request', async () => {
++  for (const error of [
++    ...[401, 403, 429, 503].map(httpStatus => Object.assign(Error('mock HTTP'), { httpStatus, retryAfterMs: 600000 })),
++    Object.assign(Error('network'), { networkError: true }),
++    Object.assign(Error('AI 返回格式无效'), { statusCode: 400 }),
++  ]) {
++    let calls = 0;
++    await assert.rejects(() => insights.summarize({ segments, config,
++      generate: async () => { calls++; throw error; }, saveCheckpoint: () => {},
++    }), observed => observed === error);
++    assert.equal(calls, 1);
++  }
++  let calls = 0;
++  await assert.rejects(() => insights.summarize({ segments, config,
++    generate: async () => { calls++; return { ...valid(), chapters: [{ ...row(), evidenceIds: [99] }] }; },
++    saveCheckpoint: () => {},
++  }), /引用无效或伪造/);
++  assert.equal(calls, 1);
++});
++test('F15: only the opted-in durable queue owns budget, HTTP classification and Retry-After', () => {
++  const cfg = { ai: config, queue: { autoRetry: true, maxRetries: 1 } };
++  const makeJob = () => ({ kind: 'summarize', status: 'running', configFingerprint: queue.fingerprint(cfg, 'summarize') });
++  for (const httpStatus of [400, 401, 403]) {
++    // Message heuristics and even network flags must never override explicit HTTP.
++    assert.equal(queue.retry(makeJob(), { httpStatus, message: 'AI 返回格式无效', networkError: true }, cfg, 0), false);
++  }
++  for (const overrides of [{ autoRetry: false }, { maxRetries: 0 }]) {
++    assert.equal(queue.retry(makeJob(), { httpStatus: 429 }, { ...cfg, queue: { ...cfg.queue, ...overrides } }, 0), false);
++  }
++  const job = makeJob();
++  assert.equal(queue.retry(job, { httpStatus: 429, retryAfterMs: 600000 }, cfg, 1000), true);
++  assert.equal(job.retryCount, 1);
++  assert.equal(Date.parse(job.nextAttemptAt), 601000);
++  assert.equal(queue.next([job], 600999), undefined);
++  assert.equal(queue.retry(job, { httpStatus: 429 }, cfg, 601000), false);
++});
+--- /dev/null
++++ after/app/server/test/audit-recorder-regressions.test.js
+@@ -0,0 +1,215 @@
++"use strict";
++// Isolated audit regressions. Application modules execute in VM contexts with
++// explicit dependencies: no application store, upstream request or real ffmpeg.
++const test = require("node:test");
++const assert = require("node:assert/strict");
++const fs = require("fs");
++const path = require("path");
++const os = require("os");
++const vm = require("vm");
++const crypto = require("crypto");
++const { EventEmitter } = require("events");
++const { Readable } = require("stream");
++function load(name, deps, extra = {}) {
++  const module = { exports: {} };
++  const filename = path.join(__dirname, "../modules/recorder", name);
++  vm.runInNewContext(fs.readFileSync(filename, "utf8"), {
++    module, exports: module.exports, require(key) {
++      if (!(key in deps)) throw Error(`Unmocked dependency: ${key}`);
++      return deps[key];
++    }, console, Buffer, URL, process: { env: {} },
++    setTimeout: () => ({ unref() {} }), clearTimeout() {},
++    setInterval: () => ({ unref() {} }), clearInterval() {}, ...extra,
++  }, { filename });
++  return module.exports;
++}
++function restartFixture(options = {}) {
++  const root = path.resolve("audit-memory-recordings");
++  const old = path.join(root, "before.partial.flv"), fresh = path.join(root, "after.flv");
++  const persisted = [{ id: "owner", source: "pocket48", liveId: "123", memberId: "1", memberName: "member", liveTitle: "test", title: "test", status: "recording", filePath: old, startedAt: "2026-10-23T09:00:00Z", ...options.owner }];
++  const store = { load: (key, fallback) => key === "recordings" ? JSON.parse(JSON.stringify(persisted)) : fallback, save() {}, atomicWrite() {}, filePath: key => key };
++  const manager = load("manager.js", { "../../lib/store": store, "../../lib/sse": { broadcast() {} } });
++  const segment = manager.addRecording({ source: "pocket48", liveId: "123", memberId: "1", memberName: "member", title: "test", liveTitle: "test", status: "waiting_merge", filePath: fresh, startedAt: "2026-10-23T09:05:00Z", endedAt: "2026-10-23T09:10:00Z" });
++  const alias = options.activeAlias ? manager.addRecording({ source: "writer", status: "recording", filePath: old }) : null;
++  let probedOld = false;
++  const known = new Set([old, fresh]);
++  const fakeFs = {
++    existsSync: file => known.has(file), realpathSync: file => file === old && options.replaced && probedOld ? path.resolve("outside-root.flv") : file,
++    lstatSync: file => ({ isFile: () => !(file === old && options.symlink) }),
++    statSync: file => ({ size: file === old && options.empty ? 0 : 100, mtimeMs: file === old && options.changed && probedOld ? 2 : 1 }),
++    writeFileSync() {}, unlinkSync() {}, renameSync: (from, to) => known.add(to),
++  };
++  const calls = []; let merged = false;
++  function spawn(bin, args) {
++    calls.push({ bin, args });
++    const child = new EventEmitter(); child.stdout = new EventEmitter(); child.stderr = new EventEmitter(); child.stderr.resume = () => {};
++    setImmediate(() => {
++      if (bin === "ffprobe") {
++        const file = args.at(-1);
++        if (file === old && options.invalid) { child.emit("close", 1); return; }
++        if (file === old) probedOld = true;
++        if (file === old && options.onProbe) options.onProbe(manager);
++        child.stdout.emit("data", JSON.stringify({ streams: [{ codec_type: "video", codec_name: "h264", width: 16, height: 16 }], format: { duration: file.endsWith(".processing.mp4") && merged ? "2" : "1" } }));
++      } else if (args.includes("concat")) merged = true;
++      child.emit("close", 0);
++    });
++    return child;
++  }
++  const recorder = { listActive: () => options.active ? [{ recordingId: "owner" }] : alias ? [{ recordingId: alias.id }] : [], onFinalized: () => () => {}, _internals: { recordingsDir: () => root, safeName: value => value } };
++  const scheduled = [];
++  const archive = load("archive-processor.js", {
++    fs: fakeFs, path, child_process: { spawn }, "./manager": manager, "../pocket48/recorder": recorder,
++    "../bilibili/queue": {}, "../backup115/leases": { lockedPath: () => false },
++    "./replay-recovery": { _internals: { needsQualityGate: () => false } }, "./covers": { generate: async () => {} },
++  }, { setTimeout: (fn, delay) => { scheduled.push({ fn, delay }); return { unref() {} }; } });
++  return { manager, archive, segment, old, fresh, calls, scheduled };
++}
++test("F02 actual loadState -> reconnect -> archive preserves both usable segments", async () => {
++  const f = restartFixture();
++  assert.equal(f.manager.getRecording("owner").status, "failed");
++  assert.equal(f.manager.getRecording("owner").interruptedByRestart, true);
++  assert.equal(f.segment.sessionId, "owner");
++  const archive = await f.archive.processRecording(f.segment.id, { immediate: true, autoEnqueue: false });
++  assert.equal(archive.id, "owner");
++  assert.equal(archive.segmentCount, 2);
++  assert.deepEqual(Array.from(archive.sourceFiles), [f.old, f.fresh]);
++  assert.equal(f.segment.status, "merged");
++});
++test("F02 start schedules only restart-specific failed records and supports legacy marker", () => {
++  const f = restartFixture({ owner: { status: "failed", error: "Server restarted before recording completed" } });
++  f.archive.start();
++  assert.equal(f.scheduled.length, 2);
++  f.archive.stop();
++});
++for (const [name, options] of [
++  ["arbitrary failure", { owner: { status: "failed", error: "unrelated media failure" } }],
++  ["zero-length file", { empty: true }],
++  ["invalid media", { invalid: true }],
++  ["active writer", { active: true }],
++  ["different-ID writer on the same path", { activeAlias: true }],
++  ["symlink", { symlink: true }],
++  ["changed media during probe", { changed: true }],
++  ["replaced realpath during probe", { replaced: true }],
++  ["state changed during probe", { onProbe: manager => manager.updateRecording("owner", { status: "deleted" }) }],
++]) {
++  test(`F02 does not revive ${name}`, async () => {
++    const f = restartFixture(options);
++    try { await f.archive.processRecording(f.segment.id, { immediate: true, autoEnqueue: false }); } catch (error) {
++      assert.match(error.message, /仍在录制/);
++    }
++    assert.notEqual(f.manager.getRecording("owner").status, "done");
++    assert.equal(f.manager.getRecording("owner").filePath, f.old);
++    assert.ok(!f.segment.sourceFiles?.includes(f.old));
++  });
++}
++function retentionFixture(verifiedAt) {
++  const root = path.resolve("audit-retention-memory"), main = path.join(root, "archive.mp4"), raw = path.join(root, "original.flv");
++  const files = new Map([[main, { size: 1000, mtimeMs: 100 }], [raw, { size: 400, mtimeMs: 100 }]]);
++  const records = [{ id: "r", status: "done", filePath: main, sourceFiles: [raw], retentionVerifiedAt: verifiedAt }];
++  const manager = { getRecordings: () => records, getQueue: () => [], updateRecording: (id, updates) => Object.assign(records.find(r => r.id === id), updates) };
++  const stat = file => { const value = files.get(path.resolve(file)); if (!value) throw Error("missing"); return { ...value, isFile: () => true }; };
++  const fakeFs = {
++    realpathSync: file => path.resolve(file), statSync: stat, lstatSync: stat,
++    existsSync: file => path.resolve(file) === root || files.has(path.resolve(file)),
++    statfsSync: () => ({ bavail: 0n, bsize: 4096n }), unlinkSync: file => files.delete(path.resolve(file)),
++    readdirSync: () => [...files.keys()].map(file => ({ name: path.basename(file), isFile: () => true, isDirectory: () => false })),
++  };
++  const leases = { lockedPath: () => false, lockedRecording: () => false }, noBusy = { busy: () => false };
++  const storage = load("storage.js", { fs: fakeFs, path, crypto, "./manager": manager, "../backup115/leases": leases, "./replay-recovery": noBusy, "../analysis/service": noBusy, "./clips": noBusy });
++  const retention = load("retention.js", { fs: fakeFs, path, "./manager": manager, "./storage": storage, "./replay-download": { verifyFull: async () => {} }, "../backup115/leases": leases, "./replay-audit": noBusy, "../pocket48/recorder": { _internals: { recordingsDir: () => root } } });
++  return { retention, root, files, raw, main };
++}
++test("F08 sweep followed immediately by pressured purge preserves original", async () => {
++  const f = retentionFixture();
++  await f.retention.sweep();
++  const result = await f.retention.purge(f.root);
++  assert.equal(result.files, 0);
++  assert.equal(f.files.has(f.raw), true);
++});
++for (const [name, age] of [["recent", new Date(Date.now() - 3600000).toISOString()], ["invalid", "not-a-date"], ["future", new Date(Date.now() + 86400000).toISOString()]]) {
++  test(`F08 purge protects ${name} verification timestamp`, async () => {
++    const f = retentionFixture(age); await f.retention.purge(f.root); assert.ok(f.files.has(f.raw));
++  });
++}
++test("F08 expired window permits reclaiming original but never main", async () => {
++  const f = retentionFixture(new Date(Date.now() - 86400001).toISOString());
++  await f.retention.purge(f.root);
++  assert.equal(f.files.has(f.raw), false); assert.equal(f.files.has(f.main), true);
++});
++function replayFixture(t, options = {}) {
++  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "audit-replay-regression-"));
++  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
++  const hash = bytes => crypto.createHash("sha256").update(bytes).digest("hex");
++  const plan = { liveId: "123", resources: [{ name: "asset-00000.ts", url: "https://cdn.example/a.ts?old=1" }, { name: "asset-00001.ts", url: "https://cdn.example/b.ts?expired=1" }], completed: { "asset-00000.ts": { bytes: 5, sha256: hash("OLD_A") } }, scope: { origin: "https://cdn.example", hostname: "cdn.example", pathPrefix: "/", resourcePathPrefixes: ["/"] }, local: "#EXTM3U", seconds: 10 };
++  fs.writeFileSync(path.join(directory, "plan.json"), JSON.stringify(plan));
++  fs.writeFileSync(path.join(directory, "asset-00000.ts"), "OLD_A");
++  const requests = [], validated = []; let lookups = 0, scopes = 0, observed;
++  const manifest = "#EXTM3U\n#EXTINF:5,\na.ts?fresh=1\n#EXTINF:5,\nb.ts?fresh=1\n#EXT-X-ENDLIST\n";
++  const proxy = {
++    MANIFEST_MAX_BYTES: 10000, decodeManifest: bytes => bytes.toString(), authorizeManifestResources() {},
++    validateSourceUrl(value) { const url = new URL(value); validated.push(url.href); if (url.hostname !== "cdn.example") throw Error("unsafe host"); return url; },
++    scopeFor: () => { scopes++; return { origin: "https://cdn.example", hostname: "cdn.example", pathPrefix: "/", resourcePathPrefixes: new Set(["/"]) }; },
++  };
++  function spawn(bin, args) {
++    const child = new EventEmitter(); child.stdout = new EventEmitter(); child.stderr = new EventEmitter(); child.stderr.resume = () => {};
++    child.kill = () => {};
++    setImmediate(() => {
++      if (bin === "ffprobe") child.stdout.emit("data", JSON.stringify({ streams: [{ codec_type: "video", width: 16, height: 16 }], format: { duration: "10" } }));
++      else fs.writeFileSync(args.at(-1), "MOCK_MUXED_VIDEO");
++      child.emit("close", 0);
++    });
++    return child;
++  }
++  const media = load("replay-download.js", {
++    fs: { ...fs, statfsSync: () => ({ bavail: 1000000n, bsize: 4096n }) }, path, crypto,
++    "stream/promises": require("stream/promises"), stream: require("stream"), child_process: { spawn },
++    "../../lib/store": { atomicWrite: (file, value) => fs.writeFileSync(file, JSON.stringify(value)) },
++    "../pocket48/replay-proxy": { _internals: proxy }, "../pocket48/replay": {}, "../backup115/leases": { lockedPath: () => false },
++  });
++  const input = {
++    liveId: "123", directory, verify: false,
++    getReplay: async () => { lookups++; return { replay: { liveId: options.wrongLive ? "456" : "123" }, streamUrl: options.unsafe ? "https://evil.example/replay.m3u8" : "https://cdn.example/replay.m3u8" }; },
++    request: async url => {
++      requests.push(url);
++      const isManifest = url.endsWith(".m3u8");
++      const expired = !isManifest && (url.includes("expired=1") || options.alwaysExpired);
++      const response = Readable.from([Buffer.from(isManifest ? manifest : url.includes("a.ts") ? "NEW_A" : "NEW_B")]);
++      response.statusCode = expired ? (options.status || 403) : 200; response.headers = {}; response.complete = true;
++      return { response, finalUrl: new URL(url) };
++    },
++    onProgress(progress) {
++      if (progress.verifying) observed = fs.readFileSync(path.join(directory, "asset-00000.ts"), "utf8");
++    },
++  };
++  return { media, input, requests, validated, lookupCount: () => lookups, scopeCount: () => scopes, observed: () => observed };
++}
++test("F09 expired cached plan refreshes same live/scope and redownloads changed same-name resources", async t => {
++  const f = replayFixture(t); const result = await f.media.download(f.input);
++  assert.equal(result.liveId, "123"); assert.equal(f.lookupCount(), 1); assert.equal(f.scopeCount(), 1);
++  assert.ok(f.validated.includes("https://cdn.example/a.ts?fresh=1"));
++  assert.ok(f.requests.includes("https://cdn.example/a.ts?fresh=1"));
++  assert.equal(f.observed(), "NEW_A", "old completed hash must not authorize new generation bytes");
++});
++test("F09 repeated expiry refreshes at most once per download", async t => {
++  const f = replayFixture(t, { alwaysExpired: true });
++  await assert.rejects(f.media.download(f.input), { code: "REPLAY_RESOURCE_EXPIRED" });
++  assert.equal(f.lookupCount(), 1); assert.equal(f.scopeCount(), 1);
++  assert.equal(f.requests.filter(url => url.endsWith(".m3u8")).length, 1);
++  assert.ok(f.requests.length <= 10);
++});
++test("F09 refreshed metadata cannot substitute a different live", async t => {
++  const f = replayFixture(t, { wrongLive: true });
++  await assert.rejects(f.media.download(f.input), /同场官方回放暂不可用/);
++  assert.equal(f.scopeCount(), 0);
++});
++test("F09 refreshed metadata is checked by URL authorization", async t => {
++  const f = replayFixture(t, { unsafe: true });
++  await assert.rejects(f.media.download(f.input), /unsafe host/);
++  assert.equal(f.requests.some(url => url.includes("evil.example")), false);
++});
++test("F09 server errors do not discard resumable plan or refresh metadata", async t => {
++  const f = replayFixture(t, { status: 500 });
++  await assert.rejects(f.media.download(f.input), /分片失效或下载失败/);
++  assert.equal(f.lookupCount(), 0);
++  assert.equal(f.requests.length, 3);
++});
+--- /dev/null
++++ after/app/client/test/audit-web-regressions.test.js
+@@ -0,0 +1,211 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import vm from 'node:vm';
++import { readFileSync, mkdtempSync, rmSync } from 'node:fs';
++import { tmpdir } from 'node:os';
++import { join } from 'node:path';
++import { fileURLToPath } from 'node:url';
++import { createRequire } from 'node:module';
++import { createServer } from 'vite';
++
++const root = fileURLToPath(new URL('../', import.meta.url));
++const read = name => readFileSync(join(root, 'src', name), 'utf8');
++const liveSource = read('pages/PublicLive.jsx');
++const replaySource = read('pages/PublicReplay.jsx');
++const overlaySource = read('components/ReplayDanmakuOverlay.jsx');
++function cut(source, start, end) {
++  const a = source.indexOf(start), b = source.indexOf(end, a);
++  assert.ok(a >= 0 && b > a, `Source marker changed: ${start}`);
++  return source.slice(a, b);
++}
++const texts = vm.runInNewContext(cut(replaySource, 'const TEXT =', 'export function languageOf(') + ';TEXT');
++const payload = response => response.data;
++const deferred = () => { let resolve, reject; const promise = new Promise((yes, no) => { resolve = yes; reject = no; }); return { promise, resolve, reject }; };
++const flush = async () => { for (let i = 0; i < 6; i++) await Promise.resolve(); };
++
++test('F01 numeric live categories support empty, matching and nonmatching searches', () => {
++  const normalize = vm.runInNewContext(cut(liveSource, 'function normalizeLive(', 'function formatStartedAt(') + ';normalizeLive');
++  const filter = cut(liveSource, '    return lives.filter(', '  }, [lives, searchQuery]);');
++  const lives = [1, 2].map(liveType => normalize({ liveId: String(liveType), title: '测试标题', member: { name: '成员' }, liveType }));
++  assert.ok(lives.every(row => typeof row.category === 'string'));
++  for (const [q, count] of [['', 2], ['成员', 2], ['测试', 2], ['1', 1], ['no-match', 0]]) {
++    assert.equal(vm.runInNewContext('(function(){' + filter + '})()', { lives, q }).length, count);
++  }
++});
++
++test('F10 all replay types, fallback fields and map normalization remain usable', () => {
++  const functions = cut(replaySource, 'function replayCategory(', 'function formatReplayTime(');
++  const { normalizeReplay, replayPage } = vm.runInNewContext(functions + ';({normalizeReplay,replayPage})', { TEXT: texts, payload });
++  for (const [liveType, expected] of [[1, '视频直播'], [2, '电台直播'], [5, '游戏直播'], [6, 'AI 直播'], [null, '视频直播']]) {
++    assert.equal(normalizeReplay({ liveId: '1', liveType }).category, expected);
++  }
++  assert.equal(normalizeReplay({ liveId: '1', liveType: 5 }, texts.en).category, 'Game live');
++  const page = replayPage({ data: { list: [{ liveId: '1', liveType: 5 }, { liveId: '2', liveType: 6 }, { liveId: '3' }] } });
++  assert.equal(page.items.length, 3);
++  assert.equal(page.items[1].title, texts.zh.detail.memberLive);
++});
++
++test('F11 first-load toggle aborts old fetch, retries, and ignores old success/error', async () => {
++  const body = cut(overlaySource, '    // A toggle can cancel', '  }, [enabled, normalizedReplayId, available]');
++  let status = 'idle', records = [], requestCount = 0;
++  const requests = [];
++  const env = () => ({ enabled: true, normalizedReplayId: '1', available: true, status, AbortController,
++    setStatus: value => { status = value; }, setRecords: value => { records = value; }, payload,
++    normalizeReplayDanmakuList: list => list,
++    publicApi: { get: (_url, options) => { requestCount++; const pending = deferred(); requests.push({ ...pending, signal: options.signal }); return pending.promise; } },
++  });
++  const run = (extra = {}) => vm.runInNewContext('(function(){' + body + '})()', { ...env(), ...extra });
++  const cleanup = run();
++  assert.equal(status, 'loading');
++  cleanup(); assert.equal(requests[0].signal.aborted, true);
++  run({ enabled: false });
++  const cleanupReplacement = run();
++  assert.equal(requestCount, 2);
++  requests[0].resolve({ data: { list: [{ text: 'stale' }] } }); await flush();
++  assert.equal(records.length, 0);
++  requests[1].resolve({ data: { list: [{ text: 'current' }] } }); await flush();
++  assert.equal(status, 'ready'); assert.equal(records[0].text, 'current');
++  cleanupReplacement(); run(); assert.equal(requestCount, 2, 'ready data is reused when toggled');
++  // A failed in-flight request must not change a replacement request to error.
++  status = 'idle'; const cleanupError = run(); cleanupError(); run();
++  requests[2].reject(new Error('stale failure')); await flush(); assert.equal(status, 'loading');
++  requests[3].resolve({ data: { list: [] } }); await flush(); assert.equal(status, 'empty');
++});
++
++// Minimal React-hook lifecycle driver, executing the actual shared download hook.
++// Deferred mocks deliberately ignore AbortSignal to exercise ownership checks too.
++function downloadHarness() {
++  const slots = [], effects = []; let index = 0, effectIndex = 0;
++  let routeReplayId, state, posts = [], gets = [], href = '', timers = new Map(), timerId = 0;
++  const env = {
++    AbortController, payload, errorMessage: (error, fallback) => error.message || fallback,
++    useParams: () => ({ replayId: routeReplayId }),
++    useState: initial => { const i = index++; if (!(i in slots)) slots[i] = initial; state = slots[i]; return [slots[i], value => { slots[i] = value; state = value; }]; },
++    useRef: value => { const i = index++; return slots[i] ||= { current: value }; },
++    useCallback: fn => fn,
++    useEffect: (fn, deps) => {
++      const i = effectIndex++, previous = effects[i];
++      if (!previous || deps.some((value, j) => !Object.is(value, previous.deps[j]))) {
++        previous?.cleanup?.(); effects[i] = { deps, cleanup: fn() };
++      }
++    },
++    window: { clearTimeout: id => timers.delete(id), setTimeout: fn => { timers.set(++timerId, fn); return timerId; },
++      location: { set href(value) { href = value; } } },
++    publicApi: {
++      post: (url, _body, options) => { const d = deferred(); posts.push({ ...d, url, signal: options.signal }); return d.promise; },
++      get: (url, options) => { const d = deferred(); gets.push({ ...d, url, signal: options.signal }); return d.promise; },
++    },
++  };
++  const hook = vm.runInNewContext(cut(replaySource, 'function useReplayDownload(', 'function ReplayCard(') + ';useReplayDownload', env);
++  return {
++    render(id, route = id) { index = 0; effectIndex = 0; routeReplayId = route; return hook(id, texts.zh); },
++    unmount() { for (const effect of effects) effect.cleanup?.(); },
++    tick() { const pending = [...timers.values()]; timers.clear(); for (const callback of pending) void callback(); },
++    get state() { return state; }, get posts() { return posts; }, get gets() { return gets; },
++    get timers() { return timers.size; }, get href() { return href; },
++  };
++}
++
++for (const phase of ['post', 'get']) {
++  for (const leave of ['route', 'unmount', 'card-route']) {
++    test(`F12 ${leave}: stale ${phase.toUpperCase()} cannot restore state/timer or navigate`, async () => {
++      const h = downloadHarness(); const [, start] = h.render('A', 'A');
++      const pending = start();
++      if (phase === 'get') { h.posts[0].resolve({}); await flush(); assert.equal(h.gets.length, 1); }
++      if (leave === 'unmount') h.unmount();
++      else h.render(leave === 'card-route' ? 'A' : 'B', 'B');
++      assert.equal(h.posts[0].signal.aborted, true);
++      if (phase === 'post') h.posts[0].resolve({});
++      else h.gets[0].resolve({ data: { status: 'ready' } });
++      await pending; await flush();
++      assert.equal(h.timers, 0); assert.equal(h.href, '');
++      if (leave !== 'unmount') assert.equal(h.state.status, 'idle');
++      assert.equal(h.gets.length, phase === 'post' ? 0 : 1);
++    });
++  }
++}
++
++test('F12 normal preparation, ready, failed retry, duplicate suppression and timer cleanup', async () => {
++  const h = downloadHarness(); const [, start] = h.render('A');
++  const first = start(); void start(); assert.equal(h.posts.length, 1);
++  h.posts[0].resolve({}); await flush();
++  h.gets[0].resolve({ data: { status: 'preparing', progress: 15 } }); await first;
++  assert.equal(h.timers, 1); assert.equal(h.state.progress, 15);
++  h.tick(); h.gets[1].resolve({ data: { status: 'ready' } }); await flush();
++  assert.equal(h.href, '/api/public/replays/A/download');
++  const again = start(); h.posts[1].reject(new Error('failed request')); await again;
++  assert.equal(h.state.status, 'failed');
++  const retry = start(); h.posts[2].resolve({}); await flush();
++  h.gets[2].resolve({ data: { status: 'preparing' } }); await retry;
++  assert.equal(h.timers, 1); h.unmount(); assert.equal(h.timers, 0);
++  h.tick(); assert.equal(h.gets.length, 3);
++});
++
++test('F01/F10/F11/F14 current-source Chrome regression with mocked APIs only', { timeout: 90000 }, async () => {
++  const require = createRequire(new URL('../../server/package.json', import.meta.url));
++  const express = require('express'), { chromium } = require('playwright');
++  const cacheDir = mkdtempSync(join(tmpdir(), 'shn48-audit-web-'));
++  const app = express();
++  const vite = await createServer({ root, cacheDir, server: { middlewareMode: true, hmr: false }, appType: 'custom' });
++  app.use(vite.middlewares);
++  app.get('*', async (req, res, next) => {
++    try { res.type('html').send(await vite.transformIndexHtml(req.originalUrl, readFileSync(join(root, 'index.html'), 'utf8'))); }
++    catch (error) { next(error); }
++  });
++  const server = app.listen(0, '127.0.0.1'); await new Promise(resolve => server.once('listening', resolve));
++  let browser;
++  try {
++    browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe' });
++    const page = await browser.newPage({ locale: 'zh-CN' }); page.setDefaultTimeout(10000);
++    const errors = []; page.on('pageerror', error => { if (!/WebSocket closed without opened/.test(error.message)) errors.push(error.message); });
++    let liveFailure = false, danmakuReads = 0; const heldDanmaku = [];
++    await page.route('**/api/**', async route => {
++      const url = new URL(route.request().url());
++      const send = data => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ success: true, data }) });
++      if (url.pathname.endsWith('/health')) return send({ status: 'ok' });
++      if (url.pathname === '/api/public/live') {
++        if (liveFailure) return route.fulfill({ status: 502, contentType: 'application/json', body: JSON.stringify({ success: false, error: 'Live list is unavailable' }) });
++        return send({ liveList: [1, 2].map(liveType => ({ liveId: String(liveType), title: '标题' + liveType, member: { name: '成员' + liveType }, liveType })) });
++      }
++      if (url.pathname === '/api/public/replays') return send({ list: [1, 2, 5, 6, null].map((liveType, index) => ({ liveId: String(index + 1), title: '回放' + index, liveType, member: { name: '测试成员' } })), next: '0' });
++      if (url.pathname.endsWith('/danmaku')) {
++        danmakuReads++;
++        if (danmakuReads === 1) { heldDanmaku.push(route); return; }
++        return send({ list: [{ id: 'current', nickname: '测试观众', text: '新请求弹幕', atMs: 0 }] });
++      }
++      if (url.pathname.endsWith('/play')) return send({ liveId: '1', protocol: 'hls', playUrl: '/mock.m3u8', danmakuAvailable: true });
++      if (url.pathname.endsWith('/summary')) return route.fulfill({ status: 404, body: '{}' });
++      if (/\/replays\/\d+$/.test(url.pathname)) return send({ liveId: url.pathname.split('/').at(-1), liveType: 1, title: '详情回放', member: { name: '测试成员' } });
++      throw new Error('Unexpected API request: ' + url.pathname);
++    });
++    await page.route('**/mock.m3u8', route => route.fulfill({ contentType: 'application/vnd.apple.mpegurl', body: '#EXTM3U\n#EXT-X-TARGETDURATION:1\n#EXT-X-ENDLIST\n' }));
++    const base = 'http://127.0.0.1:' + server.address().port;
++    await page.goto(base, { timeout: 60000, waitUntil: 'domcontentloaded' });
++    await page.locator('.public-live-card').nth(1).waitFor();
++    const search = page.getByPlaceholder('搜索成员或标题…');
++    await search.fill('audit-no-match'); await page.getByText('没有匹配的直播', { exact: true }).waitFor();
++    await search.fill('成员1'); await page.waitForFunction(() => document.querySelectorAll('.public-live-card').length === 1);
++    await search.fill(''); await page.locator('.public-live-card').nth(1).waitFor();
++    liveFailure = true;
++    await page.reload({ timeout: 60000, waitUntil: 'domcontentloaded' });
++    await page.getByText('直播列表暂时不可用', { exact: true }).waitFor();
++    assert.equal(await page.getByText('当前没有正在进行的直播', { exact: true }).count(), 0);
++    await page.goto(base + '/replays', { timeout: 60000, waitUntil: 'domcontentloaded' });
++    await page.locator('.replay-card').nth(4).waitFor();
++    await page.locator('.replay-card-main').first().click();
++    const toggle = page.locator('.replay-danmaku-toggle');
++    await toggle.click(); await page.waitForFunction(() => document.querySelector('.replay-danmaku-toggle')?.textContent.includes('加载中'));
++    await toggle.click(); await toggle.click();
++    await page.getByText('共 1 条弹幕', { exact: true }).waitFor();
++    assert.equal(danmakuReads, 2);
++    for (const route of heldDanmaku) await route.abort().catch(() => {});
++    assert.deepEqual(errors, []);
++  } finally {
++    await browser?.close();
++    await vite.close();
++    await new Promise(resolve => server.close(resolve));
++    // This is the exact mkdtemp path owned by this test, never app/dist or shared cache.
++    assert.ok(cacheDir.startsWith(join(tmpdir(), 'shn48-audit-web-')));
++    rmSync(cacheDir, { recursive: true, force: true });
++  }
++});

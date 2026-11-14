@@ -1,0 +1,6 @@
+{"id":"rec_1793460029674_k5sw2","status":"repaired_local_published","reason":"本地已替换为完整官方回放，B站投稿保持不变","error":null,"local":795.398,"official":1096.429,"next":null,"archive":1096.429,"origin":"official_replay","replayAudit":"repaired_local_published"}
+{"id":"rec_1793367807736_1gszb","status":"repaired_local_published","reason":"本地已替换为完整官方回放，B站投稿保持不变","error":null,"local":2132.193,"official":2360.133,"next":null,"archive":2360.133,"origin":"official_replay","replayAudit":"repaired_local_published"}
+{"id":"rec_1793455319510_jc46a","status":"manual","reason":"官方源含无法无损合并的短分片，已保留原录像","error":"官方清单中 0.349 秒短分片有 2 个画面包，合并仅保留 1 个，未通过完整性检查，需人工确认官方源","local":372.556,"official":589,"next":null,"archive":372.556,"origin":"official_replay"}
+{"id":"rec_1793453189443_mbo87","status":"manual","reason":"实际官方回放未明显长于本地，无法补全列表差额","error":"官方列表 574.00 秒，实际可下载 330.07 秒，本地 329.38 秒；保留原录像","local":329.379,"official":574,"downloadable":330.067,"next":null,"archive":329.379,"origin":"official_replay"}
+{"id":"rec_1793460029674_k5sw2","verification":"full","sha256":"cc2e813837d0a3d582679bcc13151a1da59dd3624e3bde497bafbc7e1d634a0b","originalPreserved":true,"postedArchiveOnly":true}
+{"id":"rec_1793367807736_1gszb","verification":"full","sha256":"860de9d76d746f23238375cc5f5a4a3b472863255f28ba05d558f4fcc27f8924","originalPreserved":true,"postedArchiveOnly":true}

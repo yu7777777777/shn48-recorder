@@ -1,0 +1,13 @@
+.env
+runtime/
+client/node_modules*/
+client/dist/
+server/node_modules*/
+*.log
+
+# The editable config can contain deployment-specific settings.
+config/config.yaml
+
+# Keep reproducible dependency metadata in source control once generated.
+!client/package-lock.json
+!server/package-lock.json

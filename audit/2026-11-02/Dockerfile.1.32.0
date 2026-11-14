@@ -1,0 +1,20 @@
+FROM shn48-shn48:1.31.2 AS frontend
+WORKDIR /build/client
+COPY client/package.json client/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY client/ ./
+COPY VERSION /build/VERSION
+RUN npm run build
+
+FROM shn48-shn48:1.31.2
+LABEL org.opencontainers.image.version="1.32.0" \
+      org.opencontainers.image.revision="release-1.32.0-20261102"
+RUN find /app/server -mindepth 1 -maxdepth 1 -not -name node_modules -exec rm -rf {} + \
+ && rm -rf /app/client/dist
+COPY server/ /app/server/
+COPY --from=frontend /build/client/dist/ /app/client/dist/
+COPY VERSION /app/VERSION
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh \
+ && test -x /opt/asr-venv/bin/python && test -x /opt/backup115/bin/python \
+ && node -e "require('/app/server/modules/notify'); require('/app/server/index').createApp(); console.log('MODULE_SMOKE_OK')"

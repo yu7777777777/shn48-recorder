@@ -1,0 +1,16 @@
+{
+  "forbiddenImportGuard": true,
+  "credentialReadGuard": true,
+  "downloadOrNetworkExecuted": false,
+  "loaded": [
+    "app/server/modules/recorder/replay-download.js",
+    "app/server/lib/store.js",
+    "app/server/modules/pocket48/replay-proxy.js",
+    "app/server/modules/pocket48/stream-proxy.js",
+    "app/server/modules/pocket48/replay.js",
+    "app/server/modules/pocket48/api.js",
+    "app/server/modules/pocket48/room-directory.js",
+    "app/server/modules/pocket48/live.js",
+    "app/server/modules/backup115/leases.js"
+  ]
+}

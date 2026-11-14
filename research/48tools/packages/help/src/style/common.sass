@@ -1,0 +1,12 @@
+/* tailwindcss */
+@import 'tailwindcss/theme.css'
+@import 'tailwindcss/utilities.css'
+
+/* https://v5.daisyui.com/docs/themes/?lang=zh_hans */
+@plugin 'daisyui'
+  themes: light --default
+
+@plugin '@tailwindcss/typography'
+
+.urlTarget
+  @apply font-bold text-primary

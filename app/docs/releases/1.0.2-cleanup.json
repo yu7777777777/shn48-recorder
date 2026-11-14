@@ -1,0 +1,102 @@
+[
+  {
+    "path": "deploy-1.0.0.tar.gz",
+    "bytes": 169740,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-1.0.1.tar.gz",
+    "bytes": 176084,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-archive-20260904.tar.gz",
+    "bytes": 183734,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-bubbles-20260913.tar.gz",
+    "bytes": 354450,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-chatrooms-20260913.tar.gz",
+    "bytes": 362359,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-checkin-20260913.tar.gz",
+    "bytes": 362741,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-covers-20260912.tar.gz",
+    "bytes": 385167,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-draft-delete-20260904.tar.gz",
+    "bytes": 26661,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-linked-20260912.tar.gz",
+    "bytes": 360421,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-login-20260912.tar.gz",
+    "bytes": 359608,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-membercolor-20260913.tar.gz",
+    "bytes": 355431,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-merged-20260913.tar.gz",
+    "bytes": 356984,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-messagebody-20260913.tar.gz",
+    "bytes": 351142,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-pocket48-20260912.tar.gz",
+    "bytes": 365716,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-queryfix-20260912.tar.gz",
+    "bytes": 359170,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-roomfix-20260913.tar.gz",
+    "bytes": 358161,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-storage-20260908.tar.gz",
+    "bytes": 352041,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-team-20260913.tar.gz",
+    "bytes": 360389,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "deploy-timeline-20260913.tar.gz",
+    "bytes": 354538,
+    "action": "recycle-bin"
+  },
+  {
+    "path": "live-panel-release.tar.gz",
+    "bytes": 353576,
+    "action": "recycle-bin"
+  }
+]

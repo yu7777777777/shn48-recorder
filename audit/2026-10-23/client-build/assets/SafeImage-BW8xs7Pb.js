@@ -1,0 +1,1 @@
+import{r as t,j as n}from"./vendor-react-CUnftwWn.js";function u({src:e,alt:a="",fallback:f,...o}){const[s,r]=t.useState(!1);return t.useEffect(()=>{r(!1)},[e]),!e||s?f||null:n.jsx("img",{...o,src:e,alt:a,referrerPolicy:"no-referrer",onError:()=>r(!0)})}export{u as S};

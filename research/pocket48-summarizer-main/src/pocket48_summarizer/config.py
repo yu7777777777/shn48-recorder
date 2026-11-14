@@ -1,0 +1,576 @@
+from __future__ import annotations
+
+import ipaddress
+import re
+import shutil
+from pathlib import Path
+from typing import Any, Literal
+
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    SecretStr,
+    field_validator,
+    model_validator,
+)
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from .errors import ConfigurationError
+
+
+VOICE_MONITOR_ID_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+
+
+class AdditionalRoomVoiceTarget(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: str = Field(min_length=1, max_length=64)
+    name: str = Field(min_length=1, max_length=100)
+    member_id: int = Field(gt=0)
+    channel_id: int | None = Field(default=None, gt=0)
+    server_id: int | None = Field(default=None, gt=0)
+
+    @field_validator("id")
+    @classmethod
+    def validate_id(cls, value: str) -> str:
+        if not VOICE_MONITOR_ID_RE.fullmatch(value):
+            raise ValueError(
+                "additional room voice target ID must be a safe lowercase slug"
+            )
+        if value == "primary":
+            raise ValueError(
+                "additional room voice target ID must not be primary"
+            )
+        return value
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value: str) -> str:
+        value = value.strip()
+        if not value or any(
+            ord(character) < 32 or ord(character) == 127
+            for character in value
+        ):
+            raise ValueError(
+                "additional room voice target name contains unsafe characters"
+            )
+        return value
+
+    @model_validator(mode="after")
+    def validate_room_ids(self) -> "AdditionalRoomVoiceTarget":
+        if (self.channel_id is None) != (self.server_id is None):
+            raise ValueError(
+                "additional room voice target channel_id and server_id "
+                "must both be present or both be absent"
+            )
+        return self
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+        case_sensitive=False,
+    )
+
+    app_host: str = "127.0.0.1"
+    app_port: int = Field(default=8000, ge=1, le=65535)
+    app_release: str = "development"
+    allow_remote_bind: bool = False
+    trusted_hosts: str = "localhost,127.0.0.1,testserver"
+    enable_worker: bool = True
+    enable_clipper: bool = True
+    data_dir: Path = Path("./data")
+    maintenance_dir: Path | None = None
+    database_name: str = "pocket48.sqlite3"
+    ffmpeg_path: str = "ffmpeg"
+    ffprobe_path: str = "ffprobe"
+    auth_required: bool = False
+    session_cookie_secure: bool = False
+    session_ttl_days: int = Field(default=30, ge=1, le=365)
+    daily_job_limit: int = Field(default=3, ge=1, le=100)
+    unlimited_job_usernames: str = "ruoke"
+    session_cookie_name: str = "p48_session"
+    csrf_cookie_name: str = "p48_csrf"
+
+    pocket_api_base_url: str = "https://pocketapi.48.cn"
+    replay_watch_member_id: int | None = Field(default=None, gt=0)
+    request_timeout_seconds: float = Field(default=30.0, gt=0, le=600)
+    external_retry_attempts: int = Field(default=3, ge=1, le=8)
+    max_api_response_bytes: int = Field(default=2 * 1024 * 1024, ge=1024)
+    pocket48_voice_token: SecretStr | None = None
+    pocket48_voice_pa: SecretStr | None = None
+    pocket48_voice_app_info: SecretStr | None = None
+    pocket48_voice_user_agent: str | None = None
+    pocket48_voice_member_name: str = "杨晔"
+    pocket48_voice_member_id: str | None = None
+    pocket48_voice_channel_id: str | None = None
+    pocket48_voice_server_id: str | None = None
+    pocket48_voice_additional_targets_json: tuple[
+        AdditionalRoomVoiceTarget, ...
+    ] = ()
+    pocket48_voice_monitor_id: str = "primary"
+    pocket48_voice_stream_hosts: str = ""
+    pocket48_voice_probe_seconds: int = Field(default=60, ge=5, le=60)
+    pocket48_voice_probe_max_bytes: int = Field(
+        default=50 * 1024 * 1024,
+        ge=1024,
+        le=200 * 1024 * 1024,
+    )
+    pocket48_voice_poll_seconds: int = Field(
+        default=60, ge=30, le=3600
+    )
+    pocket48_voice_poll_jitter_seconds: int = Field(
+        default=5, ge=0, le=60
+    )
+    pocket48_voice_max_recording_hours: float = Field(
+        default=4.0, gt=0, le=24
+    )
+    pocket48_voice_segment_seconds: int = Field(
+        default=300, ge=30, le=1800
+    )
+    pocket48_voice_max_local_bytes: int = Field(
+        default=2 * 1024 * 1024 * 1024,
+        ge=1024 * 1024,
+        le=20 * 1024 * 1024 * 1024,
+    )
+    pocket48_voice_max_total_bytes: int = Field(
+        default=20 * 1024 * 1024 * 1024,
+        ge=1024 * 1024,
+        le=1024 * 1024 * 1024 * 1024,
+    )
+    pocket48_voice_min_free_bytes: int = Field(
+        default=5 * 1024 * 1024 * 1024,
+        ge=1024 * 1024,
+        le=1024 * 1024 * 1024 * 1024,
+    )
+    pocket48_voice_allow_public_stream_hosts: bool = False
+    member_catalog_url: str = (
+        "https://h5.48.cn/resource/jsonp/"
+        "allmembers_simple.php?gid=00"
+    )
+    member_catalog_sync_interval_seconds: int = Field(
+        default=86400, ge=300
+    )
+    member_catalog_timeout_seconds: float = Field(default=20.0, gt=0)
+    member_catalog_retry_attempts: int = Field(default=3, ge=1, le=5)
+    member_catalog_max_response_bytes: int = Field(
+        default=2 * 1024 * 1024, ge=1024
+    )
+    max_manifest_bytes: int = Field(default=5 * 1024 * 1024, ge=1024)
+    max_danmaku_bytes: int = Field(default=20 * 1024 * 1024, ge=1024)
+    max_hls_segments: int = Field(default=20_000, ge=1)
+    hls_concurrent_fragments: int = Field(default=16, ge=1, le=32)
+    max_replay_hours: float = Field(default=0.0, ge=0, le=168)
+    max_clip_minutes: float = Field(default=10.0, gt=0, le=30)
+    clip_concurrency: int = Field(default=2, ge=1, le=4)
+    clip_retry_attempts: int = Field(default=3, ge=1, le=5)
+    clip_retry_delay_seconds: float = Field(default=5.0, ge=0, le=60)
+    clip_editor_context_minutes: float = Field(default=10.0, gt=0, le=60)
+    clip_sentence_snap_threshold_ms: int = Field(
+        default=1000, ge=100, le=5000
+    )
+    clip_silence_search_ms: int = Field(default=1500, ge=250, le=5000)
+    clip_silence_noise_db: float = Field(default=-35.0, ge=-100, le=0)
+    clip_silence_min_duration_ms: int = Field(
+        default=200, ge=50, le=2000
+    )
+    clip_analysis_timeout_seconds: int = Field(
+        default=45, ge=5, le=180
+    )
+    clip_analysis_concurrency: int = Field(default=2, ge=1, le=4)
+    clip_font_name: str = "Noto Sans CJK SC"
+    enable_ai_covers: bool = True
+    ai_cover_provider: Literal["seedream"] = "seedream"
+    ark_api_key: SecretStr | None = None
+    ark_base_url: str = "https://ark.cn-beijing.volces.com/api/v3"
+    ark_seedream_model: str | None = None
+    ai_cover_landscape_width: int = Field(default=2560, ge=512, le=4096)
+    ai_cover_landscape_height: int = Field(default=1440, ge=512, le=4096)
+    ai_cover_four_three_width: int = Field(default=2048, ge=512, le=4096)
+    ai_cover_four_three_height: int = Field(default=1536, ge=512, le=4096)
+    ai_cover_request_timeout_seconds: float = Field(
+        default=180.0, gt=0, le=600
+    )
+    ai_cover_download_max_bytes: int = Field(
+        default=30 * 1024 * 1024,
+        ge=1024,
+        le=100 * 1024 * 1024,
+    )
+    ai_cover_source_url_seconds: int = Field(
+        default=900, ge=300, le=3600
+    )
+    ai_cover_signed_url_seconds: int = Field(
+        default=3600, ge=300, le=86_400
+    )
+    ai_cover_concurrency: int = Field(default=1, ge=1, le=2)
+    ai_cover_font_name: str = "Noto Sans CJK SC"
+    ai_cover_prompt_version: str = "source-preserve-templates-v4"
+    max_audio_bytes: int = Field(default=2 * 1024 * 1024 * 1024, ge=1024)
+    failed_audio_retention_hours: int = Field(default=24, ge=1, le=168)
+
+    aliyun_access_key_id: SecretStr | None = None
+    aliyun_access_key_secret: SecretStr | None = None
+    aliyun_oss_endpoint: str | None = None
+    aliyun_oss_public_endpoint: str | None = None
+    aliyun_oss_bucket: str | None = None
+    aliyun_oss_prefix: str = "pocket48-summarizer"
+    aliyun_oss_signed_url_seconds: int = Field(default=7200, ge=300, le=86_400)
+    aliyun_oss_clip_prefix: str = "pocket48-clips"
+    aliyun_oss_clip_signed_url_seconds: int = Field(
+        default=3600, ge=300, le=86_400
+    )
+
+    dashscope_api_key: SecretStr | None = None
+    dashscope_base_url: str = "https://dashscope.aliyuncs.com"
+    dashscope_asr_model: str = "paraformer-v2"
+    dashscope_poll_seconds: float = Field(default=5.0, ge=1, le=60)
+    dashscope_timeout_seconds: int = Field(default=4 * 60 * 60, ge=60, le=12 * 60 * 60)
+    dashscope_diarization_enabled: bool = False
+    dashscope_vocabulary_enabled: bool = True
+    dashscope_vocabulary_prefix: str = "p48vocab"
+    dashscope_vocabulary_weight: int = Field(default=4, ge=1, le=5)
+    dashscope_vocabulary_max_terms: int = Field(default=500, ge=1, le=500)
+    dashscope_vocabulary_ready_timeout_seconds: int = Field(
+        default=60, ge=10, le=300
+    )
+
+    llm_base_url: str | None = None
+    llm_api_key: SecretStr | None = None
+    llm_model: str | None = None
+    llm_timeout_seconds: float = Field(default=120.0, gt=0, le=600)
+    llm_max_input_chars: int = Field(default=12_000, ge=2_000, le=100_000)
+    llm_chunk_max_duration_minutes: float = Field(
+        default=6.0,
+        ge=1.0,
+        le=30.0,
+    )
+    llm_max_output_tokens: int = Field(default=32_768, ge=512, le=65_536)
+    llm_truncation_retry_max_tokens: int = Field(
+        default=65_536,
+        ge=512,
+        le=65_536,
+    )
+    llm_chunk_overlap_segments: int = Field(default=3, ge=0, le=20)
+    llm_temperature: float = Field(default=0.1, ge=0, le=2)
+    llm_response_format: Literal[
+        "none", "json_object", "json_schema"
+    ] = "json_object"
+    llm_schema_retry_attempts: int = Field(default=3, ge=1, le=5)
+    llm_extra_headers_json: str = "{}"
+    translation_max_input_chars: int = Field(
+        default=10_000, ge=2_000, le=50_000
+    )
+    translation_retry_attempts: int = Field(default=3, ge=1, le=8)
+
+    worker_poll_seconds: float = Field(default=2.0, ge=0.2, le=30)
+    worker_lease_seconds: int = Field(default=120, ge=30, le=900)
+
+    @model_validator(mode="after")
+    def validate_bind_address(self) -> "Settings":
+        if not VOICE_MONITOR_ID_RE.fullmatch(
+            self.pocket48_voice_monitor_id
+        ):
+            raise ValueError(
+                "POCKET48_VOICE_MONITOR_ID must be a safe lowercase slug"
+            )
+        additional_targets = self.pocket48_voice_additional_targets_json
+        if len(additional_targets) > 10:
+            raise ValueError(
+                "POCKET48_VOICE_ADDITIONAL_TARGETS_JSON supports at most "
+                "10 targets"
+            )
+        additional_ids = [target.id for target in additional_targets]
+        if len(additional_ids) != len(set(additional_ids)):
+            raise ValueError(
+                "POCKET48_VOICE_ADDITIONAL_TARGETS_JSON target IDs "
+                "must be unique"
+            )
+        if (
+            self.llm_truncation_retry_max_tokens
+            < self.llm_max_output_tokens
+        ):
+            raise ValueError(
+                "LLM_TRUNCATION_RETRY_MAX_TOKENS must be greater than "
+                "or equal to LLM_MAX_OUTPUT_TOKENS"
+            )
+        if (
+            self.pocket48_voice_poll_jitter_seconds
+            > self.pocket48_voice_poll_seconds
+        ):
+            raise ValueError(
+                "POCKET48_VOICE_POLL_JITTER_SECONDS must not exceed "
+                "POCKET48_VOICE_POLL_SECONDS"
+            )
+        if (
+            self.pocket48_voice_max_local_bytes
+            > self.pocket48_voice_max_total_bytes
+        ):
+            raise ValueError(
+                "POCKET48_VOICE_MAX_LOCAL_BYTES must not exceed "
+                "POCKET48_VOICE_MAX_TOTAL_BYTES"
+            )
+        if (
+            self.ai_cover_landscape_width * 9
+            != self.ai_cover_landscape_height * 16
+        ):
+            raise ValueError(
+                "AI_COVER_LANDSCAPE_WIDTH and "
+                "AI_COVER_LANDSCAPE_HEIGHT must use a 16:9 ratio"
+            )
+        if (
+            self.ai_cover_four_three_width * 3
+            != self.ai_cover_four_three_height * 4
+        ):
+            raise ValueError(
+                "AI_COVER_FOUR_THREE_WIDTH and "
+                "AI_COVER_FOUR_THREE_HEIGHT must use a 4:3 ratio"
+            )
+        if self.dashscope_vocabulary_enabled:
+            prefix = self.dashscope_vocabulary_prefix
+            if (
+                not prefix
+                or len(prefix) > 10
+                or not prefix.isascii()
+                or not prefix.isalnum()
+                or prefix.lower() != prefix
+            ):
+                raise ValueError(
+                    "DASHSCOPE_VOCABULARY_PREFIX must contain only "
+                    "lowercase ASCII letters and digits and be at most "
+                    "10 characters"
+                )
+        if self.auth_required and not self.session_cookie_secure:
+            if self.app_host not in {"127.0.0.1", "localhost", "::1"}:
+                raise ValueError(
+                    "SESSION_COOKIE_SECURE must be true when authentication "
+                    "is enabled outside localhost"
+                )
+        if (
+            self.enable_ai_covers
+            and self.ark_api_key
+            and self.ark_seedream_model
+        ):
+            retry_backoff_seconds = (
+                2 ** (self.external_retry_attempts - 1) - 1
+            )
+            minimum_source_url_seconds = (
+                self.ai_cover_request_timeout_seconds
+                * self.external_retry_attempts
+                + retry_backoff_seconds
+                + 30
+            )
+            if (
+                self.ai_cover_source_url_seconds
+                < minimum_source_url_seconds
+            ):
+                raise ValueError(
+                    "AI_COVER_SOURCE_URL_SECONDS must cover the complete "
+                    "Seedream retry window"
+                )
+        if self.allow_remote_bind:
+            return self
+        if self.app_host == "localhost":
+            return self
+        try:
+            address = ipaddress.ip_address(self.app_host)
+        except ValueError as exc:
+            raise ValueError(
+                "APP_HOST must be a loopback IP or localhost unless "
+                "ALLOW_REMOTE_BIND=true"
+            ) from exc
+        if not address.is_loopback:
+            raise ValueError(
+                "Refusing a non-loopback APP_HOST unless ALLOW_REMOTE_BIND=true"
+            )
+        return self
+
+    @property
+    def database_path(self) -> Path:
+        return self.data_dir / self.database_name
+
+    @property
+    def trusted_host_list(self) -> list[str]:
+        hosts = [
+            host.strip()
+            for host in self.trusted_hosts.split(",")
+            if host.strip()
+        ]
+        if not hosts:
+            raise ConfigurationError("TRUSTED_HOSTS 至少需要一个主机名")
+        return hosts
+
+    @property
+    def pocket48_voice_stream_host_list(self) -> set[str]:
+        return {
+            host.strip().lower()
+            for host in self.pocket48_voice_stream_hosts.split(",")
+            if host.strip()
+        }
+
+    @property
+    def pocket48_voice_credentials_path(self) -> Path:
+        return self.data_dir / "private" / "room-voice-credentials.json"
+
+    @property
+    def pocket48_pa_signing_seed_path(self) -> Path:
+        return self.data_dir / "private" / "room-voice-pa-signing.json"
+
+    @property
+    def room_voice_login_pending_path(self) -> Path:
+        return self.data_dir / "private" / "room-voice-login-pending.json"
+
+    @property
+    def room_voice_path(self) -> Path:
+        return self.data_dir / "room-voice"
+
+    @property
+    def room_voice_monitor_status_path(self) -> Path:
+        root = self.maintenance_dir or self.data_dir
+        if self.pocket48_voice_monitor_id == "primary":
+            return root / "room-voice-monitor-status.json"
+        return root / (
+            f"room-voice-monitor-{self.pocket48_voice_monitor_id}-status.json"
+        )
+
+    @property
+    def room_voice_monitor_ready_path(self) -> Path:
+        root = self.maintenance_dir or self.data_dir
+        if self.pocket48_voice_monitor_id == "primary":
+            return root / "room-voice-monitor-ready"
+        return root / f"room-voice-monitor-{self.pocket48_voice_monitor_id}-ready"
+
+    def room_voice_monitor_settings(self) -> tuple["Settings", ...]:
+        primary = self.model_copy(
+            update={"pocket48_voice_monitor_id": "primary"}
+        )
+        additional = tuple(
+            self.model_copy(
+                update={
+                    "pocket48_voice_monitor_id": target.id,
+                    "pocket48_voice_member_name": target.name,
+                    "pocket48_voice_member_id": str(target.member_id),
+                    "pocket48_voice_channel_id": (
+                        str(target.channel_id)
+                        if target.channel_id is not None
+                        else None
+                    ),
+                    "pocket48_voice_server_id": (
+                        str(target.server_id)
+                        if target.server_id is not None
+                        else None
+                    ),
+                }
+            )
+            for target in self.pocket48_voice_additional_targets_json
+        )
+        return (primary, *additional)
+
+    @property
+    def unlimited_job_username_set(self) -> set[str]:
+        return {
+            username.strip().casefold()
+            for username in self.unlimited_job_usernames.split(",")
+            if username.strip()
+        }
+
+    @property
+    def temp_dir(self) -> Path:
+        return self.data_dir / "tmp"
+
+    @property
+    def preview_dir(self) -> Path:
+        return self.data_dir / "previews"
+
+    def preview_image_path(self, job_id: str) -> Path:
+        return self.preview_dir / f"{job_id}.jpg"
+
+    @property
+    def clip_maintenance_path(self) -> Path:
+        return (self.maintenance_dir or self.data_dir) / "clip-maintenance"
+
+    @property
+    def worker_maintenance_path(self) -> Path:
+        return (self.maintenance_dir or self.data_dir) / "worker-maintenance"
+
+    @property
+    def clip_operation_lock_path(self) -> Path:
+        return (self.maintenance_dir or self.data_dir) / "clip-operation.lock"
+
+    @property
+    def worker_operation_lock_path(self) -> Path:
+        return (self.maintenance_dir or self.data_dir) / "worker-operation.lock"
+
+    @property
+    def worker_ready_path(self) -> Path:
+        return (self.maintenance_dir or self.data_dir) / "worker-ready"
+
+    def prepare_directories(self) -> None:
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.temp_dir.mkdir(parents=True, exist_ok=True)
+        self.preview_dir.mkdir(parents=True, exist_ok=True)
+        self.room_voice_path.mkdir(parents=True, exist_ok=True)
+        if self.maintenance_dir:
+            self.maintenance_dir.mkdir(parents=True, exist_ok=True)
+
+    def ffmpeg_executable(self) -> str | None:
+        candidate = Path(self.ffmpeg_path).expanduser()
+        if candidate.parent != Path("."):
+            return str(candidate) if candidate.is_file() else None
+        return shutil.which(self.ffmpeg_path)
+
+    def ffprobe_executable(self) -> str | None:
+        candidate = Path(self.ffprobe_path).expanduser()
+        if candidate.parent != Path("."):
+            return str(candidate) if candidate.is_file() else None
+        return shutil.which(self.ffprobe_path)
+
+    def missing_clip_configuration(self) -> list[str]:
+        missing: list[str] = []
+        if not self.ffmpeg_executable():
+            missing.append("FFMPEG_PATH")
+        required: dict[str, Any] = {
+            "ALIYUN_ACCESS_KEY_ID": self.aliyun_access_key_id,
+            "ALIYUN_ACCESS_KEY_SECRET": self.aliyun_access_key_secret,
+            "ALIYUN_OSS_ENDPOINT": self.aliyun_oss_endpoint,
+            "ALIYUN_OSS_BUCKET": self.aliyun_oss_bucket,
+        }
+        missing.extend(name for name, value in required.items() if not value)
+        return missing
+
+    def missing_ai_cover_configuration(self) -> list[str]:
+        if not self.enable_ai_covers:
+            return ["ENABLE_AI_COVERS"]
+        missing = self.missing_clip_configuration()
+        required: dict[str, Any] = {
+            "ARK_API_KEY": self.ark_api_key,
+            "ARK_SEEDREAM_MODEL": self.ark_seedream_model,
+        }
+        missing.extend(name for name, value in required.items() if not value)
+        return sorted(set(missing))
+
+    def missing_processing_configuration(self) -> list[str]:
+        missing: list[str] = []
+        if not self.ffmpeg_executable():
+            missing.append("FFMPEG_PATH")
+        required: dict[str, Any] = {
+            "ALIYUN_ACCESS_KEY_ID": self.aliyun_access_key_id,
+            "ALIYUN_ACCESS_KEY_SECRET": self.aliyun_access_key_secret,
+            "ALIYUN_OSS_ENDPOINT": self.aliyun_oss_endpoint,
+            "ALIYUN_OSS_BUCKET": self.aliyun_oss_bucket,
+            "DASHSCOPE_API_KEY": self.dashscope_api_key,
+            "LLM_BASE_URL": self.llm_base_url,
+            "LLM_API_KEY": self.llm_api_key,
+            "LLM_MODEL": self.llm_model,
+        }
+        missing.extend(name for name, value in required.items() if not value)
+        return missing
+
+    def require_processing_configuration(self) -> None:
+        missing = self.missing_processing_configuration()
+        if missing:
+            raise ConfigurationError(
+                "Missing processing configuration: " + ", ".join(sorted(missing))
+            )

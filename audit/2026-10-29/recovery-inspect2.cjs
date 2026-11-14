@@ -1,0 +1,6 @@
+'use strict';
+const fs=require('fs');
+const dirs=['/app/data/recovery-20261026-29/1321966661005021184','/app/data/recovery-20261026-29/1322332610476445696','/app/data/recovery-staging/recordings/recovery-import-staging/1321966661005021184'];
+const rows=dirs.map(dir=>{let names=[];try{names=fs.readdirSync(dir);}catch{}const plan=(()=>{try{return JSON.parse(fs.readFileSync(dir+'/plan.json','utf8'));}catch{return null;}})();const assets=names.filter(n=>/^asset-/.test(n));return{dir,exists:names.length>0,assets:assets.length,assetBytes:assets.reduce((s,n)=>{try{return s+fs.statSync(dir+'/'+n).size;}catch{return s;}},0),segmentsDone:plan?Object.keys(plan.completed||{}).length:null,segmentsTotal:plan?.resources?.length??null,hasComplete:names.includes('complete.json'),hasVerified:names.includes('verified.mp4'),hasProcessing:names.includes('replay.processing.mp4'),mtime:names.length?fs.statSync(dir).mtime.toISOString():null};});
+const du=(p)=>{let t=0;for(const n of fs.readdirSync(p)){const f=p+'/'+n;try{const st=fs.lstatSync(f);t+=st.isDirectory()?du(f):st.size;}catch{}}return t;};
+console.log(JSON.stringify({sampledAt:new Date().toISOString(),rows,recoveryDirBytes:du('/app/data/recovery-20261026-29'),fsFree:(()=>{const s=fs.statfsSync('/recordings');return{bavailGiB:s.bavail*s.bsize/2**30,totalGiB:s.blocks*s.bsize/2**30}})()}));

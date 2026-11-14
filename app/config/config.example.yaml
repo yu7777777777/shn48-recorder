@@ -1,0 +1,35 @@
+﻿# 48tools 1.0.0 Configuration
+# See README.md for full documentation
+
+ffmpeg: ffmpeg
+
+# Public live playback: direct_first uses the viewer's network and falls back
+# to the server; server always proxies HTTP streams. RTMP always uses a relay.
+playback:
+  livePriority: direct_first
+
+# Pocket48 settings
+pocket48:
+  live:
+    recordName: []
+    downloadDir: ../recordings/live
+  video:
+    downloadDir: ../recordings/video
+
+# DDTalks meeting recording
+ddtalks:
+  downloadDir: ../recordings/ddtalks
+  maxDurationMinutes: 180
+  autoJoin: true
+
+# Bilibili upload settings
+auto_upload_bili: true
+bili_upload_mode: draft        # draft (recommended) or publish
+bili_upcdn: bda2
+draft_api_format: auto         # auto, json, or form
+default_tid: 171
+default_tags: "SNH48,直播"
+default_copyright: 1           # 1=self-made, 2=repost
+default_desc: ""
+default_cover: ""
+default_submit: web

@@ -1,0 +1,20 @@
+{
+  "success": true,
+  "status": 200,
+  "message": "OK",
+  "content": {
+    "liveId": "1300162392190947328",
+    "roomId": "123456",
+    "liveType": 1,
+    "playStreamPath": "rtmp://idol.tv.48.cn/live/test-stream",
+    "mergeStreamUrl": "",
+    "coverPath": "/2026/0611/example-cover.jpg",
+    "title": "测试直播",
+    "ctime": "1789000000000",
+    "user": {
+      "userId": "654321",
+      "userName": "测试成员",
+      "userAvatar": "/avatar/2026/example-avatar.jpg"
+    }
+  }
+}

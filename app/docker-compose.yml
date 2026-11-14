@@ -1,0 +1,70 @@
+version: "3.3"
+
+services:
+  shn48:
+    image: shn48-shn48:1.32.4
+    build:
+      context: .
+      args:
+        DEBIAN_MIRROR: ${DEBIAN_MIRROR:-http://mirrors.aliyun.com/debian}
+        NPM_REGISTRY: ${NPM_REGISTRY:-https://registry.npmmirror.com}
+    container_name: shn48-recorder
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      CONFIG_PATH: /app/config/config.yaml
+      HF_ENDPOINT: ${HF_ENDPOINT:-https://huggingface.co}
+      DATA_DIR: /app/data
+      POCKET48_DATA_DIR: /app/data
+      COVERS_DIR: /app/data/covers
+      RECORDINGS_DIR: /app/recordings
+      DDTALKS_DOWNLOAD_DIR: /app/recordings/ddtalks
+      COOKIES_PATH: /app/biliup/cookies.json
+      BILI_UPCDN: ${BILI_UPCDN:-bda2}
+      RECORDING_MERGE_WINDOW_MS: ${RECORDING_MERGE_WINDOW_MS:-300000}
+      RECORDING_TIME_ZONE: ${RECORDING_TIME_ZONE:-Asia/Shanghai}
+      # Water-level reclamation. Fragments, replay cache and stray media are
+      # removed once free space drops below the reserve, until it reaches the
+      # target. Archive main files are never removed automatically.
+      STORAGE_RESERVE_GIB: ${STORAGE_RESERVE_GIB:-8}
+      STORAGE_TARGET_GIB: ${STORAGE_TARGET_GIB:-12}
+      # Larger correction batches reduce sequential text-model round trips; lower this for small-context models.
+      CORRECTION_BATCH_SIZE: ${CORRECTION_BATCH_SIZE:-2000}
+      # Verified gateway profile: ten-minute audio with twenty concurrent requests.
+      ASR_CHUNK_SECONDS: ${ASR_CHUNK_SECONDS:-600}
+      ASR_CONCURRENCY: ${ASR_CONCURRENCY:-20}
+      DISPLAY: :99
+      ENABLE_XVFB: ${ENABLE_XVFB:-0}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      TRUST_PROXY: ${TRUST_PROXY:-true}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:?Set ADMIN_USERNAME in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
+      TYPESAFE_API_KEY: ${TYPESAFE_API_KEY:-}
+    volumes:
+      # Writable: the admin settings page persists config.yaml here.
+      - ${CONFIG_DIR:-./config}:/app/config
+      # Keep operational state separate from large recordings for backup/retention.
+      - ${DATA_DIR_HOST:-./runtime/data}:/app/data
+      - ${RECORDINGS_DIR_HOST:-./runtime/recordings}:/app/recordings
+      # Bilibili QR-login cookies/credentials must survive container replacement.
+      - ${BILIUP_DIR:-./runtime/biliup}:/app/biliup
+    tmpfs:
+      - /tmp:exec,size=1g
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/public/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - web
+
+networks:
+  web:

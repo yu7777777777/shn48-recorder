@@ -1,0 +1,340 @@
+{
+  "sampledAt": "2026-10-29T10:01:09.622Z",
+  "env": {
+    "DATA_DIR": "/app/data",
+    "RECORDINGS_DIR": "/app/recordings",
+    "CONFIG_PATH": "/app/config/config.yaml",
+    "STORAGE_RESERVE_GIB": "8",
+    "STORAGE_TARGET_GIB": "12",
+    "BACKUP115_PYTHON": "/opt/backup115/bin/python",
+    "ENABLE_XVFB": "0"
+  },
+  "configuredSecrets": {
+    "sessionSecret": true,
+    "pocketToken": true
+  },
+  "disk": {
+    "dir": "/app/recordings",
+    "freeGiB": 18.25646209716797,
+    "totalGiB": 39.199642181396484
+  },
+  "autoRecording": {
+    "enabled": true,
+    "minFreeGiB": 2,
+    "pollMs": 30000,
+    "maxConcurrent": 5,
+    "assumedLiveHours": 3,
+    "assumedBytesPerHour": 0,
+    "members": [
+      {
+        "memberId": "54526097",
+        "memberName": "禹佳蔚",
+        "priority": 50,
+        "enabled": true
+      },
+      {
+        "memberId": "64422010",
+        "memberName": "熊紫轶",
+        "priority": 50,
+        "enabled": true
+      },
+      {
+        "memberId": "407126",
+        "memberName": "杨晔",
+        "priority": 50,
+        "enabled": true
+      },
+      {
+        "memberId": "6431",
+        "memberName": "陈琳",
+        "priority": 1,
+        "enabled": true
+      },
+      {
+        "memberId": "87622891",
+        "memberName": "刘小涵",
+        "priority": 50,
+        "enabled": true
+      }
+    ],
+    "trackedCount": 0,
+    "estimatedRequiredGiB": 2.6,
+    "historyRateSamples": 0
+  },
+  "recordings": {
+    "total": 203,
+    "status": {
+      "deleted": 106,
+      "merged": 97
+    },
+    "nonDeleted": 0,
+    "missingMainFiles": [],
+    "recent": [
+      {
+        "id": "rec_1793007459667_tqssx",
+        "createdAt": "2026-10-26T10:24:32.240Z",
+        "startedAt": 1792940076588,
+        "status": "deleted",
+        "memberName": "SNH48-陈琳",
+        "liveId": "1320537915995787264",
+        "origin": "official_replay",
+        "fileSize": 0,
+        "deletedAt": "2026-10-29T09:23:20.436Z",
+        "manualReplayImport": true
+      },
+      {
+        "id": "rec_1793007431103_w3f8k",
+        "createdAt": "2026-10-26T10:24:32.241Z",
+        "startedAt": 1792939851290,
+        "status": "deleted",
+        "memberName": "SNH48-刘小涵",
+        "liveId": "1320538642788978688",
+        "origin": "official_replay",
+        "fileSize": 0,
+        "deletedAt": "2026-10-29T09:20:21.082Z",
+        "manualReplayImport": true
+      },
+      {
+        "id": "rec_1793007010878_u79nd",
+        "createdAt": "2026-10-26T10:24:32.241Z",
+        "startedAt": 1792939754767,
+        "status": "deleted",
+        "memberName": "SNH48-禹佳蔚",
+        "liveId": "1320538846204334080",
+        "origin": "official_replay",
+        "fileSize": 0,
+        "deletedAt": "2026-10-29T09:20:18.655Z",
+        "manualReplayImport": true
+      },
+      {
+        "id": "rec_1793006583775_us3ch",
+        "createdAt": "2026-10-26T10:24:32.241Z",
+        "startedAt": 1792940284632,
+        "status": "deleted",
+        "memberName": "SNH48-熊紫轶",
+        "liveId": "1320540883931435008",
+        "origin": "official_replay",
+        "fileSize": 0,
+        "deletedAt": "2026-10-29T09:20:15.013Z",
+        "manualReplayImport": true
+      },
+      {
+        "id": "rec_1793006044425_vy7k9",
+        "createdAt": "2026-10-26T10:24:32.241Z",
+        "startedAt": 1792939614108,
+        "status": "deleted",
+        "memberName": "SNH48-杨晔",
+        "liveId": "1320546015452663808",
+        "origin": "official_replay",
+        "fileSize": 0,
+        "deletedAt": "2026-10-29T09:19:10.740Z",
+        "manualReplayImport": true
+      }
+    ]
+  },
+  "uploadQueue": {
+    "total": 101,
+    "status": {
+      "done": 101
+    }
+  },
+  "backup115": {
+    "jobs": {
+      "succeeded": 31,
+      "cancelled": 2
+    },
+    "settings": {
+      "autoBackup": true,
+      "targetConfigured": true
+    }
+  },
+  "auto-checkin": {
+    "present": true,
+    "keys": [
+      "enabled",
+      "start",
+      "end",
+      "userId",
+      "nextAt",
+      "lastDate",
+      "lastResult"
+    ],
+    "enabled": true
+  },
+  "replay-watch": {
+    "present": false
+  },
+  "replay_audit": {
+    "present": true,
+    "keys": []
+  },
+  "analysis_jobs": {
+    "present": true,
+    "count": 41,
+    "status": {
+      "done": 8,
+      "failed": 33
+    }
+  },
+  "replay_import_jobs": {
+    "present": true,
+    "count": 30,
+    "status": {
+      "done": 30
+    }
+  },
+  "binaries": {
+    "ffmpeg": {
+      "exit": 0,
+      "version": "ffmpeg version 5.1.9-0+deb12u1 Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "ffprobe": {
+      "exit": 0,
+      "version": "ffprobe version 5.1.9-0+deb12u1 Copyright (c) 2007-2026 the FFmpeg developers"
+    },
+    "python3": {
+      "exit": 0,
+      "version": "Python 3.11.2"
+    },
+    "/opt/asr-venv/bin/python": {
+      "exit": 0,
+      "version": "Python 3.11.2"
+    },
+    "/opt/backup115-venv/bin/python": {
+      "exit": null,
+      "error": "ENOENT",
+      "version": ""
+    }
+  },
+  "http": [
+    {
+      "path": "/api/public/health",
+      "status": 200,
+      "ms": 73,
+      "success": true,
+      "version": "1.31.1",
+      "bytes": 58
+    },
+    {
+      "path": "/api/public/live",
+      "status": 200,
+      "ms": 91,
+      "success": true,
+      "listCount": 0,
+      "bytes": 60
+    },
+    {
+      "path": "/api/public/replays",
+      "status": 200,
+      "ms": 62,
+      "success": true,
+      "listCount": 20,
+      "bytes": 8469
+    },
+    {
+      "path": "/api/admin/health",
+      "status": 401,
+      "ms": 3,
+      "success": false,
+      "bytes": 51
+    },
+    {
+      "path": "/api/admin/pocket48/auto-recording",
+      "status": 401,
+      "ms": 4,
+      "success": false,
+      "bytes": 51
+    },
+    {
+      "path": "/api/admin/recordings",
+      "status": 401,
+      "ms": 3,
+      "success": false,
+      "bytes": 51
+    },
+    {
+      "path": "/api/admin/backup115",
+      "status": 401,
+      "ms": 3,
+      "success": false,
+      "bytes": 51
+    },
+    {
+      "path": "/api/admin/analysis/settings",
+      "status": 401,
+      "ms": 3,
+      "success": false,
+      "bytes": 51
+    },
+    {
+      "path": "/api/admin/config",
+      "status": 401,
+      "ms": 4,
+      "success": false,
+      "bytes": 51
+    },
+    {
+      "path": "/api/admin/bilibili/queue",
+      "status": 401,
+      "ms": 6,
+      "success": false,
+      "bytes": 51
+    },
+    {
+      "path": "/api/admin/ddtalks/sessions",
+      "status": 401,
+      "ms": 3,
+      "success": false,
+      "bytes": 51
+    },
+    {
+      "path": "/api/public/proxy?url=http://127.0.0.1",
+      "status": 404,
+      "ms": 5,
+      "success": false,
+      "bytes": 50
+    },
+    {
+      "path": "/api/nonexistent",
+      "status": 404,
+      "ms": 4,
+      "success": false,
+      "bytes": 50
+    },
+    {
+      "path": "/weibo-session",
+      "status": 404,
+      "ms": 4,
+      "bytes": 18
+    },
+    {
+      "path": "/api/public/replays/1322464033778765824",
+      "status": 200,
+      "ms": 49,
+      "success": true,
+      "bytes": 326
+    },
+    {
+      "path": "/api/public/replays/1322464033778765824/summary",
+      "status": 404,
+      "ms": 3,
+      "success": false,
+      "bytes": 57
+    },
+    {
+      "path": "/api/public/replays/1322464033778765824/danmaku",
+      "status": 200,
+      "ms": 173,
+      "success": true,
+      "bytes": 53277
+    }
+  ],
+  "replaySample": {
+    "liveId": "1322464033778765824",
+    "startedAt": "1793229596318",
+    "member": "SNH48-吉雅楠"
+  },
+  "adminProbe": {
+    "configuredCredentialMatches": false
+  }
+}

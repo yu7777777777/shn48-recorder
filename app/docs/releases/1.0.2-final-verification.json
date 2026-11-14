@@ -1,0 +1,27 @@
+{
+  "version": "1.0.2",
+  "date": "2026-09-16",
+  "sourceFilesVerified": 148,
+  "runtimeFilesVerified": 56,
+  "backendFilesVerifiedVersionOnly": 49,
+  "entrypointSha256": "b785c27bea08f74e7e0aa17c98bc6be04d89393103beab9b76e2fec6ca5f109c",
+  "image": "sha256:f12d5fe4bf0c3c06566d2298a3534e04f1168df88dd67f21ed7135b46dd00b6f",
+  "health": "healthy",
+  "releaseArchiveSha256": "4485ca9d9649253333738e193beb273ea563c97da871e4772e9d02969b7875cf",
+  "tests": {
+    "backend": {
+      "pass": 65,
+      "fail": 1,
+      "baselineFailureReproduced": true
+    },
+    "client": {
+      "pass": 27,
+      "fail": 7,
+      "sameFailuresOnBaseline": true
+    },
+    "isolatedSmoke": {
+      "pass": 7
+    },
+    "browserQA": "passed"
+  }
+}

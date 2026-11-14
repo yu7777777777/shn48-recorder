@@ -1,0 +1,50 @@
+[
+  {
+    "page": "live",
+    "width": 1440,
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "page": "replays",
+    "width": 1440,
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "page": "daily",
+    "width": 1440,
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "page": "login",
+    "width": 1440,
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "page": "live",
+    "width": 390,
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "page": "replays",
+    "width": 390,
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "page": "daily",
+    "width": 390,
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "page": "login",
+    "width": 390,
+    "errors": [],
+    "overflow": false
+  }
+]

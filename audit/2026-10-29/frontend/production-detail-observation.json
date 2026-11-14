@@ -1,0 +1,7 @@
+{
+  "observedAt": "2026-10-29 Asia/Shanghai",
+  "url": "http://<SERVER_IP>:3000/api/public/replays/1322464033778765824",
+  "httpStatus": 200,
+  "response": {"success":true,"data":{"liveId":"1322464033778765824","title":"小马陪你看嗯啊嗯","cover":"https://source3.48.cn/2026/1029/175308886xaq8df84vrl0mxta500gwvup.jpg","startedAt":null,"duration":"02:02:56","durationSeconds":7376,"liveType":1,"liveMode":0,"status":null,"member":{"id":"","name":"","avatar":""},"team":null}},
+  "observation": "同一条记录列表显示 SNH48-吉雅楠 与 2026/10/29 07:19，但详情 API 的 member 字段为空且 startedAt=null，直接详情页显示“口袋48成员·时间待更新”。这是真实服务返回的数据不完整，不是页面 JS 崩溃；尚未更改任何数据。"
+}

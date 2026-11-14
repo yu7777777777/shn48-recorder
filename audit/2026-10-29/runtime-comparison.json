@@ -1,0 +1,34 @@
+{
+  "compared": 114,
+  "matching": 113,
+  "differences": [
+    "client/dist/index.html"
+  ],
+  "remoteOnly": [
+    "client/dist/assets/AdminLogin-OR5prlJm.js",
+    "client/dist/assets/AnalysisSettings-B5dOZgrC.js",
+    "client/dist/assets/AutoRecord-PnbApuyn.js",
+    "client/dist/assets/Bilibili-lZLJ2YqI.js",
+    "client/dist/assets/Config-_vJIRhIp.js",
+    "client/dist/assets/ConfirmModal-DgXTMlJh.js",
+    "client/dist/assets/CoverPicker-CHWvE7LH.js",
+    "client/dist/assets/Dashboard-DtQidOEj.js",
+    "client/dist/assets/EmptyState-DtmaIPf6.js",
+    "client/dist/assets/Live-CBTie-Z8.js",
+    "client/dist/assets/Pocket48-CKhY2-HO.js",
+    "client/dist/assets/PublicLive-Deqqnl6o.js",
+    "client/dist/assets/PublicMediaTabs-CJ5FIn1w.js",
+    "client/dist/assets/PublicReplay-Ct1f1hiJ.js",
+    "client/dist/assets/PublicSocial-MO9vBLkc.js",
+    "client/dist/assets/RecordingDetail-DuIzNh3H.js",
+    "client/dist/assets/ReplayAnalysisImport-ys6AfbuT.js",
+    "client/dist/assets/ReplayAudit-Cqrht1GX.js",
+    "client/dist/assets/Security-0zLoX9FX.js",
+    "client/dist/assets/SocialAccounts-DwZEoaeo.js",
+    "client/dist/assets/Video-BIbXXvCM.js",
+    "client/dist/assets/VideoPlayer-BhiimPZo.js",
+    "client/dist/assets/index-Dp3jllcc.js"
+  ],
+  "backendDifferences": [],
+  "backendCompared": 92
+}

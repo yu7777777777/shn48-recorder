@@ -1,0 +1,11 @@
+# Build context needs a trusted public CA bundle copied from the build host.
+# BASE_IMAGE is a clean, flattened 1.6.0 image (see docs/offline-asr.md).
+ARG BASE_IMAGE=shn48-flat:1.6.0
+FROM ${BASE_IMAGE}
+COPY ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+RUN sed -i 's|http://deb.debian.org/debian-security|https://mirrors.aliyun.com/debian-security|g; s|http://deb.debian.org/debian|https://mirrors.aliyun.com/debian|g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get -o Acquire::http::Timeout=30 -o Acquire::Retries=2 update \
+    && apt-get -o Acquire::http::Timeout=30 -o Acquire::Retries=2 install -y --no-install-recommends python3 python3-venv libgomp1 ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+RUN python3 -m venv /opt/asr-venv \
+    && /opt/asr-venv/bin/pip install --no-cache-dir --timeout 30 -i https://mirrors.aliyun.com/pypi/simple faster-whisper==1.2.1

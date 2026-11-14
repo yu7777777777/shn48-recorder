@@ -1,0 +1,21 @@
+{
+  "health": {
+    "success": true,
+    "data": {
+      "status": "ok",
+      "version": "1.31.2"
+    }
+  },
+  "image": "shn48-shn48:1.31.2",
+  "imageId": "sha256:38207a421da23e8fbc4ed8ca571dd83362f187848ad7c73a4e55dbef698208b8",
+  "state": "running",
+  "healthStatus": "healthy",
+  "restartCount": 0,
+  "runtimeFilesVerified": 237,
+  "mounts": {
+    "/opt/shn48/runtime/recordings": "/app/recordings",
+    "/opt/shn48/runtime/data": "/app/data",
+    "/opt/shn48/config": "/app/config",
+    "/opt/shn48/runtime/biliup": "/app/biliup"
+  }
+}

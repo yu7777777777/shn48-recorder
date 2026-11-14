@@ -1,0 +1,30 @@
+.backup115-settings { margin-top: 24px; }
+.backup115-settings p, .backup115-toolbar p { margin: 6px 0 12px; }
+.backup115-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.backup115-settings .backup115-actions { margin: 14px 0; }
+.backup115-toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+.backup115-toggle input { width: 18px; height: 18px; flex: 0 0 18px; accent-color: var(--accent); }
+.backup115-settings > .backup115-toggle { display: flex; margin: 16px 0; }
+.backup115-qr { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; padding: 16px; border: 1px solid var(--border); border-radius: 12px; margin: 16px 0; }
+.backup115-qr img { width: 200px; height: 200px; max-width: 100%; object-fit: contain; background: white; padding: 8px; border-radius: 8px; }
+.backup115-qr > div { flex: 1 1 200px; }
+.backup115-error { color: var(--danger, #dc4545); overflow-wrap: anywhere; white-space: pre-wrap; font-size: 13px; margin: 8px 0; }
+.backup115-toolbar { border-block: 1px solid var(--border); padding: 16px 0; margin-bottom: 12px; }
+.backup115-toolbar strong { font-size: 14px; }
+.backup115-record { min-width: 0; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: 12px; overflow-wrap: anywhere; }
+.backup115-record-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; margin-bottom: 6px; }
+.backup115-record .backup115-actions { margin-top: 8px; }
+.backup115-record progress { width: 100%; height: 7px; accent-color: var(--accent); margin: 6px 0; }
+.backup115-detail { color: var(--text-dim); margin: 5px 0; }
+.backup115-verified { color: var(--success, #24936b); font-weight: 600; }
+.backup115-files { margin: 8px 0; padding-left: 18px; }
+.backup115-files li { margin-bottom: 6px; }
+.backup115-record summary { cursor: pointer; margin: 8px 0; }
+@media (max-width: 640px) {
+  .backup115-toolbar .backup115-actions > button { flex: 1 1 140px; white-space: normal; min-height: 40px; }
+  .backup115-settings .backup115-actions > button { flex: 1 1 120px; min-height: 40px; }
+  .backup115-record .backup115-actions > button { min-height: 36px; white-space: normal; }
+  .backup115-qr { justify-content: center; padding: 12px; }
+  .backup115-qr > div { text-align: center; }
+  .backup115-toggle { align-items: flex-start; }
+}

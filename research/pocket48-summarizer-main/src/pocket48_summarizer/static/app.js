@@ -1,0 +1,4164 @@
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || "";
+const i18n = window.P48I18n;
+const t = (key, params = {}) => i18n?.t(key, params) || key;
+const setLocalizedText = (element, key, params = {}) => {
+  if (i18n) {
+    i18n.setText(element, key, params);
+  } else if (element) {
+    element.textContent = key;
+  }
+};
+const apiErrorMessage = (payload, fallbackKey) => {
+  const message = payload.error?.message;
+  return message
+    ? (i18n?.translateServerMessage(message) || message)
+    : t(fallbackKey);
+};
+
+function apiFetch(url, options = {}) {
+  const method = (options.method || "GET").toUpperCase();
+  const headers = new Headers(options.headers || {});
+  if (!["GET", "HEAD", "OPTIONS"].includes(method) && csrfToken) {
+    headers.set("X-CSRF-Token", csrfToken);
+  }
+  return fetch(url, { ...options, headers }).then((response) => {
+    if (response.status === 401) {
+      window.location.assign("/login");
+    }
+    return response;
+  });
+}
+
+const historyBack = document.querySelector("#history-back");
+const historyForward = document.querySelector("#history-forward");
+
+if (historyBack && historyForward) {
+  const updateHistoryControls = () => {
+    historyBack.disabled = (
+      window.history.length <= 1
+      && window.location.pathname === "/"
+      && !window.location.search
+      && !window.location.hash
+    );
+  };
+
+  historyBack.addEventListener("click", () => {
+    if (window.history.length > 1) {
+      window.history.back();
+      return;
+    }
+    if (
+      window.location.pathname !== "/"
+      || window.location.search
+      || window.location.hash
+    ) {
+      window.location.replace("/");
+    }
+  });
+  historyForward.addEventListener("click", () => {
+    window.history.forward();
+  });
+  window.addEventListener("pageshow", updateHistoryControls);
+  updateHistoryControls();
+}
+
+const roomVoicePlaylists = [
+  ...document.querySelectorAll("[data-room-voice-playlist]")
+];
+
+for (const playlist of roomVoicePlaylists) {
+  const audio = playlist.querySelector("audio");
+  const sources = [
+    ...playlist.querySelectorAll("[data-room-voice-segment-src]")
+  ].map((item) => item.dataset.roomVoiceSegmentSrc).filter(Boolean);
+  const previous = playlist.querySelector("[data-room-voice-previous]");
+  const next = playlist.querySelector("[data-room-voice-next]");
+  const progress = playlist.querySelector(
+    "[data-room-voice-playlist-progress]"
+  );
+  let currentIndex = 0;
+
+  const renderProgress = () => {
+    playlist.dataset.roomVoiceCurrentIndex = String(currentIndex);
+    if (progress) {
+      progress.dataset.current = String(currentIndex + 1);
+      progress.dataset.total = String(sources.length);
+      setLocalizedText(progress, "roomVoicePartProgress", {
+        current: currentIndex + 1,
+        total: sources.length
+      });
+    }
+    if (previous) previous.disabled = currentIndex === 0;
+    if (next) next.disabled = currentIndex >= sources.length - 1;
+  };
+
+  const selectPart = (index, autoplay, positionSeconds = 0) => {
+    if (!audio || index < 0 || index >= sources.length) return;
+    const startPlayback = () => {
+      if (Number.isFinite(positionSeconds) && positionSeconds > 0) {
+        audio.currentTime = Math.min(
+          positionSeconds,
+          Number.isFinite(audio.duration)
+            ? Math.max(0, audio.duration - 0.05)
+            : positionSeconds
+        );
+      }
+      if (autoplay) {
+        const playback = audio.play();
+        if (playback) playback.catch(() => {});
+      }
+    };
+    if (index === currentIndex && audio.currentSrc) {
+      startPlayback();
+      return;
+    }
+    currentIndex = index;
+    audio.src = sources[currentIndex];
+    audio.load();
+    renderProgress();
+    playlist.dispatchEvent(new CustomEvent("roomvoicepartchange", {
+      detail: { index: currentIndex }
+    }));
+    if (audio.readyState >= 1) {
+      startPlayback();
+    } else {
+      audio.addEventListener("loadedmetadata", startPlayback, { once: true });
+    }
+  };
+
+  previous?.addEventListener("click", () => {
+    selectPart(currentIndex - 1, true);
+  });
+  next?.addEventListener("click", () => {
+    selectPart(currentIndex + 1, true);
+  });
+  audio?.addEventListener("ended", () => {
+    if (currentIndex < sources.length - 1) {
+      selectPart(currentIndex + 1, true);
+    }
+  });
+  playlist.selectRoomVoicePart = selectPart;
+  playlist.roomVoiceAudio = audio;
+  playlist.roomVoiceSourceCount = sources.length;
+  playlist.refreshLanguage = renderProgress;
+  renderProgress();
+}
+
+const roomVoiceLyricPlayer = document.querySelector(
+  "[data-room-voice-lyric-player]"
+);
+
+if (roomVoiceLyricPlayer) {
+  const playlist = roomVoiceLyricPlayer.querySelector(
+    "[data-room-voice-playlist]"
+  );
+  const audio = playlist?.roomVoiceAudio;
+  const captions = [
+    ...roomVoiceLyricPlayer.querySelectorAll("[data-room-voice-caption]")
+  ];
+  const messages = [
+    ...roomVoiceLyricPlayer.querySelectorAll("[data-room-voice-message]")
+  ];
+  const segmentDurationMs = Number(
+    roomVoiceLyricPlayer.dataset.segmentDurationMs || 300000
+  );
+  let activeCaption = null;
+  let activeMessage = null;
+
+  const renderSynchronizedReplay = () => {
+    if (!audio || !playlist) return;
+    const partIndex = Number(
+      playlist.dataset.roomVoiceCurrentIndex || 0
+    );
+    const currentMs = (
+      partIndex * segmentDurationMs + audio.currentTime * 1000
+    );
+    const nextCaption = captions.find((caption) => (
+      currentMs >= Number(caption.dataset.startMs)
+      && currentMs < Number(caption.dataset.endMs)
+    )) || null;
+    if (nextCaption !== activeCaption) {
+      activeCaption?.classList.remove("is-active");
+      activeCaption = nextCaption;
+      activeCaption?.classList.add("is-active");
+      activeCaption?.scrollIntoView({
+        block: "center",
+        behavior: audio.paused ? "auto" : "smooth"
+      });
+    }
+    let nextMessage = null;
+    for (const message of messages) {
+      if (Number(message.dataset.timestampMs) > currentMs) break;
+      nextMessage = message;
+    }
+    if (nextMessage !== activeMessage) {
+      activeMessage?.classList.remove("is-active");
+      activeMessage = nextMessage;
+      activeMessage?.classList.add("is-active");
+      activeMessage?.scrollIntoView({
+        block: "center",
+        behavior: audio.paused ? "auto" : "smooth"
+      });
+    }
+  };
+
+  audio?.addEventListener("timeupdate", renderSynchronizedReplay);
+  audio?.addEventListener("seeked", renderSynchronizedReplay);
+  playlist?.addEventListener(
+    "roomvoicepartchange",
+    renderSynchronizedReplay
+  );
+  roomVoiceLyricPlayer.addEventListener("click", (event) => {
+    const target = event.target.closest("[data-room-voice-seek-ms]");
+    if (!target || !playlist?.selectRoomVoicePart) return;
+    const targetMs = Number(target.dataset.roomVoiceSeekMs);
+    if (!Number.isFinite(targetMs) || targetMs < 0) return;
+    const partIndex = Math.min(
+      Math.floor(targetMs / segmentDurationMs),
+      Math.max(0, playlist.roomVoiceSourceCount - 1)
+    );
+    playlist.selectRoomVoicePart(
+      partIndex,
+      true,
+      (targetMs - partIndex * segmentDurationMs) / 1000
+    );
+  });
+  renderSynchronizedReplay();
+}
+
+const createForm = document.querySelector("#create-job-form");
+
+if (createForm) {
+  createForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = createForm.querySelector("button");
+    const error = document.querySelector("#create-job-error");
+    const url = new FormData(createForm).get("url");
+    button.disabled = true;
+    error.textContent = "";
+    try {
+      const response = await apiFetch("/api/jobs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(apiErrorMessage(payload, "createJobFailed"));
+      }
+      window.location.assign(`/jobs/${encodeURIComponent(payload.id)}`);
+    } catch (requestError) {
+      error.textContent = requestError instanceof Error
+        ? requestError.message
+        : t("createJobFailed");
+      button.disabled = false;
+    }
+  });
+}
+
+const jobHero = document.querySelector("[data-job-id]");
+if (jobHero) {
+  const jobID = jobHero.dataset.jobId;
+  let active = jobHero.dataset.jobActive === "true";
+  let previousStatus = document.querySelector("#job-status")?.textContent;
+  const poll = async () => {
+    if (!active) return;
+    try {
+      const response = await apiFetch(`/api/jobs/${encodeURIComponent(jobID)}/status`);
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(apiErrorMessage(payload, "readJobFailed"));
+      }
+      const status = document.querySelector("#job-status");
+      const bar = document.querySelector("#job-progress-bar");
+      const message = document.querySelector("#job-progress-message");
+      const percent = document.querySelector("#job-progress-percent");
+      if (status) {
+        status.dataset.jobStatus = payload.status;
+        status.textContent = i18n?.translateStatus(payload.status) || payload.status;
+        status.className = `status status-${payload.status}`;
+      }
+      if (bar) bar.style.width = `${payload.progress_percent}%`;
+      if (message) {
+        message.dataset.operationalMessage = payload.progress_message;
+        message.textContent = i18n?.translateOperationalMessage(
+          payload.progress_message
+        ) || payload.progress_message;
+      }
+      if (percent) percent.textContent = `${payload.progress_percent}%`;
+      active = payload.status === "queued" || payload.status === "running";
+      if (!active || payload.status !== previousStatus && payload.status === "completed") {
+        window.location.reload();
+        return;
+      }
+      previousStatus = payload.status;
+    } catch {
+      // A later poll can recover from a transient localhost request failure.
+    }
+    window.setTimeout(poll, 2000);
+  };
+  window.setTimeout(poll, 1200);
+}
+
+const replayPlayer = document.querySelector("#replay-player");
+const replayPlayerPanel = document.querySelector("#replay-player-panel");
+const replayPlayerMessage = document.querySelector("#replay-player-message");
+let pendingSeekSeconds = null;
+let replayUsesNativeHls = false;
+let hlsPlayer = null;
+let hlsNetworkRetries = 0;
+let hlsMediaRetries = 0;
+
+const applyPendingSeek = () => {
+  if (!replayPlayer || pendingSeekSeconds === null) return;
+  const duration = Number.isFinite(replayPlayer.duration) ? replayPlayer.duration : null;
+  replayPlayer.currentTime = duration === null
+    ? pendingSeekSeconds
+    : Math.min(pendingSeekSeconds, Math.max(0, duration - 0.1));
+  pendingSeekSeconds = null;
+  void replayPlayer.play().catch(() => {
+    if (replayPlayerMessage) {
+      setLocalizedText(replayPlayerMessage, "jumpedToTarget");
+    }
+  });
+};
+
+if (replayPlayer) {
+  replayPlayer.addEventListener("loadedmetadata", () => {
+    if (replayPlayerMessage) setLocalizedText(replayPlayerMessage, "replayHelp");
+    applyPendingSeek();
+  });
+  replayPlayer.addEventListener("canplay", () => {
+    if (replayPlayerMessage) setLocalizedText(replayPlayerMessage, "replayHelp");
+  });
+  replayPlayer.addEventListener("error", () => {
+    if (hlsPlayer) return;
+    if (replayPlayerMessage) {
+      const code = replayPlayer.error?.code;
+      setLocalizedText(replayPlayerMessage, "mediaError", {
+        detail: code ? t("mediaErrorCode", { code }) : ""
+      });
+    }
+  });
+  const replaySource = replayPlayer.dataset.hlsSrc || "";
+  if (window.Hls?.isSupported()) {
+    hlsPlayer = new window.Hls({ enableWorker: true });
+    hlsPlayer.on(window.Hls.Events.MEDIA_ATTACHED, () => {
+      hlsPlayer.loadSource(replaySource);
+    });
+    hlsPlayer.on(window.Hls.Events.ERROR, (_event, data) => {
+      if (!data.fatal || !replayPlayerMessage) return;
+      if (
+        data.type === window.Hls.ErrorTypes.NETWORK_ERROR
+        && hlsNetworkRetries < 2
+      ) {
+        hlsNetworkRetries += 1;
+        setLocalizedText(replayPlayerMessage, "networkRetry");
+        hlsPlayer.startLoad();
+        return;
+      }
+      if (
+        data.type === window.Hls.ErrorTypes.MEDIA_ERROR
+        && hlsMediaRetries < 2
+      ) {
+        hlsMediaRetries += 1;
+        setLocalizedText(replayPlayerMessage, "mediaRecover");
+        hlsPlayer.recoverMediaError();
+        return;
+      }
+      setLocalizedText(replayPlayerMessage, "mediaError", {
+        detail: t("mediaErrorDetail", {
+          detail: data.details || data.type
+        })
+      });
+    });
+    hlsPlayer.attachMedia(replayPlayer);
+  } else if (replayPlayer.canPlayType("application/vnd.apple.mpegurl")) {
+    replayUsesNativeHls = true;
+    replayPlayer.src = replaySource;
+  } else if (replayPlayerMessage) {
+    setLocalizedText(replayPlayerMessage, "unsupportedHls");
+  }
+}
+
+document.addEventListener("click", (event) => {
+  const timestamp = event.target.closest("[data-seek-ms]");
+  if (!timestamp || !replayPlayer) return;
+  pendingSeekSeconds = Math.max(0, Number(timestamp.dataset.seekMs || 0) / 1000);
+  replayPlayerPanel?.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (replayPlayer.readyState >= 1) {
+    applyPendingSeek();
+  } else if (replayUsesNativeHls) {
+    replayPlayer.load();
+  } else if (replayPlayerMessage) {
+    setLocalizedText(replayPlayerMessage, "loadingReplay");
+  }
+});
+
+const formatClock = (milliseconds) => {
+  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
+};
+
+const formatFineClock = (milliseconds) => {
+  const tenths = Math.max(0, Math.round(milliseconds / 100));
+  const hours = Math.floor(tenths / 36000);
+  const minutes = Math.floor((tenths % 36000) / 600);
+  const seconds = Math.floor((tenths % 600) / 10);
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${tenths % 10}`;
+};
+
+const clipRows = Array.from(document.querySelectorAll(".timeline > li[data-clip-index]"));
+const clipEditor = document.querySelector("#clip-editor");
+const clipEditorTopic = document.querySelector("#clip-editor-topic");
+const clipEditorClose = document.querySelector("#clip-editor-close");
+const clipEditorCancel = document.querySelector("#clip-editor-cancel");
+const clipEditorSubmit = document.querySelector("#clip-editor-submit");
+const clipCanSubmit = clipEditor?.dataset.canSubmit === "true";
+const clipEditorError = document.querySelector("#clip-editor-error");
+const clipTimelineViewport = document.querySelector("#clip-timeline-viewport");
+const clipRangeControl = document.querySelector("#clip-range-control");
+const clipTimelineCues = document.querySelector("#clip-transcript-cues");
+const clipSegmentTrack = document.querySelector("#clip-segment-track");
+const clipStartHandle = document.querySelector("#clip-start-handle");
+const clipEndHandle = document.querySelector("#clip-end-handle");
+const clipStartHandleTime = document.querySelector("#clip-start-handle-time");
+const clipEndHandleTime = document.querySelector("#clip-end-handle-time");
+const clipRawMarker = document.querySelector("#clip-raw-marker");
+const clipSnapMarker = document.querySelector("#clip-snap-marker");
+const clipHoverMarker = document.querySelector("#clip-hover-marker");
+const clipMarkedMarker = document.querySelector("#clip-marked-marker");
+const clipPreviewPlayhead = document.querySelector("#clip-preview-playhead");
+const clipZoomOut = document.querySelector("#clip-zoom-out");
+const clipZoomIn = document.querySelector("#clip-zoom-in");
+const clipZoomLevel = document.querySelector("#clip-zoom-value");
+const clipWindowStart = document.querySelector("#clip-window-start");
+const clipWindowEnd = document.querySelector("#clip-window-end");
+const clipSelectedDuration = document.querySelector("#clip-selected-duration");
+const clipSnapEnabled = document.querySelector("#clip-snap-enabled");
+const clipResetRange = document.querySelector("#clip-reset-range");
+const clipSubtitleMode = document.querySelector("#clip-subtitle-mode");
+const clipDanmakuEnabled = document.querySelector("#clip-danmaku-enabled");
+const clipPreviewStage = document.querySelector("#clip-preview-stage");
+const clipPreviewPlayer = document.querySelector("#clip-preview-player");
+const clipPreviewSelection = document.querySelector("#clip-preview-selection");
+const clipPreviewSubtitles = document.querySelector("#clip-preview-subtitles");
+const clipPreviewZh = document.querySelector("#clip-preview-zh");
+const clipPreviewEn = document.querySelector("#clip-preview-en");
+const clipPreviewDanmaku = document.querySelector("#clip-preview-danmaku");
+const clipPreviewWatermark = document.querySelector(
+  "#clip-preview-watermark"
+);
+const clipPreviewCutNotice = document.querySelector("#clip-preview-cut-notice");
+const clipCutSummary = document.querySelector("#clip-cut-summary");
+const clipSplitAtMarker = document.querySelector("#clip-split-at-marker");
+const clipToggleSegment = document.querySelector("#clip-toggle-segment");
+const clipSegmentList = document.querySelector("#clip-segment-list");
+const clipLyricPreview = document.querySelector("#clip-lyric-preview");
+const clipLyricTime = document.querySelector("#clip-lyric-time");
+const clipLyricStack = document.querySelector("#clip-lyric-stack");
+const clipLyricPreviousTwo = document.querySelector("#clip-lyric-previous-2");
+const clipLyricPrevious = document.querySelector("#clip-lyric-previous");
+const clipLyricCurrent = document.querySelector("#clip-lyric-current");
+const clipLyricNext = document.querySelector("#clip-lyric-next");
+const clipLyricNextTwo = document.querySelector("#clip-lyric-next-2");
+const clipStylePanel = document.querySelector("#clip-style-panel");
+const clipLandscapeStyleNote = document.querySelector("#clip-landscape-style-note");
+const clipPortraitStyleNote = document.querySelector("#clip-portrait-style-note");
+const clipOutputLayoutRadios = Array.from(
+  document.querySelectorAll('input[name="clip-output-layout"]')
+);
+const clipSubtitleFontScale = document.querySelector("#clip-subtitle-font-scale");
+const clipSubtitleFontScaleValue = document.querySelector("#clip-subtitle-font-scale-value");
+const clipSubtitleFontFamilyControl = document.querySelector("#clip-subtitle-font-family-control");
+const clipSubtitleFontFamily = document.querySelector("#clip-subtitle-font-family");
+const clipLandscapeThemeControl = document.querySelector("#clip-landscape-theme-control");
+const clipLandscapeThemeRadios = Array.from(
+  document.querySelectorAll('input[name="clip-landscape-theme"]')
+);
+const aiCoverPanel = document.querySelector("#ai-cover-panel");
+const aiCoverMarkTime = document.querySelector("#ai-cover-mark-time");
+const aiCoverTitleInput = document.querySelector("#ai-cover-title-input");
+const aiCoverTitleCount = document.querySelector("#ai-cover-title-count");
+const aiCoverGenerate = document.querySelector("#ai-cover-generate");
+const aiCoverPromptInput = document.querySelector("#ai-cover-prompt-input");
+const aiCoverPromptCount = document.querySelector("#ai-cover-prompt-count");
+const aiCoverPromptReset = document.querySelector("#ai-cover-prompt-reset");
+const aiCoverRegenerate = document.querySelector("#ai-cover-regenerate");
+const aiCoverRetry = document.querySelector("#ai-cover-retry");
+const aiCoverSelect = document.querySelector("#ai-cover-select");
+const aiCoverStatus = document.querySelector("#ai-cover-status");
+const aiCoverLandscapeImage = document.querySelector("#ai-cover-landscape-image");
+const aiCoverFourThreeImage = document.querySelector("#ai-cover-four-three-image");
+const aiCoverLandscapeState = document.querySelector("#ai-cover-landscape-state");
+const aiCoverFourThreeState = document.querySelector("#ai-cover-four-three-state");
+const aiCoverLandscapeDownload = document.querySelector("#ai-cover-landscape-download");
+const aiCoverFourThreeDownload = document.querySelector("#ai-cover-four-three-download");
+const aiCoverHistoryList = document.querySelector("#ai-cover-history-list");
+
+let clipExports = [];
+let clipPollTimer = null;
+let clipEditorState = null;
+let clipOriginButton = null;
+let clipPreviewHls = null;
+let clipPreviewUsesNativeHls = false;
+let clipPreviewFrame = null;
+let clipPendingSeekMs = null;
+let clipPendingPlay = false;
+let clipSuggestionTokens = { start: 0, end: 0 };
+let clipDragState = null;
+let clipLyricHoverFrame = null;
+let clipLyricHoverClientX = 0;
+let clipLyricHoverMs = null;
+let clipLyricHovering = false;
+let clipSegmentSequence = 0;
+let aiCoverPollTimer = null;
+const selectedAICoverByTimeline = new Map();
+
+const CLIP_MIN_ZOOM = 1;
+const CLIP_MAX_ZOOM = 64;
+const CLIP_SNAP_ENTER_PX = 12;
+const CLIP_SNAP_RELEASE_PX = 22;
+const CLIP_DANMAKU_MAX_STACK = 16;
+const CLIP_DANMAKU_MIN_GAP_MS = 450;
+const CLIP_DANMAKU_RISE_MS = 220;
+const CLIP_AUTO_SCROLL_EDGE_PX = 52;
+const CLIP_AUTO_SCROLL_MAX_PX = 24;
+const CLIP_MIN_SEGMENT_MS = 100;
+const CLIP_MAX_SEGMENTS = 63;
+const CLIP_MAX_KEPT_RANGES = 32;
+const CLIP_SUBTITLE_FONT_SCALE_MIN = 50;
+const CLIP_SUBTITLE_FONT_SCALE_MAX = 150;
+const CLIP_DEFAULT_FONT_SCALE = 100;
+const CLIP_SUBTITLE_BASE_SCALE = 1.6;
+const CLIP_ASS_ADVANCE = .69;
+const AI_COVER_POLL_MS = 1_500;
+const CLIP_DEFAULT_FONT_FAMILY = "wenkai";
+const CLIP_DEFAULT_LANDSCAPE_THEME = "cream";
+const CLIP_PORTRAIT_TEXT_COLOR = "#FFFFFF";
+const CLIP_PORTRAIT_OUTLINE_COLOR = "#000000";
+const CLIP_LANDSCAPE_FONT_STACKS = {
+  wenkai: '"LXGW WenKai", "Kaiti SC", STKaiti, serif',
+  serif: '"Noto Serif CJK SC", "Songti SC", STSong, serif',
+  sans: '"Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei", sans-serif'
+};
+
+const clipOutputLayoutValue = () => {
+  if (!window.matchMedia("(min-width: 761px)").matches) {
+    return "portrait";
+  }
+  return clipOutputLayoutRadios.find((input) => input.checked)?.value
+    || "portrait";
+};
+
+const createClipSegment = (
+  startMs,
+  endMs,
+  kept = true,
+  manualBoundaryBefore = false
+) => ({
+  id: `clip-segment-${++clipSegmentSequence}`,
+  startMs,
+  endMs,
+  kept,
+  manualBoundaryBefore
+});
+
+const selectedClipSegment = () => (
+  clipEditorState?.segments?.find(
+    (segment) => segment.id === clipEditorState.selectedSegmentId
+  ) || null
+);
+
+const clipKeptRanges = () => {
+  const keptRanges = [];
+  for (const segment of clipEditorState?.segments || []) {
+    if (!segment.kept || segment.endMs <= segment.startMs) continue;
+    const previous = keptRanges[keptRanges.length - 1];
+    if (previous && segment.startMs <= previous.end_ms) {
+      previous.end_ms = Math.max(previous.end_ms, segment.endMs);
+      continue;
+    }
+    keptRanges.push({
+      start_ms: segment.startMs,
+      end_ms: segment.endMs
+    });
+  }
+  return keptRanges;
+};
+
+const clipKeptDurationMs = () => (
+  clipKeptRanges().reduce(
+    (total, clipRange) => (
+      total + clipRange.end_ms - clipRange.start_ms
+    ),
+    0
+  )
+);
+
+const clipSegmentAt = (milliseconds, { keptOnly = false } = {}) => {
+  const segments = clipEditorState?.segments || [];
+  const targetMs = Number(milliseconds);
+  return segments.find((segment, index) => (
+    (!keptOnly || segment.kept)
+    && targetMs >= segment.startMs
+    && (
+      targetMs < segment.endMs
+      || (
+        index === segments.length - 1
+        && targetMs === segment.endMs
+      )
+    )
+  )) || null;
+};
+
+const clipTimeIsKept = (milliseconds, { includeFinalEnd = false } = {}) => {
+  const targetMs = Number(milliseconds);
+  const ranges = clipKeptRanges();
+  return ranges.some((clipRange, index) => (
+    targetMs >= clipRange.start_ms
+    && (
+      targetMs < clipRange.end_ms
+      || (
+        includeFinalEnd
+        && index === ranges.length - 1
+        && targetMs === clipRange.end_ms
+      )
+    )
+  ));
+};
+
+const nearestClipKeptFrameMs = (milliseconds) => {
+  const ranges = clipKeptRanges();
+  if (!ranges.length) return null;
+  const targetMs = Number(milliseconds);
+  for (const clipRange of ranges) {
+    if (targetMs < clipRange.start_ms) return clipRange.start_ms;
+    if (targetMs < clipRange.end_ms) return targetMs;
+  }
+  const last = ranges[ranges.length - 1];
+  return Math.max(last.start_ms, last.end_ms - CLIP_MIN_SEGMENT_MS);
+};
+
+const clipSplitCandidate = () => {
+  if (
+    !clipEditorState
+    || !Number.isFinite(clipEditorState.markerMs)
+    || clipEditorState.segments.length >= CLIP_MAX_SEGMENTS
+  ) return null;
+  const markerMs = clipEditorState.markerMs;
+  const segment = clipEditorState.segments.find((item) => (
+    item.kept
+    && markerMs - item.startMs >= CLIP_MIN_SEGMENT_MS
+    && item.endMs - markerMs >= CLIP_MIN_SEGMENT_MS
+  ));
+  return segment ? { segment, markerMs } : null;
+};
+
+const syncClipSegmentsToBounds = () => {
+  if (!clipEditorState) return;
+  const existing = [...(clipEditorState.segments || [])]
+    .sort((left, right) => left.startMs - right.startMs);
+  const normalized = [];
+  let cursor = clipEditorState.startMs;
+  for (const segment of existing) {
+    const startMs = Math.max(cursor, clipEditorState.startMs, segment.startMs);
+    const endMs = Math.min(clipEditorState.endMs, segment.endMs);
+    if (endMs <= startMs) continue;
+    if (startMs > cursor) {
+      normalized.push(createClipSegment(cursor, startMs));
+    }
+    normalized.push({
+      ...segment,
+      startMs,
+      endMs,
+      manualBoundaryBefore: (
+        startMs === segment.startMs
+        && Boolean(segment.manualBoundaryBefore)
+      )
+    });
+    cursor = endMs;
+    if (cursor >= clipEditorState.endMs) break;
+  }
+  if (cursor < clipEditorState.endMs) {
+    normalized.push(createClipSegment(cursor, clipEditorState.endMs));
+  }
+  if (!normalized.length) {
+    normalized.push(
+      createClipSegment(clipEditorState.startMs, clipEditorState.endMs)
+    );
+  }
+  const merged = [];
+  for (const segment of normalized) {
+    const previous = merged[merged.length - 1];
+    if (
+      previous
+      && previous.endMs === segment.startMs
+      && previous.kept === segment.kept
+      && !segment.manualBoundaryBefore
+    ) {
+      previous.endMs = segment.endMs;
+      continue;
+    }
+    merged.push(segment);
+  }
+  clipEditorState.segments = merged;
+  if (!selectedClipSegment()) {
+    clipEditorState.selectedSegmentId = (
+      (
+        Number.isFinite(clipEditorState.markerMs)
+          ? clipSegmentAt(clipEditorState.markerMs)?.id
+          : null
+      )
+      || merged[0].id
+    );
+  }
+};
+
+const selectClipSegment = (segmentID, { seek = true } = {}) => {
+  if (!clipEditorState) return;
+  const segment = clipEditorState.segments.find(
+    (item) => item.id === segmentID
+  );
+  if (!segment) return;
+  clipEditorState.selectedSegmentId = segment.id;
+  if (seek) seekClipPreview(segment.startMs);
+  updateClipRangeUI({ renderPreview: true });
+};
+
+const renderClipSegments = () => {
+  if (!clipEditorState) return;
+  const segments = clipEditorState.segments || [];
+  const keptSegments = segments.filter((segment) => segment.kept);
+  const selected = selectedClipSegment();
+  const keptRanges = clipKeptRanges();
+  if (clipCutSummary) {
+    clipCutSummary.textContent = t("clipCutSummary", {
+      duration: formatFineClock(clipKeptDurationMs()),
+      kept: keptRanges.length
+    });
+  }
+  if (clipSplitAtMarker) {
+    clipSplitAtMarker.disabled = !clipSplitCandidate();
+  }
+  if (clipToggleSegment) {
+    const onlyKeptSegment = (
+      selected?.kept
+      && segments.filter((segment) => segment.kept).length === 1
+    );
+    clipToggleSegment.disabled = !selected || onlyKeptSegment;
+    clipToggleSegment.textContent = selected?.kept
+      ? t("deleteSelectedSegment")
+      : t("restoreSelectedSegment");
+  }
+
+  const bindSelection = (element, segment) => {
+    element.addEventListener("click", (event) => {
+      event.stopPropagation();
+      selectClipSegment(segment.id);
+    });
+  };
+
+  if (clipSegmentTrack) {
+    const fragment = document.createDocumentFragment();
+    for (const [index, segment] of segments.entries()) {
+      const block = document.createElement("span");
+      block.className = "clip-segment-block";
+      block.setAttribute("aria-hidden", "true");
+      block.classList.toggle("is-deleted", !segment.kept);
+      block.classList.toggle("is-selected", segment.id === selected?.id);
+      block.style.left = `${clipPercent(segment.startMs)}%`;
+      block.style.width = `${Math.max(
+        .08,
+        clipPercent(segment.endMs) - clipPercent(segment.startMs)
+      )}%`;
+      block.setAttribute(
+        "title",
+        t(segment.kept ? "keptSegmentLabel" : "deletedSegmentLabel", {
+          index: index + 1,
+          start: formatFineClock(segment.startMs),
+          end: formatFineClock(segment.endMs)
+        })
+      );
+      fragment.append(block);
+    }
+    clipSegmentTrack.replaceChildren(fragment);
+  }
+
+  if (clipSegmentList) {
+    const fragment = document.createDocumentFragment();
+    for (const [index, segment] of keptSegments.entries()) {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "clip-segment-card";
+      card.classList.toggle("is-selected", segment.id === selected?.id);
+      const number = document.createElement("strong");
+      number.textContent = String(index + 1).padStart(2, "0");
+      const range = document.createElement("span");
+      range.textContent = (
+        `${formatFineClock(segment.startMs)}–${formatFineClock(segment.endMs)}`
+      );
+      const state = document.createElement("small");
+      state.textContent = t("clipSegmentKept");
+      card.append(number, range, state);
+      bindSelection(card, segment);
+      fragment.append(card);
+    }
+    clipSegmentList.replaceChildren(fragment);
+  }
+};
+
+const clipStyleValues = () => ({
+  fontScale: Math.max(
+    CLIP_SUBTITLE_FONT_SCALE_MIN,
+    Math.min(
+      CLIP_SUBTITLE_FONT_SCALE_MAX,
+      Number(clipSubtitleFontScale?.value) || CLIP_DEFAULT_FONT_SCALE
+    )
+  ),
+  fontFamily: Object.prototype.hasOwnProperty.call(
+    CLIP_LANDSCAPE_FONT_STACKS,
+    clipSubtitleFontFamily?.value
+  )
+    ? clipSubtitleFontFamily.value
+    : CLIP_DEFAULT_FONT_FAMILY,
+  landscapeTheme: (
+    clipLandscapeThemeRadios.find((input) => input.checked)?.value
+    || CLIP_DEFAULT_LANDSCAPE_THEME
+  )
+});
+
+const applyClipSubtitleStyle = () => {
+  if (!clipEditor) return;
+  const { fontScale, fontFamily, landscapeTheme } = clipStyleValues();
+  if (clipPreviewStage) {
+    clipPreviewStage.dataset.theme = landscapeTheme;
+  }
+  const scale = fontScale / 100 * CLIP_SUBTITLE_BASE_SCALE;
+  clipEditor.style.setProperty(
+    "--clip-landscape-subtitle-font-family",
+    CLIP_LANDSCAPE_FONT_STACKS[fontFamily]
+  );
+  // The export derives portrait caption sizes from the frame height, so the
+  // preview has to as well; a viewport-relative clamp only lined up by
+  // coincidence. CLIP_ASS_ADVANCE converts an ASS font size to the glyph size
+  // libass actually draws.
+  clipEditor.style.setProperty(
+    "--clip-subtitle-zh-size",
+    `${(3.4 * scale * CLIP_ASS_ADVANCE).toFixed(3)}cqh`
+  );
+  clipEditor.style.setProperty(
+    "--clip-subtitle-en-size",
+    `${(2.5 * scale * CLIP_ASS_ADVANCE).toFixed(3)}cqh`
+  );
+  clipEditor.style.setProperty(
+    "--clip-landscape-subtitle-zh-size",
+    `${(2.13 * scale).toFixed(3)}cqh`
+  );
+  clipEditor.style.setProperty(
+    "--clip-landscape-subtitle-en-size",
+    `${(1.67 * scale).toFixed(3)}cqh`
+  );
+  clipEditor.style.setProperty(
+    "--clip-lyric-current-size",
+    `${Math.round(13 * Math.min(1.3, scale))}px`
+  );
+  if (clipSubtitleFontScaleValue) {
+    clipSubtitleFontScaleValue.textContent = `${fontScale}%`;
+  }
+};
+
+const applyClipOutputLayout = ({ resetRequest = true } = {}) => {
+  const landscape = clipOutputLayoutValue() === "landscape";
+  clipEditor?.classList.toggle("is-landscape-layout", landscape);
+  clipPreviewStage?.classList.toggle(
+    "is-landscape-layout",
+    landscape
+  );
+  clipStylePanel?.classList.toggle("is-landscape-layout", landscape);
+  // Only the landscape export has cream columns beside the frame to put a
+  // watermark in, so the portrait preview must not promise one.
+  if (clipPreviewWatermark) {
+    clipPreviewWatermark.hidden = !landscape;
+  }
+  if (clipLandscapeStyleNote) {
+    clipLandscapeStyleNote.hidden = !landscape;
+  }
+  if (clipPortraitStyleNote) {
+    clipPortraitStyleNote.hidden = landscape;
+  }
+  if (clipSubtitleFontFamilyControl) {
+    clipSubtitleFontFamilyControl.hidden = !landscape;
+  }
+  if (clipSubtitleFontFamily) {
+    clipSubtitleFontFamily.disabled = !landscape;
+  }
+  if (clipLandscapeThemeControl) {
+    clipLandscapeThemeControl.hidden = !landscape;
+  }
+  for (const input of clipLandscapeThemeRadios) {
+    input.disabled = !landscape;
+  }
+  if (resetRequest && clipEditorState) {
+    clipEditorState.requestId = null;
+    clipEditorState.notice = "";
+  }
+  updateClipRangeUI({ renderPreview: true });
+  renderAICoverState();
+};
+
+const aiCoverIsAdmin = () => (
+  clipEditor?.dataset.aiCoverAdmin === "true"
+);
+
+const aiCoverIsConfigured = () => (
+  clipEditor?.dataset.aiCoverConfigured === "true"
+);
+
+const aiCoverTitleValue = () => (
+  String(aiCoverTitleInput?.value || "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 80)
+);
+
+const aiCoverDefaultTitle = (value) => (
+  String(value || "").replace(/\s+/g, " ").trim().slice(0, 80)
+);
+
+const AI_COVER_DEFAULT_PROMPT = String(
+  aiCoverPromptInput?.defaultValue || ""
+).trim();
+
+const aiCoverPromptValue = () => (
+  String(aiCoverPromptInput?.value || "").trim()
+);
+
+const setAICoverStatus = (message = "", { error = false } = {}) => {
+  if (!aiCoverStatus) return;
+  aiCoverStatus.textContent = message;
+  aiCoverStatus.classList.toggle("is-error", error);
+};
+
+const aiCoverAsset = (generation, orientation) => (
+  generation?.assets?.find(
+    (asset) => asset.orientation === orientation
+  ) || null
+);
+
+const aiCoverGenerationMessage = (generation) => {
+  if (!generation) return "";
+  const errorCode = generation.error?.code || generation.error_code;
+  const errorMessage = (
+    generation.error?.message || generation.error_message
+  );
+  if (generation.status === "queued") return t("aiCoverQueued");
+  if (generation.status === "running") return t("aiCoverRunning");
+  if (generation.status === "completed") return t("aiCoverCompleted");
+  if (errorCode === "ai_cover_moderation_rejected") {
+    return t("aiCoverModerationRejected");
+  }
+  return errorMessage || t("aiCoverFailed");
+};
+
+const renderAICoverAsset = (
+  generation,
+  orientation,
+  image,
+  state,
+  download
+) => {
+  const asset = aiCoverAsset(generation, orientation);
+  const completed = (
+    asset?.status === "completed"
+    && asset.download_url
+  );
+  if (image) {
+    image.hidden = !completed;
+    if (completed) {
+      image.src = (
+        `${asset.download_url}?revision=${asset.text_revision || 0}`
+      );
+      image.alt = orientation === "four_three"
+        ? t("aiCoverFourThreeAlt")
+        : t("aiCoverLandscapeAlt");
+    } else {
+      image.removeAttribute("src");
+      image.alt = "";
+    }
+  }
+  if (state) {
+    state.hidden = completed;
+    state.textContent = asset
+      ? aiCoverGenerationMessage({
+        ...generation,
+        status: asset.status,
+        error: asset.error
+      })
+      : t("aiCoverWaiting");
+  }
+  if (download) {
+    download.hidden = !completed;
+    download.href = completed ? asset.download_url : "#";
+  }
+};
+
+const renderAICoverHistory = () => {
+  if (!aiCoverHistoryList || !clipEditorState) return;
+  aiCoverHistoryList.replaceChildren();
+  clipEditorState.aiCoverGenerations.forEach((generation, index) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "ai-cover-history-item";
+    button.classList.toggle(
+      "is-active",
+      generation.id === clipEditorState.aiCoverGeneration?.id
+    );
+    button.classList.toggle(
+      "is-selected",
+      generation.id === clipEditorState.aiCoverGenerationId
+    );
+    const number = clipEditorState.aiCoverGenerations.length - index;
+    button.textContent = t("aiCoverHistoryItem", {
+      number,
+      time: formatFineClock(generation.source_timestamp_ms),
+      style: generation.title_text || "",
+      status: i18n?.translateStatus(generation.status) || generation.status
+    });
+    button.addEventListener("click", () => {
+      showAICoverGeneration(generation, { syncText: true });
+    });
+    aiCoverHistoryList.append(button);
+  });
+  if (!clipEditorState.aiCoverGenerations.length) {
+    const empty = document.createElement("span");
+    empty.textContent = t("aiCoverNoHistory");
+    aiCoverHistoryList.append(empty);
+  }
+};
+
+const renderAICoverState = () => {
+  if (!clipEditorState || !aiCoverPanel) return;
+  const generation = clipEditorState.aiCoverGeneration;
+  const activeGeneration = clipEditorState.aiCoverGenerations.some(
+    (item) => ["queued", "running"].includes(item.status)
+  );
+  const validMark = (
+    Number.isFinite(clipEditorState.markerMs)
+    && clipTimeIsKept(clipEditorState.markerMs)
+  );
+  const title = aiCoverTitleValue();
+  if (aiCoverMarkTime) {
+    aiCoverMarkTime.textContent = validMark
+      ? formatFineClock(clipEditorState.markerMs)
+      : "--:--:--.-";
+  }
+  if (aiCoverTitleCount) {
+    aiCoverTitleCount.textContent = `${title.length}/80`;
+  }
+  if (aiCoverPromptCount) {
+    aiCoverPromptCount.textContent = (
+      `${aiCoverPromptValue().length}/`
+      + `${aiCoverPromptInput?.maxLength || 4000}`
+    );
+  }
+  if (aiCoverPromptReset) {
+    aiCoverPromptReset.disabled = (
+      !aiCoverIsAdmin()
+      || aiCoverPromptValue() === AI_COVER_DEFAULT_PROMPT
+    );
+  }
+  if (aiCoverGenerate) {
+    aiCoverGenerate.disabled = (
+      !aiCoverIsAdmin()
+      || !aiCoverIsConfigured()
+      || clipEditorState.aiCoverBusy
+      || activeGeneration
+      || !validMark
+      || !title
+      || !aiCoverPromptValue()
+    );
+  }
+  if (aiCoverRegenerate) {
+    aiCoverRegenerate.hidden = !(
+      aiCoverIsAdmin()
+      && aiCoverIsConfigured()
+      && generation
+      && ["completed", "failed"].includes(generation.status)
+    );
+    aiCoverRegenerate.disabled = (
+      clipEditorState.aiCoverBusy || activeGeneration
+    );
+  }
+  if (aiCoverRetry) {
+    aiCoverRetry.hidden = !(
+      aiCoverIsAdmin()
+      && aiCoverIsConfigured()
+      && generation?.status === "failed"
+    );
+    aiCoverRetry.disabled = (
+      clipEditorState.aiCoverBusy || activeGeneration
+    );
+  }
+  const selected = (
+    generation?.id
+    && generation.id === clipEditorState.aiCoverGenerationId
+  );
+  const landscapeOutput = clipOutputLayoutValue() === "landscape";
+  if (aiCoverSelect) {
+    aiCoverSelect.hidden = !(
+      aiCoverIsAdmin()
+      && generation?.status === "completed"
+    );
+    aiCoverSelect.disabled = (
+      clipEditorState.aiCoverBusy
+      || (!selected && !landscapeOutput)
+    );
+    aiCoverSelect.setAttribute("aria-pressed", String(Boolean(selected)));
+    aiCoverSelect.textContent = selected
+      ? t("aiCoverRemoveFromVideo")
+      : (
+        landscapeOutput
+          ? t("aiCoverUseForVideo")
+          : t("aiCoverLandscapeVideoOnly")
+      );
+  }
+  renderAICoverAsset(
+    generation,
+    "landscape",
+    aiCoverLandscapeImage,
+    aiCoverLandscapeState,
+    aiCoverLandscapeDownload
+  );
+  renderAICoverAsset(
+    generation,
+    "four_three",
+    aiCoverFourThreeImage,
+    aiCoverFourThreeState,
+    aiCoverFourThreeDownload
+  );
+  if (generation) {
+    setAICoverStatus(
+      aiCoverGenerationMessage(generation),
+      { error: generation.status === "failed" }
+    );
+  }
+  renderAICoverHistory();
+};
+
+const upsertAICoverGeneration = (generation) => {
+  if (!clipEditorState || !generation) return;
+  const generations = clipEditorState.aiCoverGenerations.filter(
+    (item) => item.id !== generation.id
+  );
+  generations.push(generation);
+  generations.sort((left, right) => (
+    String(right.created_at).localeCompare(String(left.created_at))
+  ));
+  clipEditorState.aiCoverGenerations = generations;
+};
+
+const stopAICoverPolling = () => {
+  if (aiCoverPollTimer !== null) {
+    window.clearTimeout(aiCoverPollTimer);
+    aiCoverPollTimer = null;
+  }
+};
+
+const scheduleAICoverPoll = () => {
+  stopAICoverPolling();
+  const activeGenerations = (
+    clipEditorState?.aiCoverGenerations.filter(
+      (generation) => ["queued", "running"].includes(generation.status)
+    ) || []
+  );
+  if (!activeGenerations.length) return;
+  const jobId = clipEditor?.dataset.jobId;
+  aiCoverPollTimer = window.setTimeout(async () => {
+    if (!clipEditorState || !clipEditor?.open) return;
+    try {
+      const results = await Promise.all(activeGenerations.map(
+        async (generation) => {
+          const response = await apiFetch(
+            `/api/jobs/${jobId}/ai-covers/${generation.id}`
+          );
+          const payload = await response.json().catch(() => ({}));
+          return response.ok ? payload : null;
+        }
+      ));
+      for (const payload of results.filter(Boolean)) {
+        upsertAICoverGeneration(payload);
+        if (clipEditorState.aiCoverGeneration?.id === payload.id) {
+          clipEditorState.aiCoverGeneration = payload;
+        }
+      }
+      renderAICoverState();
+    } finally {
+      scheduleAICoverPoll();
+    }
+  }, AI_COVER_POLL_MS);
+};
+
+const showAICoverGeneration = (
+  generation,
+  { syncText = false } = {}
+) => {
+  if (!clipEditorState) return;
+  clipEditorState.aiCoverGeneration = generation || null;
+  if (syncText && generation) {
+    if (aiCoverTitleInput) {
+      aiCoverTitleInput.value = generation.title_text || "";
+    }
+    if (aiCoverPromptInput && generation.prompt_template) {
+      aiCoverPromptInput.value = generation.prompt_template;
+    }
+  }
+  renderAICoverState();
+  scheduleAICoverPoll();
+};
+
+const loadAICoverGenerations = async () => {
+  if (!clipEditorState || !clipEditor?.dataset.jobId) return;
+  const timelineIndex = clipEditorState.timelineIndex;
+  try {
+    const response = await apiFetch(
+      (
+        `/api/jobs/${clipEditor.dataset.jobId}/ai-covers`
+        + `?timeline_index=${timelineIndex}`
+      )
+    );
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(apiErrorMessage(payload, "aiCoverLoadFailed"));
+    }
+    if (!clipEditorState || clipEditorState.timelineIndex !== timelineIndex) {
+      return;
+    }
+    clipEditorState.aiCoverGenerations = (payload.covers || []).filter(
+      (generation) => generation.timeline_index === timelineIndex
+    );
+    const selectedId = selectedAICoverByTimeline.get(timelineIndex) || null;
+    clipEditorState.aiCoverGenerationId = (
+      clipEditorState.aiCoverGenerations.some(
+        (generation) => generation.id === selectedId
+      )
+        ? selectedId
+        : null
+    );
+    const generation = (
+      clipEditorState.aiCoverGenerations.find(
+        (item) => item.id === clipEditorState.aiCoverGenerationId
+      )
+      || clipEditorState.aiCoverGenerations[0]
+      || null
+    );
+    showAICoverGeneration(generation, {
+      syncText: Boolean(generation)
+    });
+  } catch (error) {
+    setAICoverStatus(
+      error instanceof Error ? error.message : t("aiCoverLoadFailed"),
+      { error: true }
+    );
+  }
+};
+
+const runAICoverAction = async (request) => {
+  if (!clipEditorState) return null;
+  clipEditorState.aiCoverBusy = true;
+  renderAICoverState();
+  let failureMessage = "";
+  try {
+    const response = await request();
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(apiErrorMessage(payload, "aiCoverRequestFailed"));
+    }
+    clipEditorState.requestId = null;
+    upsertAICoverGeneration(payload);
+    showAICoverGeneration(payload, { syncText: true });
+    return payload;
+  } catch (error) {
+    failureMessage = (
+      error instanceof Error ? error.message : t("aiCoverRequestFailed")
+    );
+    return null;
+  } finally {
+    if (clipEditorState) {
+      clipEditorState.aiCoverBusy = false;
+      renderAICoverState();
+      if (failureMessage) {
+        setAICoverStatus(failureMessage, { error: true });
+      }
+      scheduleAICoverPoll();
+    }
+  }
+};
+
+const newAICoverRequestId = () => (
+  window.crypto?.randomUUID?.()
+  || `ai-cover-${Date.now()}-${Math.random().toString(16).slice(2)}`
+);
+
+const createAICoverGeneration = () => {
+  if (
+    !clipEditorState
+    || !Number.isFinite(clipEditorState.markerMs)
+    || !clipTimeIsKept(clipEditorState.markerMs)
+  ) {
+    setAICoverStatus(t("aiCoverMarkRequired"), { error: true });
+    return;
+  }
+  const titleText = aiCoverTitleValue();
+  if (!titleText) {
+    setAICoverStatus(t("aiCoverTextRequired"), { error: true });
+    return;
+  }
+  void runAICoverAction(() => apiFetch(
+    `/api/jobs/${clipEditor.dataset.jobId}/ai-covers`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        request_id: newAICoverRequestId(),
+        timeline_index: clipEditorState.timelineIndex,
+        source_timestamp_ms: Math.round(clipEditorState.markerMs),
+        title_text: titleText,
+        prompt_template: aiCoverPromptValue()
+      })
+    }
+  ));
+};
+
+const regenerateAICover = () => {
+  const generation = clipEditorState?.aiCoverGeneration;
+  if (!generation) return;
+  const titleText = aiCoverTitleValue();
+  if (!titleText) {
+    setAICoverStatus(t("aiCoverTextRequired"), { error: true });
+    return;
+  }
+  // The panel shows the current mark, so regenerating has to use it. Omitting
+  // it keeps the frame this cover already used, which is what an untouched
+  // timeline means.
+  const markerMs = clipEditorState.markerMs;
+  const sourceTimestampMs = (
+    Number.isFinite(markerMs) && clipTimeIsKept(markerMs)
+      ? Math.round(markerMs)
+      : null
+  );
+  void runAICoverAction(() => apiFetch(
+    (
+      `/api/jobs/${clipEditor.dataset.jobId}/ai-covers/`
+      + `${generation.id}/regenerate`
+    ),
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        request_id: newAICoverRequestId(),
+        source_timestamp_ms: sourceTimestampMs,
+        title_text: titleText,
+        prompt_template: aiCoverPromptValue()
+      })
+    }
+  ));
+};
+
+const retryAICover = () => {
+  const generation = clipEditorState?.aiCoverGeneration;
+  if (!generation) return;
+  void runAICoverAction(() => apiFetch(
+    (
+      `/api/jobs/${clipEditor.dataset.jobId}/ai-covers/`
+      + `${generation.id}/retry`
+    ),
+    { method: "POST" }
+  ));
+};
+
+const clipOverlayLabel = (clip) => {
+  const subtitles = {
+    off: t("noSubtitles"),
+    zh: t("chineseSubtitles"),
+    en: t("englishSubtitles"),
+    bilingual: t("bilingualSubtitles")
+  }[clip.subtitle_mode] || clip.subtitle_mode;
+  const overlay = clip.include_danmaku
+    ? `${subtitles} · ${t("danmaku")}`
+    : subtitles;
+  const layout = clip.output_layout === "landscape"
+    ? t("clipLandscapeLayout")
+    : t("clipPortraitLayout");
+  return `${layout} · ${overlay}${clip.ai_cover_generation_id
+    ? ` · ${t("aiCoverTitle")}`
+    : ""}`;
+};
+
+const clipStyleLabel = (clip) => {
+  if (clip.output_layout === "landscape") {
+    const font = {
+      wenkai: t("subtitleFontWenkai"),
+      serif: t("subtitleFontSerif"),
+      sans: t("subtitleFontSans")
+    }[clip.subtitle_font_family] || t("subtitleFontSans");
+    const theme = {
+      cream: t("landscapeThemeCream"),
+      denim: t("landscapeThemeDenim"),
+      mint: t("landscapeThemeMint"),
+      sakura: t("landscapeThemeSakura"),
+      matcha: t("landscapeThemeMatcha"),
+      ink: t("landscapeThemeInk")
+    }[clip.landscape_theme] || t("landscapeThemeCream");
+    return `${font} · ${theme} · ${Number(clip.subtitle_font_scale) || CLIP_DEFAULT_FONT_SCALE}%`;
+  }
+  return `${t("portraitPlainSubtitle")} · ${Number(clip.subtitle_font_scale) || CLIP_DEFAULT_FONT_SCALE}%`;
+};
+
+const clipServerMessage = (message) => (
+  message ? (i18n?.translateServerMessage(message) || message) : ""
+);
+
+const retryClipExport = async (clipID, button) => {
+  if (!jobHero) return;
+  button.disabled = true;
+  try {
+    const response = await apiFetch(
+      `/api/jobs/${encodeURIComponent(jobHero.dataset.jobId)}/clip-exports/${encodeURIComponent(clipID)}/retry`,
+      { method: "POST" }
+    );
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(apiErrorMessage(payload, "retryClipFailed"));
+    }
+    await loadClipExports();
+  } catch (requestError) {
+    window.alert(requestError instanceof Error ? requestError.message : t("retryClipFailed"));
+  } finally {
+    button.disabled = false;
+  }
+};
+
+const renderClipExports = () => {
+  for (const row of clipRows) {
+    const status = row.querySelector(".clip-status");
+    const button = row.querySelector(".clip-button");
+    if (button) {
+      button.disabled = false;
+      button.textContent = t("clipVideo");
+    }
+    if (!status) continue;
+    const rowClips = clipExports.filter(
+      (clip) => String(clip.timeline_index) === String(row.dataset.clipIndex)
+    );
+    status.replaceChildren();
+    status.hidden = rowClips.length === 0;
+    if (!rowClips.length) continue;
+    const list = document.createElement("div");
+    list.className = "clip-export-list";
+    for (const clip of rowClips) {
+      const item = document.createElement("article");
+      item.className = "clip-export-item";
+      const copy = document.createElement("div");
+      copy.className = "clip-export-copy";
+      const title = document.createElement("strong");
+      const keptRangeCount = Math.max(
+        1,
+        Array.isArray(clip.kept_ranges) ? clip.kept_ranges.length : 1
+      );
+      title.textContent = (
+        `${formatFineClock(clip.start_ms)}–${formatFineClock(clip.end_ms)}`
+        + ` · ${t("clipExportDurationSummary", {
+          duration: formatFineClock(Number(clip.duration_ms) || 0),
+          count: keptRangeCount
+        })}`
+        + ` · ${clipOverlayLabel(clip)}`
+      );
+      if (clip.subtitle_mode !== "off") {
+        const landscape = clip.output_layout === "landscape";
+        const themeInput = clipLandscapeThemeRadios.find(
+          (input) => input.value === (
+            clip.landscape_theme || CLIP_DEFAULT_LANDSCAPE_THEME
+          )
+        );
+        const textColor = (
+          landscape
+            ? themeInput?.dataset.themeSubtitle
+            : CLIP_PORTRAIT_TEXT_COLOR
+        ) || CLIP_PORTRAIT_TEXT_COLOR;
+        const backgroundColor = (
+          landscape
+            ? themeInput?.dataset.themeBackground
+            : CLIP_PORTRAIT_OUTLINE_COLOR
+        ) || CLIP_PORTRAIT_OUTLINE_COLOR;
+        const swatch = document.createElement("span");
+        swatch.className = "clip-export-style-swatch";
+        swatch.style.setProperty(
+          "--clip-export-text-color",
+          textColor
+        );
+        swatch.style.setProperty(
+          "--clip-export-background-color",
+          backgroundColor
+        );
+        swatch.setAttribute("aria-hidden", "true");
+        title.append(" · ", swatch, clipStyleLabel(clip));
+      }
+      const detail = document.createElement("small");
+      detail.textContent = clip.error || clip.warning
+        ? clipServerMessage(clip.error || clip.warning)
+        : t(`clipStatus_${clip.status}`);
+      detail.className = `clip-export-${clip.status}`;
+      copy.append(title, detail);
+      const actions = document.createElement("div");
+      actions.className = "clip-export-actions";
+      if (clip.status === "completed" && clip.download_url) {
+        const link = document.createElement("a");
+        link.href = clip.download_url;
+        link.textContent = t("downloadMp4");
+        actions.append(link);
+      }
+      if (clip.status === "failed" && clipEditor) {
+        const retry = document.createElement("button");
+        retry.type = "button";
+        retry.textContent = t("retryClip");
+        retry.addEventListener("click", () => void retryClipExport(clip.id, retry));
+        actions.append(retry);
+      }
+      item.append(copy, actions);
+      list.append(item);
+    }
+    status.append(list);
+  }
+};
+
+async function loadClipExports() {
+  if (!jobHero || !clipRows.length) return;
+  window.clearTimeout(clipPollTimer);
+  try {
+    const response = await apiFetch(
+      `/api/jobs/${encodeURIComponent(jobHero.dataset.jobId)}/clip-exports`
+    );
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(apiErrorMessage(payload, "readClipFailed"));
+    }
+    clipExports = payload.clips || [];
+    renderClipExports();
+    if (clipExports.some((clip) => clip.status === "running")) {
+      clipPollTimer = window.setTimeout(() => void loadClipExports(), 2000);
+    }
+  } catch (requestError) {
+    if (!clipExports.length) {
+      for (const row of clipRows) {
+        const status = row.querySelector(".clip-status");
+        if (!status) continue;
+        status.hidden = false;
+        status.textContent = requestError instanceof Error
+          ? requestError.message
+          : t("readClipFailed");
+      }
+    }
+    clipPollTimer = window.setTimeout(() => void loadClipExports(), 5000);
+  }
+}
+
+const clipValidationMessage = () => {
+  if (!clipEditorState) return "";
+  const keptRanges = clipKeptRanges();
+  if (!keptRanges.length) {
+    return t("clipNoKeptSegments");
+  }
+  if (
+    keptRanges[0].start_ms < clipEditorState.minMs
+    || keptRanges[keptRanges.length - 1].end_ms > clipEditorState.maxMs
+  ) {
+    return t("clipOutsideWindow");
+  }
+  if (keptRanges.some((clipRange) => (
+    clipRange.end_ms <= clipRange.start_ms
+  ))) {
+    return t("clipInvalidRange");
+  }
+  if (keptRanges.length > CLIP_MAX_KEPT_RANGES) {
+    return t("clipTooManyKeptSegments", {
+      count: CLIP_MAX_KEPT_RANGES
+    });
+  }
+  if (clipKeptDurationMs() > clipEditorState.maxDurationMs) {
+    return t("clipDurationTooLong", {
+      minutes: Math.round(clipEditorState.maxDurationMs / 60000)
+    });
+  }
+  if (
+    ["en", "bilingual"].includes(clipSubtitleMode?.value)
+    && playbackTrack?.translation?.status !== "completed"
+  ) {
+    return t("clipEnglishUnavailable");
+  }
+  return "";
+};
+
+const updateClipEnglishOptions = () => {
+  const englishReady = playbackTrack?.translation?.status === "completed";
+  for (const value of ["en", "bilingual"]) {
+    const option = clipSubtitleMode?.querySelector(`option[value="${value}"]`);
+    if (option) option.disabled = !englishReady;
+  }
+};
+
+const clipPercent = (milliseconds) => {
+  if (!clipEditorState) return 0;
+  const span = Math.max(1, clipEditorState.maxMs - clipEditorState.minMs);
+  return Math.max(
+    0,
+    Math.min(100, ((milliseconds - clipEditorState.minMs) / span) * 100)
+  );
+};
+
+const updateClipHandle = (boundary, handle, output) => {
+  if (!clipEditorState || !handle) return;
+  const value = boundary === "start"
+    ? clipEditorState.startMs
+    : clipEditorState.endMs;
+  const source = clipEditorState[`${boundary}Source`];
+  const minimum = boundary === "start"
+    ? clipEditorState.minMs
+    : clipEditorState.startMs + 100;
+  const maximum = boundary === "start"
+    ? clipEditorState.endMs - 100
+    : clipEditorState.maxMs;
+  handle.setAttribute("aria-valuemin", String(minimum));
+  handle.setAttribute("aria-valuemax", String(maximum));
+  handle.setAttribute("aria-valuenow", String(value));
+  handle.setAttribute("aria-valuetext", formatFineClock(value));
+  handle.classList.toggle("is-snapped", source !== "manual");
+  handle.classList.toggle("is-marker-snapped", source === "marker");
+  if (output) output.textContent = formatFineClock(value);
+};
+
+const updateClipRangeUI = ({ renderPreview = false } = {}) => {
+  if (!clipEditorState) return;
+  const {
+    minMs, maxMs, startMs, endMs, aiStartMs, aiEndMs
+  } = clipEditorState;
+  if (clipRangeControl) {
+    clipRangeControl.style.setProperty(
+      "--clip-start-position",
+      `${clipPercent(startMs)}%`
+    );
+    clipRangeControl.style.setProperty(
+      "--clip-end-position",
+      `${clipPercent(endMs)}%`
+    );
+    clipRangeControl.style.setProperty(
+      "--clip-ai-start-position",
+      `${clipPercent(aiStartMs)}%`
+    );
+    clipRangeControl.style.setProperty(
+      "--clip-ai-end-position",
+      `${clipPercent(aiEndMs)}%`
+    );
+    clipRangeControl.classList.toggle("is-dragging", Boolean(clipDragState));
+  }
+  if (clipDragState && clipRangeControl) {
+    clipRangeControl.style.setProperty(
+      "--clip-raw-position",
+      `${clipPercent(clipDragState.rawMs)}%`
+    );
+    if (clipDragState.candidate) {
+      clipRangeControl.style.setProperty(
+        "--clip-snap-position",
+        `${clipPercent(clipDragState.candidate.anchorMs)}%`
+      );
+    }
+  }
+  if (clipRawMarker) clipRawMarker.hidden = !clipDragState;
+  if (clipSnapMarker) {
+    clipSnapMarker.hidden = (
+      !clipDragState?.candidate
+      || clipDragState.candidate.kind === "marker"
+    );
+  }
+  if (Number.isFinite(clipEditorState.markerMs)) {
+    renderClipTimelineMarkedMarker(clipEditorState.markerMs);
+  } else if (clipMarkedMarker) {
+    clipMarkedMarker.hidden = true;
+  }
+  clipStartHandle?.classList.toggle(
+    "is-active",
+    clipDragState?.boundary === "start"
+  );
+  clipEndHandle?.classList.toggle(
+    "is-active",
+    clipDragState?.boundary === "end"
+  );
+  updateClipHandle("start", clipStartHandle, clipStartHandleTime);
+  updateClipHandle("end", clipEndHandle, clipEndHandleTime);
+  if (clipWindowStart) clipWindowStart.textContent = formatFineClock(minMs);
+  if (clipWindowEnd) clipWindowEnd.textContent = formatFineClock(maxMs);
+  if (clipSelectedDuration) {
+    clipSelectedDuration.textContent = t("clipKeptDuration", {
+      duration: formatFineClock(clipKeptDurationMs()),
+      count: clipKeptRanges().length
+    });
+  }
+  renderClipSegments();
+  const error = clipValidationMessage();
+  if (clipEditorError) {
+    clipEditorError.textContent = error || clipEditorState.notice || "";
+  }
+  if (clipEditorSubmit) {
+    clipEditorSubmit.disabled = Boolean(
+      !clipCanSubmit
+      || error
+      || clipEditorState.submitting
+    );
+  }
+  if (clipZoomOut) {
+    clipZoomOut.disabled = clipEditorState.zoom <= CLIP_MIN_ZOOM;
+  }
+  if (clipZoomIn) {
+    clipZoomIn.disabled = clipEditorState.zoom >= CLIP_MAX_ZOOM;
+  }
+  renderAICoverState();
+  if (renderPreview) renderClipPreview();
+};
+
+const setClipBoundary = (
+  boundary,
+  value,
+  source = "manual",
+  {
+    resetRequest = true,
+    invalidateSuggestion = source === "manual",
+    clearNotice = source === "manual",
+    renderPreview = false
+  } = {}
+) => {
+  if (!clipEditorState || !Number.isFinite(Number(value))) return null;
+  const previousStartMs = clipEditorState.startMs;
+  const previousEndMs = clipEditorState.endMs;
+  const rounded = Math.round(Number(value) / 100) * 100;
+  let clamped = Math.max(
+    clipEditorState.minMs,
+    Math.min(rounded, clipEditorState.maxMs)
+  );
+  if (boundary === "start") {
+    clamped = Math.min(clamped, clipEditorState.endMs - 100);
+    clipEditorState.startMs = clamped;
+    clipEditorState.startSource = source;
+  } else {
+    clamped = Math.max(clamped, clipEditorState.startMs + 100);
+    clipEditorState.endMs = clamped;
+    clipEditorState.endSource = source;
+  }
+  if (invalidateSuggestion) clipSuggestionTokens[boundary] += 1;
+  if (resetRequest) clipEditorState.requestId = null;
+  if (clearNotice) clipEditorState.notice = "";
+  if (
+    previousStartMs !== clipEditorState.startMs
+    || previousEndMs !== clipEditorState.endMs
+  ) {
+    syncClipSegmentsToBounds();
+  }
+  updateClipRangeUI({ renderPreview });
+  return clamped;
+};
+
+const clipBoundaryLimits = (boundary) => {
+  if (!clipEditorState) return { minimum: 0, maximum: 0 };
+  return boundary === "start"
+    ? {
+      minimum: clipEditorState.minMs,
+      maximum: clipEditorState.endMs - 100
+    }
+    : {
+      minimum: clipEditorState.startMs + 100,
+      maximum: clipEditorState.maxMs
+    };
+};
+
+const clipSentenceAnchor = (boundary, subtitle) => (
+  boundary === "start" ? subtitle.start_ms : subtitle.end_ms
+);
+
+const nearestClipSentence = (
+  boundary,
+  targetMs,
+  thresholdMs = clipEditorState?.snapThresholdMs
+) => {
+  const subtitles = playbackTrack?.subtitles || [];
+  if (!subtitles.length || !clipEditorState) return null;
+  const field = boundary === "start" ? "start_ms" : "end_ms";
+  const insertion = lowerBoundByTime(subtitles, targetMs, field);
+  const { minimum, maximum } = clipBoundaryLimits(boundary);
+  const candidates = [subtitles[insertion - 1], subtitles[insertion]]
+    .filter((subtitle) => {
+      const anchorMs = subtitle ? Number(subtitle[field]) : Number.NaN;
+      return Number.isFinite(anchorMs)
+        && anchorMs >= minimum
+        && anchorMs <= maximum;
+    })
+    .sort((left, right) => (
+      Math.abs(left[field] - targetMs) - Math.abs(right[field] - targetMs)
+      || left.sequence - right.sequence
+    ));
+  const nearest = candidates[0];
+  return nearest
+    && Math.abs(nearest[field] - targetMs) <= Number(thresholdMs)
+    ? nearest
+    : null;
+};
+
+const nearestClipMarker = (boundary, targetMs, thresholdMs) => {
+  if (!clipEditorState || !Number.isFinite(clipEditorState.markerMs)) {
+    return null;
+  }
+  const { minimum, maximum } = clipBoundaryLimits(boundary);
+  const anchorMs = clipEditorState.markerMs;
+  return (
+    anchorMs >= minimum
+    && anchorMs <= maximum
+    && Math.abs(anchorMs - targetMs) <= Number(thresholdMs)
+  )
+    ? { kind: "marker", anchorMs }
+    : null;
+};
+
+const nearestClipSnapCandidate = (boundary, targetMs, thresholdMs) => {
+  const marker = nearestClipMarker(boundary, targetMs, thresholdMs);
+  if (marker) return marker;
+  const subtitle = nearestClipSentence(boundary, targetMs, thresholdMs);
+  return subtitle
+    ? {
+      kind: "sentence",
+      subtitle,
+      anchorMs: clipSentenceAnchor(boundary, subtitle)
+    }
+    : null;
+};
+
+const seekClipPreview = (milliseconds) => {
+  if (!clipPreviewPlayer || !clipEditorState) return;
+  const targetMs = Math.max(
+    clipEditorState.minMs,
+    Math.min(milliseconds, clipEditorState.maxMs)
+  );
+  clipPreviewPlayer.pause();
+  if (clipPreviewPlayer.readyState >= 1) {
+    clipPreviewPlayer.currentTime = targetMs / 1000;
+    renderClipPreview();
+  } else {
+    clipPendingSeekMs = targetMs;
+  }
+  if (clipRangeControl) {
+    clipRangeControl.style.setProperty(
+      "--clip-preview-position",
+      `${clipPercent(targetMs)}%`
+    );
+  }
+  if (clipPreviewPlayhead) clipPreviewPlayhead.hidden = false;
+};
+
+const showClipRefinement = () => {
+  if (!clipEditorState || !clipRangeControl) return;
+  window.clearTimeout(clipEditorState.refineTimer);
+  clipRangeControl.classList.add("is-refining");
+  clipEditorState.refineTimer = window.setTimeout(() => {
+    clipRangeControl.classList.remove("is-refining");
+  }, 220);
+};
+
+const refineClipBoundary = async (boundary, anchorMs) => {
+  if (!clipEditorState || !clipSnapEnabled?.checked || !jobHero) return;
+  const state = clipEditorState;
+  state[`${boundary}Source`] = "checking";
+  updateClipRangeUI();
+  const token = ++clipSuggestionTokens[boundary];
+  try {
+    const response = await apiFetch(
+      `/api/jobs/${encodeURIComponent(jobHero.dataset.jobId)}/clip-boundaries/suggest`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          timeline_index: state.timelineIndex,
+          boundary,
+          target_ms: anchorMs
+        })
+      }
+    );
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(apiErrorMessage(payload, "clipSnapFailed"));
+    }
+    if (
+      clipEditorState !== state
+      || token !== clipSuggestionTokens[boundary]
+      || !clipSnapEnabled?.checked
+    ) return;
+    showClipRefinement();
+    setClipBoundary(boundary, payload.suggested_ms, payload.source, {
+      invalidateSuggestion: false,
+      clearNotice: false
+    });
+  } catch (requestError) {
+    if (
+      clipEditorState !== state
+      || token !== clipSuggestionTokens[boundary]
+    ) return;
+    setClipBoundary(boundary, anchorMs, "sentence", {
+      invalidateSuggestion: false,
+      clearNotice: false
+    });
+    state.notice = requestError instanceof Error
+      ? requestError.message
+      : t("clipSnapFailed");
+    updateClipRangeUI();
+  }
+};
+
+const renderClipTimelineCues = () => {
+  if (!clipTimelineCues || !clipEditorState) return;
+  const fragment = document.createDocumentFragment();
+  for (const subtitle of playbackTrack?.subtitles || []) {
+    if (
+      subtitle.end_ms <= clipEditorState.minMs
+      || subtitle.start_ms >= clipEditorState.maxMs
+    ) continue;
+    const startMs = Math.max(subtitle.start_ms, clipEditorState.minMs);
+    const endMs = Math.min(subtitle.end_ms, clipEditorState.maxMs);
+    const cue = document.createElement("span");
+    cue.className = "clip-transcript-cue";
+    cue.style.left = `${clipPercent(startMs)}%`;
+    cue.style.width = `${Math.max(.08, clipPercent(endMs) - clipPercent(startMs))}%`;
+    cue.textContent = subtitle.zh || subtitle.en || "";
+    cue.title = `${formatFineClock(subtitle.start_ms)} ${cue.textContent}`;
+    fragment.append(cue);
+  }
+  clipTimelineCues.replaceChildren(fragment);
+};
+
+const scrollClipTimelineTo = (milliseconds) => {
+  if (!clipTimelineViewport || !clipRangeControl || !clipEditorState) return;
+  const viewportRect = clipTimelineViewport.getBoundingClientRect();
+  const controlRect = clipRangeControl.getBoundingClientRect();
+  const controlOffset = controlRect.left
+    - viewportRect.left
+    + clipTimelineViewport.scrollLeft;
+  const canvasX = controlOffset
+    + (clipPercent(milliseconds) / 100) * controlRect.width;
+  clipTimelineViewport.scrollLeft = Math.max(
+    0,
+    canvasX - clipTimelineViewport.clientWidth / 2
+  );
+};
+
+const setClipTimelineZoom = (value, anchorMs = null) => {
+  if (!clipEditorState || !clipRangeControl) return;
+  const zoom = Math.max(
+    CLIP_MIN_ZOOM,
+    Math.min(CLIP_MAX_ZOOM, Number(value) || CLIP_MIN_ZOOM)
+  );
+  clipEditorState.zoom = Math.round(zoom * 100) / 100;
+  clipRangeControl.style.width = `${clipEditorState.zoom * 100}%`;
+  if (clipZoomLevel) {
+    clipZoomLevel.textContent = `${clipEditorState.zoom >= 10
+      ? Math.round(clipEditorState.zoom)
+      : clipEditorState.zoom.toFixed(1)}×`;
+  }
+  updateClipRangeUI();
+  const anchor = anchorMs ?? (
+    clipEditorState.startMs + clipEditorState.endMs
+  ) / 2;
+  scrollClipTimelineTo(anchor);
+};
+
+const fitClipTimeline = () => {
+  if (!clipEditorState) return;
+  const span = Math.max(1, clipEditorState.maxMs - clipEditorState.minMs);
+  const selected = Math.max(
+    100,
+    clipEditorState.endMs - clipEditorState.startMs
+  );
+  setClipTimelineZoom(
+    Math.max(CLIP_MIN_ZOOM, Math.min(CLIP_MAX_ZOOM, .68 * span / selected))
+  );
+};
+
+const clipTimeFromClientX = (clientX) => {
+  if (!clipEditorState || !clipRangeControl) return 0;
+  const rect = clipRangeControl.getBoundingClientRect();
+  const fraction = rect.width > 0
+    ? Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+    : 0;
+  return clipEditorState.minMs
+    + fraction * (clipEditorState.maxMs - clipEditorState.minMs);
+};
+
+const renderClipTimelineLine = (milliseconds, marker, positionProperty) => {
+  if (
+    !clipEditorState
+    || !Number.isFinite(Number(milliseconds))
+    || !marker
+  ) return;
+  const boundedMs = Math.max(
+    clipEditorState.minMs,
+    Math.min(Number(milliseconds), clipEditorState.maxMs)
+  );
+  clipRangeControl?.style.setProperty(
+    positionProperty,
+    `${clipPercent(boundedMs)}%`
+  );
+  marker.hidden = false;
+};
+
+const renderClipTimelineHoverMarker = (milliseconds) => {
+  renderClipTimelineLine(
+    milliseconds,
+    clipHoverMarker,
+    "--clip-hover-position"
+  );
+};
+
+const renderClipTimelineMarkedMarker = (milliseconds) => {
+  renderClipTimelineLine(
+    milliseconds,
+    clipMarkedMarker,
+    "--clip-marked-position"
+  );
+};
+
+const resetClipLyricHover = () => {
+  if (clipLyricHoverFrame !== null) {
+    window.cancelAnimationFrame(clipLyricHoverFrame);
+  }
+  clipLyricHoverFrame = null;
+  clipLyricHovering = false;
+  const markedMs = Number.isFinite(clipEditorState?.markerMs)
+    ? clipEditorState.markerMs
+    : null;
+  clipLyricHoverMs = markedMs;
+  if (clipHoverMarker) clipHoverMarker.hidden = true;
+  if (markedMs !== null) {
+    renderClipTimelineMarkedMarker(markedMs);
+  } else if (clipMarkedMarker) {
+    clipMarkedMarker.hidden = true;
+  }
+  const currentMs = (
+    markedMs
+    ?? (
+      clipPreviewPlayer?.readyState >= 1
+    && Number.isFinite(clipPreviewPlayer.currentTime)
+      ? clipPreviewPlayer.currentTime * 1000
+      : clipEditorState?.startMs
+    )
+  );
+  if (Number.isFinite(currentMs)) {
+    renderClipLyricPreview(currentMs, { hovering: false });
+  }
+};
+
+const renderClipLyricHoverFrame = () => {
+  clipLyricHoverFrame = null;
+  if (!clipEditorState || clipDragState) return;
+  const milliseconds = clipTimeFromClientX(clipLyricHoverClientX);
+  clipLyricHoverMs = milliseconds;
+  clipLyricHovering = true;
+  renderClipTimelineHoverMarker(milliseconds);
+  renderClipLyricPreview(milliseconds, { hovering: true });
+};
+
+const queueClipLyricHover = (clientX) => {
+  if (!clipEditorState || clipDragState) return;
+  clipLyricHoverClientX = clientX;
+  if (clipLyricHoverFrame === null) {
+    clipLyricHoverFrame = window.requestAnimationFrame(
+      renderClipLyricHoverFrame
+    );
+  }
+};
+
+const pinClipTimelineMarker = (clientX) => {
+  if (!clipEditorState || clipDragState) return;
+  const milliseconds = Math.round(clipTimeFromClientX(clientX) / 100) * 100;
+  clipEditorState.markerMs = Math.max(
+    clipEditorState.minMs,
+    Math.min(milliseconds, clipEditorState.maxMs)
+  );
+  const markedSegment = clipSegmentAt(clipEditorState.markerMs);
+  if (markedSegment) {
+    clipEditorState.selectedSegmentId = markedSegment.id;
+  }
+  for (const boundary of ["start", "end"]) {
+    const value = clipEditorState[`${boundary}Ms`];
+    if (
+      clipEditorState[`${boundary}Source`] === "marker"
+      && value !== clipEditorState.markerMs
+    ) {
+      clipEditorState[`${boundary}Source`] = "manual";
+    }
+  }
+  clipLyricHoverMs = clipEditorState.markerMs;
+  clipLyricHovering = true;
+  renderClipTimelineHoverMarker(clipEditorState.markerMs);
+  renderClipTimelineMarkedMarker(clipEditorState.markerMs);
+  renderClipLyricPreview(clipEditorState.markerMs, { hovering: true });
+  updateClipRangeUI();
+  seekClipPreview(clipEditorState.markerMs);
+};
+
+const splitClipAtMarkedTime = () => {
+  if (!clipEditorState) return;
+  const candidate = clipSplitCandidate();
+  if (!candidate) {
+    clipEditorState.notice = t("clipSplitUnavailable");
+    updateClipRangeUI();
+    return;
+  }
+  const index = clipEditorState.segments.findIndex(
+    (segment) => segment.id === candidate.segment.id
+  );
+  if (index < 0) return;
+  const left = {
+    ...candidate.segment,
+    endMs: candidate.markerMs
+  };
+  const right = createClipSegment(
+    candidate.markerMs,
+    candidate.segment.endMs,
+    candidate.segment.kept,
+    true
+  );
+  clipEditorState.segments.splice(index, 1, left, right);
+  clipEditorState.selectedSegmentId = right.id;
+  clipEditorState.requestId = null;
+  clipEditorState.notice = t("clipSplitComplete", {
+    time: formatFineClock(candidate.markerMs)
+  });
+  updateClipRangeUI({ renderPreview: true });
+};
+
+const toggleSelectedClipSegment = () => {
+  if (!clipEditorState) return;
+  const segment = selectedClipSegment();
+  if (!segment) {
+    clipEditorState.notice = t("clipSelectSegmentFirst");
+    updateClipRangeUI();
+    return;
+  }
+  if (
+    segment.kept
+    && clipEditorState.segments.filter((item) => item.kept).length === 1
+  ) {
+    clipEditorState.notice = t("clipMustKeepOneSegment");
+    updateClipRangeUI();
+    return;
+  }
+  segment.kept = !segment.kept;
+  clipEditorState.requestId = null;
+  clipEditorState.notice = t(
+    segment.kept ? "clipSegmentRestoredNotice" : "clipSegmentDeletedNotice"
+  );
+  const currentMs = (
+    clipPreviewPlayer?.readyState >= 1
+    && Number.isFinite(clipPreviewPlayer.currentTime)
+  )
+    ? clipPreviewPlayer.currentTime * 1000
+    : null;
+  if (
+    !segment.kept
+    && currentMs !== null
+    && currentMs >= segment.startMs
+    && currentMs < segment.endMs
+  ) {
+    const nextFrameMs = nearestClipKeptFrameMs(currentMs);
+    if (Number.isFinite(nextFrameMs)) seekClipPreview(nextFrameMs);
+  }
+  updateClipRangeUI({ renderPreview: true });
+};
+
+const clipSnapThresholdForPixels = (
+  pixels,
+  maximumMs = clipEditorState?.snapThresholdMs
+) => {
+  if (!clipEditorState || !clipRangeControl) return 0;
+  const width = Math.max(1, clipRangeControl.getBoundingClientRect().width);
+  const pixelThreshold = (
+    pixels / width
+  ) * (clipEditorState.maxMs - clipEditorState.minMs);
+  return Math.min(Number(maximumMs), pixelThreshold);
+};
+
+const updateClipDragAt = (clientX) => {
+  if (!clipDragState || !clipEditorState) return;
+  const { boundary } = clipDragState;
+  const { minimum, maximum } = clipBoundaryLimits(boundary);
+  const rawMs = Math.max(
+    minimum,
+    Math.min(clipTimeFromClientX(clientX), maximum)
+  );
+  clipDragState.rawMs = rawMs;
+  clipDragState.candidate = null;
+  let valueMs = rawMs;
+  let source = "manual";
+  if (clipSnapEnabled?.checked) {
+    const releaseMs = clipSnapThresholdForPixels(
+      CLIP_SNAP_RELEASE_PX,
+      clipEditorState.snapThresholdMs * 2
+    );
+    const entering = nearestClipSnapCandidate(
+      boundary,
+      rawMs,
+      clipSnapThresholdForPixels(CLIP_SNAP_ENTER_PX)
+    );
+    if (clipDragState.locked && entering) {
+      const switchMarginMs = clipSnapThresholdForPixels(
+        3,
+        Number.POSITIVE_INFINITY
+      );
+      const shouldPreferMarker = (
+        entering.kind === "marker"
+        && clipDragState.locked.kind !== "marker"
+      );
+      const shouldSwitchNearby = (
+        clipDragState.locked.kind !== "marker"
+        && entering.anchorMs !== clipDragState.locked.anchorMs
+        && Math.abs(entering.anchorMs - rawMs) + switchMarginMs
+          < Math.abs(clipDragState.locked.anchorMs - rawMs)
+      );
+      if (shouldPreferMarker || shouldSwitchNearby) {
+        clipDragState.locked = entering;
+      }
+    }
+    if (
+      clipDragState.locked
+      && Math.abs(clipDragState.locked.anchorMs - rawMs) > releaseMs
+    ) {
+      clipDragState.locked = null;
+    }
+    const nearby = nearestClipSnapCandidate(boundary, rawMs, releaseMs);
+    if (!clipDragState.locked && entering) {
+      clipDragState.locked = entering;
+    }
+    clipDragState.candidate = clipDragState.locked || nearby;
+    if (clipDragState.locked) {
+      valueMs = clipDragState.locked.anchorMs;
+      source = clipDragState.locked.kind === "marker"
+        ? "marker"
+        : "sentence";
+    }
+  } else {
+    clipDragState.locked = null;
+  }
+  setClipBoundary(boundary, valueMs, source, {
+    invalidateSuggestion: false,
+    clearNotice: false
+  });
+};
+
+const clipAutoScrollVelocity = (clientX) => {
+  if (!clipTimelineViewport) return 0;
+  const rect = clipTimelineViewport.getBoundingClientRect();
+  if (clientX < rect.left + CLIP_AUTO_SCROLL_EDGE_PX) {
+    const pressure = Math.min(
+      1,
+      (rect.left + CLIP_AUTO_SCROLL_EDGE_PX - clientX)
+      / CLIP_AUTO_SCROLL_EDGE_PX
+    );
+    return -Math.max(2, pressure * CLIP_AUTO_SCROLL_MAX_PX);
+  }
+  if (clientX > rect.right - CLIP_AUTO_SCROLL_EDGE_PX) {
+    const pressure = Math.min(
+      1,
+      (clientX - rect.right + CLIP_AUTO_SCROLL_EDGE_PX)
+      / CLIP_AUTO_SCROLL_EDGE_PX
+    );
+    return Math.max(2, pressure * CLIP_AUTO_SCROLL_MAX_PX);
+  }
+  return 0;
+};
+
+const runClipDragFrame = () => {
+  if (!clipDragState || !clipTimelineViewport) return;
+  clipDragState.frame = null;
+  if (!clipDragState.moved) return;
+  const velocity = clipAutoScrollVelocity(clipDragState.clientX);
+  const maximumScroll = Math.max(
+    0,
+    clipTimelineViewport.scrollWidth - clipTimelineViewport.clientWidth
+  );
+  const previousScroll = clipTimelineViewport.scrollLeft;
+  if (velocity) {
+    clipTimelineViewport.scrollLeft = Math.max(
+      0,
+      Math.min(maximumScroll, previousScroll + velocity)
+    );
+  }
+  updateClipDragAt(clipDragState.clientX);
+  if (velocity && clipTimelineViewport.scrollLeft !== previousScroll) {
+    clipDragState.frame = window.requestAnimationFrame(runClipDragFrame);
+  }
+};
+
+const queueClipDragFrame = () => {
+  if (!clipDragState || clipDragState.frame !== null) return;
+  clipDragState.frame = window.requestAnimationFrame(runClipDragFrame);
+};
+
+const startClipDrag = (boundary, event) => {
+  if (
+    !clipEditorState
+    || clipEditorState.submitting
+    || event.button !== 0
+  ) return;
+  event.preventDefault();
+  clipSuggestionTokens[boundary] += 1;
+  clipEditorState.notice = "";
+  resetClipLyricHover();
+  clipPreviewPlayer?.pause();
+  const handle = boundary === "start" ? clipStartHandle : clipEndHandle;
+  clipDragState = {
+    boundary,
+    pointerId: event.pointerId,
+    startClientX: event.clientX,
+    clientX: event.clientX,
+    rawMs: boundary === "start"
+      ? clipEditorState.startMs
+      : clipEditorState.endMs,
+    moved: false,
+    candidate: null,
+    locked: null,
+    frame: null
+  };
+  handle?.setPointerCapture(event.pointerId);
+  updateClipRangeUI();
+};
+
+const moveClipDrag = (event) => {
+  if (!clipDragState || event.pointerId !== clipDragState.pointerId) return;
+  event.preventDefault();
+  clipDragState.clientX = event.clientX;
+  if (Math.abs(event.clientX - clipDragState.startClientX) >= 2) {
+    clipDragState.moved = true;
+  }
+  queueClipDragFrame();
+};
+
+const finishClipDrag = (event, canceled = false) => {
+  if (!clipDragState || event.pointerId !== clipDragState.pointerId) return;
+  event.preventDefault();
+  if (clipDragState.frame !== null) {
+    window.cancelAnimationFrame(clipDragState.frame);
+  }
+  const moved = clipDragState.moved || (
+    !canceled
+    && Math.abs(event.clientX - clipDragState.startClientX) >= 2
+  );
+  if (!moved) {
+    clipDragState = null;
+    updateClipRangeUI();
+    return;
+  }
+  clipDragState.moved = true;
+  if (!canceled) clipDragState.clientX = event.clientX;
+  updateClipDragAt(clipDragState.clientX);
+  const drag = clipDragState;
+  const locked = drag.locked && clipSnapEnabled?.checked
+    ? drag.locked
+    : null;
+  const finalMs = locked ? locked.anchorMs : drag.rawMs;
+  clipDragState = null;
+  const committedMs = setClipBoundary(
+    drag.boundary,
+    finalMs,
+    locked?.kind === "marker"
+      ? "marker"
+      : locked
+      ? "sentence"
+      : "manual",
+    { invalidateSuggestion: false, clearNotice: false }
+  );
+  if (committedMs === null) return;
+  seekClipPreview(committedMs);
+  if (!canceled && locked?.kind === "sentence") {
+    void refineClipBoundary(drag.boundary, locked.anchorMs);
+  }
+};
+
+const clipSubtitleAt = (milliseconds) => {
+  const subtitles = playbackTrack?.subtitles || [];
+  const insertion = lowerBoundByTime(subtitles, milliseconds + 1, "start_ms");
+  const subtitle = subtitles[insertion - 1];
+  return subtitle
+    && milliseconds >= subtitle.start_ms
+    && milliseconds < subtitle.end_ms
+    ? subtitle
+    : null;
+};
+
+const clipSubtitleContextAt = (milliseconds) => {
+  const subtitles = playbackTrack?.subtitles || [];
+  if (!subtitles.length) return null;
+  const insertion = lowerBoundByTime(
+    subtitles,
+    milliseconds + 1,
+    "start_ms"
+  );
+  let index = insertion - 1;
+  const previous = subtitles[index];
+  if (
+    !previous
+    || milliseconds < previous.start_ms
+    || milliseconds >= previous.end_ms
+  ) {
+    const nextIndex = Math.min(insertion, subtitles.length - 1);
+    const beforeIndex = Math.max(0, insertion - 1);
+    const beforeDistance = subtitles[beforeIndex]
+      ? Math.abs(milliseconds - subtitles[beforeIndex].end_ms)
+      : Number.POSITIVE_INFINITY;
+    const nextDistance = subtitles[nextIndex]
+      ? Math.abs(subtitles[nextIndex].start_ms - milliseconds)
+      : Number.POSITIVE_INFINITY;
+    index = nextDistance < beforeDistance ? nextIndex : beforeIndex;
+  }
+  return {
+    index,
+    previousTwo: subtitles[index - 2] || null,
+    previous: subtitles[index - 1] || null,
+    current: subtitles[index] || null,
+    next: subtitles[index + 1] || null,
+    nextTwo: subtitles[index + 2] || null
+  };
+};
+
+const clipLyricText = (subtitle) => {
+  if (!subtitle) return "";
+  const mode = clipSubtitleMode?.value || "zh";
+  if (mode === "en") return subtitle.en || "";
+  if (mode === "bilingual") {
+    return [subtitle.zh, subtitle.en].filter(Boolean).join("\n");
+  }
+  return subtitle.zh || subtitle.en || "";
+};
+
+const renderClipLyricPreview = (
+  milliseconds,
+  { hovering = clipLyricHovering } = {}
+) => {
+  if (
+    !clipLyricPreview
+    || !clipLyricPreviousTwo
+    || !clipLyricPrevious
+    || !clipLyricCurrent
+    || !clipLyricNext
+    || !clipLyricNextTwo
+  ) return;
+  if (clipLyricTime) {
+    clipLyricTime.textContent = formatFineClock(milliseconds);
+  }
+  clipLyricPreview.classList.toggle("is-hovering", hovering);
+  const mode = clipSubtitleMode?.value || "zh";
+  const context = mode === "off"
+    ? null
+    : clipSubtitleContextAt(milliseconds);
+  let sequence = mode;
+  let previousTwoText = "";
+  let previousText = "";
+  let currentText = mode === "off"
+    ? t("timelineLyricDisabled")
+    : t("timelineLyricUnavailable");
+  let nextText = "";
+  let nextTwoText = "";
+  if (context?.current) {
+    sequence = `${mode}:${context.current.sequence}`;
+    previousTwoText = clipLyricText(context.previousTwo);
+    previousText = clipLyricText(context.previous);
+    currentText = clipLyricText(context.current)
+      || t("timelineLyricUnavailable");
+    nextText = clipLyricText(context.next);
+    nextTwoText = clipLyricText(context.nextTwo);
+  }
+  if (
+    clipLyricStack
+    && clipLyricStack.dataset.sequence !== sequence
+  ) {
+    clipLyricStack.dataset.sequence = sequence;
+    if (
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      && typeof clipLyricStack.animate === "function"
+    ) {
+      clipLyricStack.animate(
+        [
+          { opacity: .42, transform: "translateY(5px)" },
+          { opacity: 1, transform: "translateY(0)" }
+        ],
+        {
+          duration: 170,
+          easing: "cubic-bezier(.22, .8, .36, 1)"
+        }
+      );
+    }
+  }
+  clipLyricPreviousTwo.textContent = previousTwoText;
+  clipLyricPrevious.textContent = previousText;
+  clipLyricCurrent.textContent = currentText;
+  clipLyricNext.textContent = nextText;
+  clipLyricNextTwo.textContent = nextTwoText;
+};
+
+const clipDanmakuStream = () => {
+  if (!clipEditorState) return [];
+  const entries = playbackTrack?.danmaku || [];
+  const keptRanges = clipKeptRanges();
+  const cacheKey = [
+    keptRanges.map(
+      (clipRange) => `${clipRange.start_ms}-${clipRange.end_ms}`
+    ).join(","),
+    entries.length,
+    entries[entries.length - 1]?.timestamp_ms || 0
+  ].join(":");
+  if (clipEditorState.danmakuCacheKey === cacheKey) {
+    return clipEditorState.danmakuStream;
+  }
+  const stream = [];
+  let lastTimestamp = Number.NEGATIVE_INFINITY;
+  for (const clipRange of keptRanges) {
+    const startIndex = lowerBoundByTime(
+      entries,
+      clipRange.start_ms,
+      "timestamp_ms"
+    );
+    const endIndex = lowerBoundByTime(
+      entries,
+      clipRange.end_ms,
+      "timestamp_ms"
+    );
+    for (let index = startIndex; index < endIndex; index += 1) {
+      const entry = entries[index];
+      if (
+        entry.timestamp_ms - lastTimestamp < CLIP_DANMAKU_MIN_GAP_MS
+        || !String(entry.text || "").trim()
+      ) continue;
+      stream.push(entry);
+      lastTimestamp = entry.timestamp_ms;
+    }
+  }
+  clipEditorState.danmakuCacheKey = cacheKey;
+  clipEditorState.danmakuStream = stream;
+  return stream;
+};
+
+const clipDanmakuEntryKey = (entry) => (
+  `${entry.timestamp_ms}:${entry.sequence}`
+);
+
+const createClipDanmakuBubble = (entry) => {
+  const bubble = document.createElement("article");
+  bubble.dataset.danmakuKey = clipDanmakuEntryKey(entry);
+  const author = document.createElement("strong");
+  author.textContent = entry.author || t("anonymous");
+  const text = document.createElement("p");
+  text.textContent = entry.text;
+  bubble.append(author, text);
+  return bubble;
+};
+
+const renderClipDanmakuPreview = (milliseconds) => {
+  if (!clipPreviewDanmaku) return;
+  const enabled = Boolean(clipDanmakuEnabled?.checked);
+  clipPreviewDanmaku.hidden = !enabled;
+  if (!enabled) {
+    clipPreviewDanmaku.replaceChildren();
+    delete clipPreviewDanmaku.dataset.stackKey;
+    return;
+  }
+  const stream = clipDanmakuStream();
+  const endIndex = lowerBoundByTime(
+    stream,
+    milliseconds + 1,
+    "timestamp_ms"
+  );
+  // Both layouts are bounded by the measured column height below, so the
+  // slice only has to cap how many cards are worth measuring.
+  const visible = stream.slice(
+    Math.max(0, endIndex - CLIP_DANMAKU_MAX_STACK),
+    endIndex
+  );
+  const stackKey = visible.map(clipDanmakuEntryKey).join("|");
+  if (clipPreviewDanmaku.dataset.stackKey === stackKey) return;
+
+  const previous = new Map(
+    Array.from(clipPreviewDanmaku.children, (bubble) => [
+      bubble.dataset.danmakuKey,
+      {
+        bubble,
+        top: bubble.getBoundingClientRect().top
+      }
+    ])
+  );
+  const fragment = document.createDocumentFragment();
+  const rendered = [];
+  for (const entry of visible) {
+    const key = clipDanmakuEntryKey(entry);
+    const existing = previous.get(key);
+    const bubble = existing?.bubble || createClipDanmakuBubble(entry);
+    fragment.append(bubble);
+    rendered.push({ bubble, previousTop: existing?.top });
+  }
+  clipPreviewDanmaku.replaceChildren(fragment);
+  // Cards vary in height, so trim the oldest until the column fits rather
+  // than letting `overflow: hidden` slice one in half.
+  // `justify-content: end` overflows past the top edge, where scrollHeight
+  // stops reporting it, so measure the cards themselves.
+  const stackGap = parseFloat(
+    window.getComputedStyle(clipPreviewDanmaku).rowGap
+  ) || 0;
+  const stackBudget = clipPreviewDanmaku.clientHeight;
+  const stackHeight = () => Array.from(
+    clipPreviewDanmaku.children,
+    (bubble) => bubble.offsetHeight
+  ).reduce(
+    (total, value, index) => total + value + (index ? stackGap : 0),
+    0
+  );
+  while (
+    clipPreviewDanmaku.children.length > 1
+    && stackHeight() > stackBudget
+  ) {
+    const dropped = clipPreviewDanmaku.firstElementChild;
+    dropped.remove();
+    const index = rendered.findIndex((item) => item.bubble === dropped);
+    if (index >= 0) rendered.splice(index, 1);
+  }
+  clipPreviewDanmaku.dataset.stackKey = stackKey;
+
+  if (
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    || typeof Element.prototype.animate !== "function"
+  ) return;
+  for (const { bubble, previousTop } of rendered) {
+    if (previousTop === undefined) {
+      bubble.animate(
+        [
+          { opacity: 0, transform: "translateY(10px) scale(.98)" },
+          { opacity: 1, transform: "translateY(0) scale(1)" }
+        ],
+        {
+          duration: CLIP_DANMAKU_RISE_MS,
+          easing: "cubic-bezier(.22, .8, .36, 1)"
+        }
+      );
+      continue;
+    }
+    const offset = previousTop - bubble.getBoundingClientRect().top;
+    if (Math.abs(offset) < .5) continue;
+    bubble.animate(
+      [
+        { transform: `translateY(${offset}px)` },
+        { transform: "translateY(0)" }
+      ],
+      {
+        duration: CLIP_DANMAKU_RISE_MS,
+        easing: "cubic-bezier(.22, .8, .36, 1)"
+      }
+    );
+  }
+};
+
+const renderClipPreview = () => {
+  if (!clipEditorState || !clipPreviewPlayer) return;
+  let milliseconds = (
+    clipPreviewPlayer.readyState >= 1
+    && Number.isFinite(clipPreviewPlayer.currentTime)
+  )
+    ? clipPreviewPlayer.currentTime * 1000
+    : Number.isFinite(clipPendingSeekMs)
+      ? clipPendingSeekMs
+      : clipEditorState.startMs;
+  if (
+    milliseconds < clipEditorState.minMs
+    || milliseconds > clipEditorState.maxMs
+  ) {
+    milliseconds = clipEditorState.startMs;
+  }
+  const deletedFrame = !clipTimeIsKept(
+    milliseconds,
+    { includeFinalEnd: true }
+  );
+  clipPreviewStage?.classList.toggle("is-deleted-frame", deletedFrame);
+  if (clipPreviewCutNotice) clipPreviewCutNotice.hidden = !deletedFrame;
+  if (clipRangeControl) {
+    clipRangeControl.style.setProperty(
+      "--clip-preview-position",
+      `${clipPercent(milliseconds)}%`
+    );
+  }
+  if (clipPreviewPlayhead) clipPreviewPlayhead.hidden = false;
+  if (deletedFrame) {
+    if (clipPreviewSubtitles) clipPreviewSubtitles.hidden = true;
+    if (clipPreviewDanmaku) {
+      clipPreviewDanmaku.hidden = true;
+      clipPreviewDanmaku.replaceChildren();
+      delete clipPreviewDanmaku.dataset.stackKey;
+    }
+    if (!clipLyricHovering) renderClipLyricPreview(milliseconds);
+    return;
+  }
+  const mode = clipSubtitleMode?.value || "zh";
+  const subtitle = mode === "off" ? null : clipSubtitleAt(milliseconds);
+  if (clipPreviewSubtitles && clipPreviewZh && clipPreviewEn) {
+    const showZh = subtitle && ["zh", "bilingual"].includes(mode);
+    const showEn = subtitle && ["en", "bilingual"].includes(mode) && subtitle.en;
+    clipPreviewZh.hidden = !showZh;
+    clipPreviewEn.hidden = !showEn;
+    clipPreviewZh.textContent = showZh ? subtitle.zh : "";
+    clipPreviewEn.textContent = showEn ? subtitle.en : "";
+    clipPreviewSubtitles.hidden = !showZh && !showEn;
+    clipPreviewSubtitles.classList.toggle(
+      "is-with-danmaku",
+      Boolean(clipDanmakuEnabled?.checked)
+    );
+  }
+  renderClipDanmakuPreview(milliseconds);
+  if (!clipLyricHovering) {
+    const lyricMs = Number.isFinite(clipEditorState.markerMs)
+      ? clipEditorState.markerMs
+      : milliseconds;
+    renderClipLyricPreview(lyricMs);
+  }
+};
+
+const cancelClipPreviewClock = () => {
+  if (clipPreviewFrame !== null) {
+    window.cancelAnimationFrame(clipPreviewFrame);
+  }
+  clipPreviewFrame = null;
+};
+
+const startClipPreviewClock = () => {
+  cancelClipPreviewClock();
+  const tick = () => {
+    if (!clipEditorState || !clipPreviewPlayer || clipPreviewPlayer.paused) {
+      clipPreviewFrame = null;
+      return;
+    }
+    const keptRanges = clipKeptRanges();
+    if (!keptRanges.length) {
+      clipPreviewPlayer.pause();
+      renderClipPreview();
+      clipPreviewFrame = null;
+      return;
+    }
+    const currentMs = clipPreviewPlayer.currentTime * 1000;
+    const currentRangeIndex = keptRanges.findIndex((clipRange) => (
+      currentMs >= clipRange.start_ms
+      && currentMs < clipRange.end_ms
+    ));
+    if (currentRangeIndex < 0) {
+      const nextRange = keptRanges.find(
+        (clipRange) => clipRange.start_ms > currentMs
+      );
+      if (nextRange) {
+        clipPreviewPlayer.currentTime = nextRange.start_ms / 1000;
+        renderClipPreview();
+        clipPreviewFrame = window.requestAnimationFrame(tick);
+        return;
+      }
+      const lastRange = keptRanges[keptRanges.length - 1];
+      clipPreviewPlayer.pause();
+      clipPreviewPlayer.currentTime = lastRange.end_ms / 1000;
+      renderClipPreview();
+      clipPreviewFrame = null;
+      return;
+    }
+    renderClipPreview();
+    clipPreviewFrame = window.requestAnimationFrame(tick);
+  };
+  clipPreviewFrame = window.requestAnimationFrame(tick);
+};
+
+const attachClipPreview = () => {
+  if (!clipPreviewPlayer || !replayPlayer) return;
+  const source = replayPlayer.dataset.hlsSrc || "";
+  if (!source) {
+    if (clipEditorError) clipEditorError.textContent = t("clipPreviewUnavailable");
+    return;
+  }
+  clipPreviewUsesNativeHls = false;
+  if (window.Hls?.isSupported()) {
+    clipPreviewHls = new window.Hls({ enableWorker: true });
+    clipPreviewHls.on(window.Hls.Events.MEDIA_ATTACHED, () => {
+      clipPreviewHls.loadSource(source);
+    });
+    clipPreviewHls.on(window.Hls.Events.ERROR, (_event, data) => {
+      if (data?.fatal && clipEditorError) {
+        clipEditorError.textContent = t("clipPreviewFailed");
+      }
+    });
+    clipPreviewHls.attachMedia(clipPreviewPlayer);
+  } else if (clipPreviewPlayer.canPlayType("application/vnd.apple.mpegurl")) {
+    clipPreviewUsesNativeHls = true;
+    clipPreviewPlayer.src = source;
+  } else if (clipEditorError) {
+    clipEditorError.textContent = t("clipPreviewUnavailable");
+  }
+};
+
+const destroyClipPreview = () => {
+  cancelClipPreviewClock();
+  clipPreviewPlayer?.pause();
+  if (clipPreviewHls) {
+    clipPreviewHls.destroy();
+    clipPreviewHls = null;
+  }
+  if (clipPreviewPlayer) {
+    clipPreviewPlayer.removeAttribute("src");
+    clipPreviewPlayer.load();
+  }
+  clipPreviewDanmaku?.replaceChildren();
+  if (clipPreviewDanmaku) {
+    delete clipPreviewDanmaku.dataset.stackKey;
+  }
+  clipPendingSeekMs = null;
+  clipPendingPlay = false;
+  if (clipPreviewPlayhead) clipPreviewPlayhead.hidden = true;
+  if (clipPreviewCutNotice) clipPreviewCutNotice.hidden = true;
+  clipPreviewStage?.classList.remove("is-deleted-frame");
+};
+
+const closeClipEditor = () => {
+  if (clipEditor?.open) clipEditor.close();
+};
+
+const openClipEditor = async (row, button) => {
+  if (!clipEditor || !replayPlayer) return;
+  if (!playbackTrack) await loadPlaybackTrack();
+  replayPlayer.pause();
+  clipOriginButton = button;
+  const aiStartMs = Number(row.dataset.clipStartMs || 0);
+  const aiEndMs = Number(row.dataset.clipEndMs || aiStartMs + 100);
+  const configuredDurationMs = Number(clipEditor.dataset.durationMs || 0);
+  const mediaDurationMs = Number(replayPlayer.duration) * 1000;
+  const contextMs = Number(clipEditor.dataset.contextMs || 600000);
+  const durationMs = configuredDurationMs > 0
+    ? configuredDurationMs
+    : mediaDurationMs > 0
+    ? mediaDurationMs
+    : aiEndMs + contextMs;
+  clipSegmentSequence = 0;
+  const initialSegment = createClipSegment(aiStartMs, aiEndMs);
+  clipEditorState = {
+    timelineIndex: Number(row.dataset.clipIndex),
+    title: row.dataset.clipTitle || "",
+    aiStartMs,
+    aiEndMs,
+    minMs: Math.max(0, aiStartMs - contextMs),
+    maxMs: Math.min(durationMs, aiEndMs + contextMs),
+    maxDurationMs: Number(clipEditor.dataset.maxClipMs || 600000),
+    snapThresholdMs: Number(clipEditor.dataset.snapThresholdMs || 1000),
+    startMs: aiStartMs,
+    endMs: aiEndMs,
+    segments: [initialSegment],
+    selectedSegmentId: initialSegment.id,
+    markerMs: null,
+    aiCoverGenerationId: (
+      selectedAICoverByTimeline.get(Number(row.dataset.clipIndex)) || null
+    ),
+    aiCoverGeneration: null,
+    aiCoverGenerations: [],
+    aiCoverBusy: false,
+    danmakuCacheKey: "",
+    danmakuStream: [],
+    startSource: "manual",
+    endSource: "manual",
+    requestId: null,
+    submitting: false,
+    notice: "",
+    zoom: CLIP_MIN_ZOOM,
+    refineTimer: null
+  };
+  clipSuggestionTokens = { start: 0, end: 0 };
+  clipDragState = null;
+  if (clipEditorTopic) clipEditorTopic.textContent = clipEditorState.title;
+  if (clipSnapEnabled) clipSnapEnabled.checked = true;
+  if (clipSubtitleMode) clipSubtitleMode.value = "zh";
+  if (clipDanmakuEnabled) clipDanmakuEnabled.checked = false;
+  if (aiCoverTitleInput) {
+    aiCoverTitleInput.value = aiCoverDefaultTitle(clipEditorState.title);
+  }
+  if (aiCoverPromptInput) {
+    aiCoverPromptInput.value = AI_COVER_DEFAULT_PROMPT;
+  }
+  setAICoverStatus("");
+  for (const input of clipOutputLayoutRadios) {
+    input.checked = input.value === "portrait";
+  }
+  if (clipSubtitleFontScale) {
+    clipSubtitleFontScale.value = String(CLIP_DEFAULT_FONT_SCALE);
+  }
+  if (clipSubtitleFontFamily) {
+    clipSubtitleFontFamily.value = CLIP_DEFAULT_FONT_FAMILY;
+  }
+  for (const input of clipLandscapeThemeRadios) {
+    input.checked = input.value === CLIP_DEFAULT_LANDSCAPE_THEME;
+  }
+  applyClipSubtitleStyle();
+  applyClipOutputLayout({ resetRequest: false });
+  renderAICoverState();
+  updateClipEnglishOptions();
+  if (clipRangeControl) clipRangeControl.style.width = "100%";
+  if (clipTimelineViewport) clipTimelineViewport.scrollLeft = 0;
+  if (clipHoverMarker) clipHoverMarker.hidden = true;
+  if (clipMarkedMarker) clipMarkedMarker.hidden = true;
+  clipEditor.showModal();
+  updateClipRangeUI({ renderPreview: true });
+  renderClipTimelineCues();
+  attachClipPreview();
+  clipPendingSeekMs = aiStartMs;
+  if (clipPreviewPlayhead) clipPreviewPlayhead.hidden = false;
+  fitClipTimeline();
+  void loadAICoverGenerations();
+};
+
+for (const row of clipRows) {
+  const button = row.querySelector(".clip-button");
+  button?.addEventListener("click", () => void openClipEditor(row, button));
+}
+void loadClipExports();
+
+const bindClipHandle = (boundary, handle) => {
+  if (!handle) return;
+  handle.addEventListener("pointerdown", (event) => {
+    startClipDrag(boundary, event);
+  });
+  handle.addEventListener("pointermove", moveClipDrag);
+  handle.addEventListener("pointerup", (event) => {
+    finishClipDrag(event);
+  });
+  handle.addEventListener("pointercancel", (event) => {
+    finishClipDrag(event, true);
+  });
+  handle.addEventListener("keydown", (event) => {
+    if (!clipEditorState || !["ArrowLeft", "ArrowRight"].includes(event.key)) {
+      return;
+    }
+    event.preventDefault();
+    const direction = event.key === "ArrowLeft" ? -1 : 1;
+    const stepMs = event.shiftKey ? 1000 : 100;
+    const current = boundary === "start"
+      ? clipEditorState.startMs
+      : clipEditorState.endMs;
+    const targetMs = current + direction * stepMs;
+    const marker = clipSnapEnabled?.checked
+      ? nearestClipMarker(
+        boundary,
+        targetMs,
+        clipEditorState.snapThresholdMs
+      )
+      : null;
+    setClipBoundary(
+      boundary,
+      marker?.anchorMs ?? targetMs,
+      marker ? "marker" : "manual",
+      { invalidateSuggestion: true, clearNotice: true }
+    );
+  });
+  handle.addEventListener("keyup", (event) => {
+    if (!clipEditorState || !["ArrowLeft", "ArrowRight"].includes(event.key)) {
+      return;
+    }
+    const current = boundary === "start"
+      ? clipEditorState.startMs
+      : clipEditorState.endMs;
+    seekClipPreview(current);
+  });
+};
+
+bindClipHandle("start", clipStartHandle);
+bindClipHandle("end", clipEndHandle);
+
+clipZoomOut?.addEventListener("click", () => {
+  if (!clipEditorState) return;
+  setClipTimelineZoom(clipEditorState.zoom / 1.5);
+});
+clipZoomIn?.addEventListener("click", () => {
+  if (!clipEditorState) return;
+  setClipTimelineZoom(clipEditorState.zoom * 1.5);
+});
+clipTimelineViewport?.addEventListener("wheel", (event) => {
+  if (!clipEditorState || (!event.ctrlKey && !event.metaKey)) return;
+  event.preventDefault();
+  setClipTimelineZoom(
+    event.deltaY < 0
+      ? clipEditorState.zoom * 1.18
+      : clipEditorState.zoom / 1.18
+  );
+}, { passive: false });
+clipTimelineViewport?.addEventListener("pointermove", (event) => {
+  if (event.pointerType === "touch") return;
+  queueClipLyricHover(event.clientX);
+});
+clipTimelineViewport?.addEventListener("click", (event) => {
+  if (
+    event.target instanceof Element
+    && event.target.closest(".clip-boundary-handle")
+  ) return;
+  clipTimelineViewport.focus({ preventScroll: true });
+  pinClipTimelineMarker(event.clientX);
+});
+clipTimelineViewport?.addEventListener("pointerleave", () => {
+  resetClipLyricHover();
+});
+clipTimelineViewport?.addEventListener("scroll", () => {
+  if (clipLyricHovering) queueClipLyricHover(clipLyricHoverClientX);
+}, { passive: true });
+
+clipSnapEnabled?.addEventListener("change", () => {
+  if (!clipEditorState) return;
+  clipSuggestionTokens.start += 1;
+  clipSuggestionTokens.end += 1;
+  clipEditorState.notice = "";
+  if (!clipSnapEnabled.checked) {
+    clipEditorState.startSource = "manual";
+    clipEditorState.endSource = "manual";
+  }
+  updateClipRangeUI();
+});
+
+clipResetRange?.addEventListener("click", () => {
+  if (!clipEditorState) return;
+  clipSuggestionTokens.start += 1;
+  clipSuggestionTokens.end += 1;
+  clipEditorState.startMs = clipEditorState.aiStartMs;
+  clipEditorState.endMs = clipEditorState.aiEndMs;
+  const initialSegment = createClipSegment(
+    clipEditorState.aiStartMs,
+    clipEditorState.aiEndMs
+  );
+  clipEditorState.segments = [initialSegment];
+  clipEditorState.selectedSegmentId = initialSegment.id;
+  clipEditorState.markerMs = null;
+  clipEditorState.startSource = "manual";
+  clipEditorState.endSource = "manual";
+  clipEditorState.requestId = null;
+  clipEditorState.notice = "";
+  updateClipRangeUI();
+  seekClipPreview(clipEditorState.startMs);
+  scrollClipTimelineTo(
+    (clipEditorState.startMs + clipEditorState.endMs) / 2
+  );
+});
+
+clipSplitAtMarker?.addEventListener("click", splitClipAtMarkedTime);
+clipToggleSegment?.addEventListener("click", toggleSelectedClipSegment);
+
+clipSubtitleMode?.addEventListener("change", () => {
+  if (clipEditorState) clipEditorState.requestId = null;
+  updateClipRangeUI({ renderPreview: true });
+  if (clipLyricHoverMs !== null) {
+    renderClipLyricPreview(clipLyricHoverMs, { hovering: true });
+  }
+});
+clipDanmakuEnabled?.addEventListener("change", () => {
+  if (clipEditorState) clipEditorState.requestId = null;
+  updateClipRangeUI({ renderPreview: true });
+});
+for (const input of clipOutputLayoutRadios) {
+  input.addEventListener("change", () => {
+    if (!input.checked) return;
+    applyClipOutputLayout();
+  });
+}
+window.addEventListener("resize", () => {
+  if (clipEditor?.open) {
+    applyClipOutputLayout();
+  }
+});
+
+const handleClipStyleChange = () => {
+  if (clipEditorState) {
+    clipEditorState.requestId = null;
+    clipEditorState.notice = "";
+  }
+  applyClipSubtitleStyle();
+  updateClipRangeUI({ renderPreview: true });
+  if (clipLyricHoverMs !== null) {
+    renderClipLyricPreview(clipLyricHoverMs, { hovering: true });
+  }
+};
+
+clipSubtitleFontScale?.addEventListener("input", handleClipStyleChange);
+clipSubtitleFontFamily?.addEventListener("change", handleClipStyleChange);
+for (const input of clipLandscapeThemeRadios) {
+  input.addEventListener("change", () => {
+    if (input.checked) handleClipStyleChange();
+  });
+}
+
+aiCoverTitleInput?.addEventListener("input", renderAICoverState);
+aiCoverPromptInput?.addEventListener("input", renderAICoverState);
+aiCoverPromptReset?.addEventListener("click", () => {
+  if (aiCoverPromptInput) aiCoverPromptInput.value = AI_COVER_DEFAULT_PROMPT;
+  renderAICoverState();
+});
+aiCoverGenerate?.addEventListener("click", createAICoverGeneration);
+aiCoverRegenerate?.addEventListener("click", regenerateAICover);
+aiCoverRetry?.addEventListener("click", retryAICover);
+aiCoverSelect?.addEventListener("click", () => {
+  if (
+    !clipEditorState
+    || clipEditorState.aiCoverGeneration?.status !== "completed"
+  ) return;
+  const generationId = clipEditorState.aiCoverGeneration.id;
+  const selected = clipEditorState.aiCoverGenerationId === generationId;
+  if (!selected && clipOutputLayoutValue() !== "landscape") return;
+  clipEditorState.aiCoverGenerationId = selected ? null : generationId;
+  if (clipEditorState.aiCoverGenerationId) {
+    selectedAICoverByTimeline.set(
+      clipEditorState.timelineIndex,
+      clipEditorState.aiCoverGenerationId
+    );
+  } else {
+    selectedAICoverByTimeline.delete(clipEditorState.timelineIndex);
+  }
+  clipEditorState.requestId = null;
+  renderAICoverState();
+});
+
+const applyClipPreviewAspect = () => {
+  if (!clipPreviewStage || !clipPreviewPlayer) return;
+  const { videoWidth, videoHeight } = clipPreviewPlayer;
+  if (!videoWidth || !videoHeight) return;
+  // A portrait export re-encodes the source untouched, so the stage must
+  // adopt the source ratio for the percentage-positioned overlays to land
+  // where the burned-in ones will.
+  clipPreviewStage.style.setProperty(
+    "--clip-preview-aspect",
+    `${videoWidth} / ${videoHeight}`
+  );
+  clipPreviewStage.style.setProperty(
+    "--clip-preview-ratio",
+    `${videoWidth / videoHeight}`
+  );
+};
+
+clipPreviewPlayer?.addEventListener("loadedmetadata", () => {
+  applyClipPreviewAspect();
+  if (clipPendingSeekMs !== null) {
+    clipPreviewPlayer.currentTime = clipPendingSeekMs / 1000;
+    clipPendingSeekMs = null;
+  }
+  if (clipPendingPlay) {
+    clipPendingPlay = false;
+    clipPreviewPlayer.play().catch(() => {});
+  }
+  renderClipPreview();
+});
+clipPreviewPlayer?.addEventListener("play", () => {
+  const keptRanges = clipKeptRanges();
+  if (clipEditorState && keptRanges.length) {
+    const currentMs = clipPreviewPlayer.currentTime * 1000;
+    if (!clipTimeIsKept(currentMs)) {
+      const nextRange = keptRanges.find(
+        (clipRange) => clipRange.start_ms >= currentMs
+      ) || keptRanges[0];
+      clipPreviewPlayer.currentTime = nextRange.start_ms / 1000;
+    }
+  }
+  startClipPreviewClock();
+});
+clipPreviewPlayer?.addEventListener("pause", () => {
+  cancelClipPreviewClock();
+  renderClipPreview();
+});
+clipPreviewPlayer?.addEventListener("seeked", renderClipPreview);
+clipPreviewPlayer?.addEventListener("error", () => {
+  if (clipEditor?.open && clipEditorError) {
+    clipEditorError.textContent = t("clipPreviewFailed");
+  }
+});
+clipPreviewSelection?.addEventListener("click", () => {
+  if (!clipEditorState || !clipPreviewPlayer) return;
+  const keptRanges = clipKeptRanges();
+  if (!keptRanges.length) {
+    clipEditorState.notice = t("clipNoKeptSegments");
+    updateClipRangeUI();
+    return;
+  }
+  const seekAndPlay = () => {
+    clipPreviewPlayer.currentTime = keptRanges[0].start_ms / 1000;
+    clipPreviewPlayer.play().catch(() => {
+      if (clipEditorError) clipEditorError.textContent = t("clipPreviewFailed");
+    });
+  };
+  if (clipPreviewPlayer.readyState >= 1) {
+    seekAndPlay();
+  } else {
+    clipPendingSeekMs = keptRanges[0].start_ms;
+    clipPendingPlay = true;
+    if (clipPreviewUsesNativeHls) clipPreviewPlayer.load();
+  }
+});
+
+const spacePlaybackTargetIsEditable = (target) => (
+  target instanceof Element
+  && Boolean(target.closest(
+    "input, textarea, select, button, a[href], [contenteditable], [role='slider']"
+  ))
+);
+
+document.addEventListener("keydown", (event) => {
+  if (
+    event.defaultPrevented
+    || event.repeat
+    || event.code !== "Space"
+    || event.altKey
+    || event.ctrlKey
+    || event.metaKey
+    || spacePlaybackTargetIsEditable(event.target)
+  ) return;
+  const player = clipEditor?.open ? clipPreviewPlayer : replayPlayer;
+  if (!player) return;
+  event.preventDefault();
+  if (!player.paused) {
+    player.pause();
+    return;
+  }
+  if (clipEditor?.open && player.readyState < 1) {
+    clipPendingPlay = true;
+    if (clipPreviewUsesNativeHls) player.load();
+    return;
+  }
+  player.play().catch(() => {
+    const message = clipEditor?.open ? clipEditorError : replayPlayerMessage;
+    if (message) message.textContent = t(
+      clipEditor?.open ? "clipPreviewFailed" : "mediaError"
+    );
+  });
+});
+
+clipEditorClose?.addEventListener("click", closeClipEditor);
+clipEditorCancel?.addEventListener("click", closeClipEditor);
+clipEditor?.addEventListener("close", () => {
+  if (clipDragState?.frame !== null) {
+    window.cancelAnimationFrame(clipDragState.frame);
+  }
+  clipDragState = null;
+  if (clipEditorState?.refineTimer) {
+    window.clearTimeout(clipEditorState.refineTimer);
+  }
+  clipRangeControl?.classList.remove("is-dragging", "is-refining");
+  resetClipLyricHover();
+  if (clipRawMarker) clipRawMarker.hidden = true;
+  if (clipSnapMarker) clipSnapMarker.hidden = true;
+  if (clipHoverMarker) clipHoverMarker.hidden = true;
+  if (clipMarkedMarker) clipMarkedMarker.hidden = true;
+  stopAICoverPolling();
+  clipTimelineCues?.replaceChildren();
+  clipSegmentTrack?.replaceChildren();
+  clipSegmentList?.replaceChildren();
+  destroyClipPreview();
+  clipEditorState = null;
+  clipSuggestionTokens.start += 1;
+  clipSuggestionTokens.end += 1;
+  clipOriginButton?.focus();
+  clipOriginButton = null;
+});
+
+clipEditorSubmit?.addEventListener("click", async () => {
+  if (!clipCanSubmit || !clipEditorState || !jobHero) return;
+  const validation = clipValidationMessage();
+  if (validation) {
+    if (clipEditorError) clipEditorError.textContent = validation;
+    return;
+  }
+  clipSuggestionTokens.start += 1;
+  clipSuggestionTokens.end += 1;
+  if (clipEditorState.startSource === "checking") {
+    clipEditorState.startSource = "sentence";
+  }
+  if (clipEditorState.endSource === "checking") {
+    clipEditorState.endSource = "sentence";
+  }
+  clipEditorState.submitting = true;
+  updateClipRangeUI();
+  clipEditorSubmit.textContent = t("starting");
+  clipEditorState.requestId ||= (
+    window.crypto?.randomUUID?.()
+    || `clip-${Date.now()}-${Math.random().toString(16).slice(2)}`
+  );
+  const { fontScale, fontFamily, landscapeTheme } = clipStyleValues();
+  const keptRanges = clipKeptRanges();
+  try {
+    const response = await apiFetch(
+      `/api/jobs/${encodeURIComponent(jobHero.dataset.jobId)}/clip-exports`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          request_id: clipEditorState.requestId,
+          timeline_index: clipEditorState.timelineIndex,
+          start_ms: keptRanges[0].start_ms,
+          end_ms: keptRanges[keptRanges.length - 1].end_ms,
+          kept_ranges: keptRanges,
+          subtitle_mode: clipSubtitleMode?.value || "zh",
+          include_danmaku: Boolean(clipDanmakuEnabled?.checked),
+          subtitle_font_scale: fontScale,
+          output_layout: clipOutputLayoutValue(),
+          subtitle_font_family: fontFamily,
+          landscape_theme: landscapeTheme,
+          ai_cover_generation_id: (
+            clipOutputLayoutValue() === "landscape"
+              ? clipEditorState.aiCoverGenerationId
+              : null
+          )
+        })
+      }
+    );
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(apiErrorMessage(payload, "startClipFailed"));
+    }
+    clipExports = [
+      payload,
+      ...clipExports.filter((clip) => clip.id !== payload.id)
+    ];
+    renderClipExports();
+    closeClipEditor();
+    window.setTimeout(() => void loadClipExports(), 1000);
+  } catch (requestError) {
+    clipEditorState.notice = requestError instanceof Error
+      ? requestError.message
+      : t("startClipFailed");
+  } finally {
+    if (clipEditorState) {
+      clipEditorState.submitting = false;
+      updateClipRangeUI();
+    } else {
+      clipEditorSubmit.disabled = false;
+    }
+    clipEditorSubmit.textContent = t("createClipExport");
+  }
+});
+
+const retryButton = document.querySelector("#retry-job");
+if (retryButton && jobHero) {
+  retryButton.addEventListener("click", async () => {
+    retryButton.disabled = true;
+    try {
+      const response = await apiFetch(`/api/jobs/${encodeURIComponent(jobHero.dataset.jobId)}/retry`, {
+        method: "POST"
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(apiErrorMessage(payload, "retryFailed"));
+      }
+      window.location.reload();
+    } catch (requestError) {
+      window.alert(
+        requestError instanceof Error ? requestError.message : t("retryFailed")
+      );
+      retryButton.disabled = false;
+    }
+  });
+}
+
+const subtitleMode = document.querySelector("#subtitle-mode");
+const subtitleOverlay = document.querySelector("#subtitle-overlay");
+const subtitleZh = document.querySelector("#subtitle-zh");
+const subtitleEn = document.querySelector("#subtitle-en");
+const danmakuEnabled = document.querySelector("#danmaku-enabled");
+const danmakuDensity = document.querySelector("#danmaku-density");
+const playbackLayout = document.querySelector("#playback-layout");
+const replayFullscreen = document.querySelector("#replay-fullscreen");
+const liveDanmakuPanel = document.querySelector("#live-danmaku-panel");
+const liveDanmakuStream = document.querySelector("#live-danmaku-stream");
+const liveDanmakuEmpty = document.querySelector("#live-danmaku-empty");
+const danmakuLiveCount = document.querySelector("#danmaku-live-count");
+const playbackSyncState = document.querySelector("#playback-sync-state");
+const syncOffset = document.querySelector("#sync-offset");
+const syncOffsetValue = document.querySelector("#sync-offset-value");
+const translationState = document.querySelector("#translation-state");
+const translationRetry = document.querySelector("#translation-retry");
+const canRequestTranslation =
+  replayPlayerPanel?.dataset.canRequestTranslation === "true";
+
+let replayFullscreenScrollY = 0;
+
+const documentFullscreenElement = () => (
+  document.fullscreenElement || document.webkitFullscreenElement || null
+);
+
+const replayIsFullscreen = () => Boolean(
+  playbackLayout
+  && (
+    documentFullscreenElement() === playbackLayout
+    || playbackLayout.classList.contains("is-pseudo-fullscreen")
+  )
+);
+
+const updateReplayFullscreenButton = () => {
+  if (!replayFullscreen) return;
+  const active = replayIsFullscreen();
+  const key = active
+    ? "exitReplayFullscreen"
+    : "enterReplayFullscreen";
+  replayFullscreen.dataset.i18n = key;
+  replayFullscreen.textContent = t(key);
+  replayFullscreen.setAttribute("aria-pressed", String(active));
+};
+
+const setReplayPseudoFullscreen = (active) => {
+  if (!playbackLayout) return;
+  if (active) {
+    replayFullscreenScrollY = window.scrollY;
+    playbackLayout.classList.add("is-pseudo-fullscreen");
+    document.body.classList.add("has-replay-pseudo-fullscreen");
+  } else {
+    playbackLayout.classList.remove("is-pseudo-fullscreen");
+    document.body.classList.remove("has-replay-pseudo-fullscreen");
+    window.scrollTo(0, replayFullscreenScrollY);
+  }
+  updateReplayFullscreenButton();
+};
+
+const enterReplayFullscreen = async () => {
+  if (!playbackLayout) return;
+  const isIOS = (
+    /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (
+      navigator.platform === "MacIntel"
+      && navigator.maxTouchPoints > 1
+    )
+  );
+  const useMobileFullscreen = (
+    isIOS
+    || /Android/i.test(navigator.userAgent)
+    || window.matchMedia("(pointer: coarse)").matches
+  );
+  const requestFullscreen = (
+    playbackLayout.requestFullscreen
+    || playbackLayout.webkitRequestFullscreen
+  );
+  if (!useMobileFullscreen && typeof requestFullscreen === "function") {
+    try {
+      await Promise.resolve(requestFullscreen.call(playbackLayout));
+      return;
+    } catch {
+      // Fall back to the same in-page fullscreen used by iOS Safari.
+    }
+  }
+  setReplayPseudoFullscreen(true);
+};
+
+const exitReplayFullscreen = async () => {
+  if (!playbackLayout) return;
+  if (playbackLayout.classList.contains("is-pseudo-fullscreen")) {
+    setReplayPseudoFullscreen(false);
+    return;
+  }
+  const exitFullscreen = (
+    document.exitFullscreen || document.webkitExitFullscreen
+  );
+  if (typeof exitFullscreen === "function") {
+    await Promise.resolve(exitFullscreen.call(document));
+  }
+};
+
+replayFullscreen?.addEventListener("click", () => {
+  if (replayIsFullscreen()) {
+    void exitReplayFullscreen();
+  } else {
+    void enterReplayFullscreen();
+  }
+});
+document.addEventListener(
+  "fullscreenchange",
+  updateReplayFullscreenButton
+);
+document.addEventListener(
+  "webkitfullscreenchange",
+  updateReplayFullscreenButton
+);
+document.addEventListener("keydown", (event) => {
+  if (
+    event.key === "Escape"
+    && playbackLayout?.classList.contains("is-pseudo-fullscreen")
+  ) {
+    setReplayPseudoFullscreen(false);
+  }
+});
+updateReplayFullscreenButton();
+
+const densityProfiles = {
+  low: { maxBubbles: 10, minGapMs: 700, contextMs: 5000 },
+  normal: { maxBubbles: 22, minGapMs: 250, contextMs: 8000 },
+  high: { maxBubbles: 38, minGapMs: 0, contextMs: 12000 }
+};
+const mobileDensityProfiles = {
+  low: { maxBubbles: 3, minGapMs: 900, contextMs: 3500 },
+  normal: { maxBubbles: 5, minGapMs: 450, contextMs: 5000 },
+  high: { maxBubbles: 8, minGapMs: 150, contextMs: 6500 }
+};
+const mobileDanmakuMedia = window.matchMedia(
+  "(max-width: 760px), (max-width: 900px) and (pointer: coarse)"
+);
+
+const activeDanmakuProfile = () => {
+  const profiles = mobileDanmakuMedia.matches
+    ? mobileDensityProfiles
+    : densityProfiles;
+  return profiles[danmakuDensity?.value] || profiles.normal;
+};
+
+let playbackTrack = null;
+let playbackSyncPayload = null;
+let lastTranslationPayload = null;
+let currentTranslationStatus = "not_requested";
+let translationPollTimer = null;
+let translationRequestStarted = false;
+let activeSubtitleKey = "";
+let nextDanmakuIndex = 0;
+let lastMediaTimeMs = null;
+let lastDisplayedDanmakuMs = Number.NEGATIVE_INFINITY;
+let videoFrameRequest = null;
+let animationFrameRequest = null;
+
+const lowerBoundByTime = (items, milliseconds, field) => {
+  let low = 0;
+  let high = items.length;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (items[middle][field] < milliseconds) {
+      low = middle + 1;
+    } else {
+      high = middle;
+    }
+  }
+  return low;
+};
+
+const activeSubtitleAt = (milliseconds) => {
+  const subtitles = playbackTrack?.subtitles || [];
+  const insertion = lowerBoundByTime(subtitles, milliseconds + 1, "start_ms");
+  const index = insertion - 1;
+  if (
+    index < 0
+    || milliseconds < subtitles[index].start_ms
+    || milliseconds >= subtitles[index].end_ms
+  ) {
+    return null;
+  }
+  return subtitles[index];
+};
+
+const renderSubtitle = (milliseconds) => {
+  if (!subtitleOverlay || !subtitleZh || !subtitleEn || !subtitleMode) return;
+  const mode = subtitleMode.value;
+  const subtitle = mode === "off" ? null : activeSubtitleAt(milliseconds);
+  const key = subtitle
+    ? `${mode}:${subtitle.sequence}:${subtitle.en || ""}`
+    : `${mode}:none`;
+  if (key === activeSubtitleKey) return;
+  activeSubtitleKey = key;
+  if (!subtitle) {
+    subtitleOverlay.hidden = true;
+    subtitleZh.textContent = "";
+    subtitleEn.textContent = "";
+    return;
+  }
+  const showZh = mode === "zh" || mode === "bilingual";
+  const showEn = mode === "en" || mode === "bilingual";
+  subtitleZh.hidden = !showZh;
+  subtitleEn.hidden = !showEn || !subtitle.en;
+  subtitleZh.textContent = showZh ? subtitle.zh : "";
+  subtitleEn.textContent = showEn && subtitle.en ? subtitle.en : "";
+  subtitleOverlay.hidden = !showZh && (!showEn || !subtitle.en);
+};
+
+const updateDanmakuCount = () => {
+  if (!liveDanmakuStream || !danmakuLiveCount) return;
+  danmakuLiveCount.textContent = String(
+    liveDanmakuStream.querySelectorAll(".danmaku-bubble").length
+  );
+};
+
+const clearDanmakuStream = (messageKey = "") => {
+  if (!liveDanmakuStream || !liveDanmakuEmpty) return;
+  liveDanmakuStream.querySelectorAll(".danmaku-bubble").forEach((bubble) => bubble.remove());
+  if (messageKey) {
+    setLocalizedText(liveDanmakuEmpty, messageKey);
+  } else {
+    liveDanmakuEmpty.textContent = "";
+    delete liveDanmakuEmpty.dataset.i18nRuntime;
+    delete liveDanmakuEmpty.dataset.i18nRuntimeParams;
+  }
+  liveDanmakuEmpty.hidden = !messageKey;
+  updateDanmakuCount();
+};
+
+const appendDanmakuBubble = (entry, isContext = false) => {
+  if (!liveDanmakuStream || !liveDanmakuEmpty || !danmakuDensity) return;
+  liveDanmakuEmpty.hidden = true;
+  const bubble = document.createElement("article");
+  bubble.className = `danmaku-bubble${isContext ? " is-context" : ""}`;
+  const header = document.createElement("header");
+  const author = document.createElement("span");
+  author.textContent = entry.author || t("anonymous");
+  if (!entry.author) author.dataset.i18n = "anonymous";
+  const time = document.createElement("time");
+  time.textContent = formatClock(entry.timestamp_ms);
+  const text = document.createElement("p");
+  text.textContent = entry.text;
+  header.append(author, time);
+  bubble.append(header, text);
+  liveDanmakuStream.append(bubble);
+  const profile = activeDanmakuProfile();
+  const bubbles = liveDanmakuStream.querySelectorAll(".danmaku-bubble");
+  for (let index = 0; index < bubbles.length - profile.maxBubbles; index += 1) {
+    bubbles[index].remove();
+  }
+  updateDanmakuCount();
+};
+
+const rebuildDanmakuContext = (milliseconds) => {
+  if (!liveDanmakuStream || !danmakuEnabled || !danmakuDensity) return;
+  const entries = playbackTrack?.danmaku || [];
+  if (!danmakuEnabled.checked) {
+    clearDanmakuStream("danmakuDisabled");
+    return;
+  }
+  const profile = activeDanmakuProfile();
+  clearDanmakuStream("");
+  const startIndex = lowerBoundByTime(
+    entries,
+    Math.max(0, milliseconds - profile.contextMs),
+    "timestamp_ms"
+  );
+  nextDanmakuIndex = lowerBoundByTime(entries, milliseconds + 1, "timestamp_ms");
+  lastDisplayedDanmakuMs = Number.NEGATIVE_INFINITY;
+  for (let index = startIndex; index < nextDanmakuIndex; index += 1) {
+    const entry = entries[index];
+    if (
+      profile.minGapMs > 0
+      && entry.timestamp_ms - lastDisplayedDanmakuMs < profile.minGapMs
+    ) {
+      continue;
+    }
+    appendDanmakuBubble(entry, true);
+    lastDisplayedDanmakuMs = entry.timestamp_ms;
+  }
+  if (!liveDanmakuStream.querySelector(".danmaku-bubble")) {
+    setLocalizedText(liveDanmakuEmpty, "noNearbyDanmaku");
+    liveDanmakuEmpty.hidden = false;
+  }
+};
+
+const renderDanmaku = (milliseconds, reset = false) => {
+  if (!danmakuEnabled || !danmakuDensity) return;
+  const entries = playbackTrack?.danmaku || [];
+  if (!danmakuEnabled.checked) return;
+  if (
+    reset
+    || lastMediaTimeMs === null
+    || milliseconds < lastMediaTimeMs
+    || milliseconds - lastMediaTimeMs > 1500
+  ) {
+    rebuildDanmakuContext(milliseconds);
+    lastMediaTimeMs = milliseconds;
+    return;
+  }
+  const profile = activeDanmakuProfile();
+  while (
+    nextDanmakuIndex < entries.length
+    && entries[nextDanmakuIndex].timestamp_ms <= milliseconds
+  ) {
+    const entry = entries[nextDanmakuIndex];
+    if (
+      entry.timestamp_ms > lastMediaTimeMs
+      && (
+        profile.minGapMs === 0
+        || entry.timestamp_ms - lastDisplayedDanmakuMs >= profile.minGapMs
+      )
+    ) {
+      appendDanmakuBubble(entry);
+      lastDisplayedDanmakuMs = entry.timestamp_ms;
+    }
+    nextDanmakuIndex += 1;
+  }
+  lastMediaTimeMs = milliseconds;
+};
+
+const playbackMediaTimeMs = () => {
+  const mediaTime = replayPlayer && Number.isFinite(replayPlayer.currentTime)
+    ? replayPlayer.currentTime * 1000
+    : 0;
+  return Math.max(0, mediaTime + Number(syncOffset?.value || 0));
+};
+
+const renderPlaybackAt = (mediaTimeMs, reset = false) => {
+  const adjusted = Math.max(
+    0,
+    mediaTimeMs + Number(syncOffset?.value || 0)
+  );
+  renderSubtitle(adjusted);
+  renderDanmaku(adjusted, reset);
+};
+
+const cancelPlaybackClock = () => {
+  if (
+    replayPlayer
+    && videoFrameRequest !== null
+    && "cancelVideoFrameCallback" in replayPlayer
+  ) {
+    replayPlayer.cancelVideoFrameCallback(videoFrameRequest);
+  }
+  if (animationFrameRequest !== null) {
+    window.cancelAnimationFrame(animationFrameRequest);
+  }
+  videoFrameRequest = null;
+  animationFrameRequest = null;
+};
+
+const startPlaybackClock = () => {
+  if (!replayPlayer || replayPlayer.paused || replayPlayer.ended) return;
+  cancelPlaybackClock();
+  if ("requestVideoFrameCallback" in replayPlayer) {
+    const onVideoFrame = (_now, metadata) => {
+      renderPlaybackAt(metadata.mediaTime * 1000);
+      if (!replayPlayer.paused && !replayPlayer.ended) {
+        videoFrameRequest = replayPlayer.requestVideoFrameCallback(onVideoFrame);
+      }
+    };
+    videoFrameRequest = replayPlayer.requestVideoFrameCallback(onVideoFrame);
+    return;
+  }
+  const onAnimationFrame = () => {
+    renderPlaybackAt(replayPlayer.currentTime * 1000);
+    if (!replayPlayer.paused && !replayPlayer.ended) {
+      animationFrameRequest = window.requestAnimationFrame(onAnimationFrame);
+    }
+  };
+  animationFrameRequest = window.requestAnimationFrame(onAnimationFrame);
+};
+
+const renderTranslationState = (translation) => {
+  if (!translationState || !translationRetry) return;
+  lastTranslationPayload = translation;
+  currentTranslationStatus = translation?.status || "not_requested";
+  translationRetry.hidden = true;
+  if (currentTranslationStatus === "completed") {
+    setLocalizedText(translationState, "englishReady");
+    return;
+  }
+  if (
+    currentTranslationStatus === "queued"
+    || currentTranslationStatus === "running"
+  ) {
+    setLocalizedText(translationState, "englishGenerating");
+    return;
+  }
+  if (currentTranslationStatus === "failed") {
+    translationState.textContent = translation?.error
+      ? (i18n?.translateServerMessage(translation.error) || translation.error)
+      : t("englishFailed");
+    if (canRequestTranslation) {
+      setLocalizedText(translationRetry, "retryTranslation");
+      translationRetry.hidden = false;
+    }
+    return;
+  }
+  setLocalizedText(
+    translationState,
+    canRequestTranslation ? "autoEnglishOnPlay" : "loginForEnglish"
+  );
+  if (canRequestTranslation) {
+    setLocalizedText(translationRetry, "generateNow");
+    translationRetry.hidden = false;
+  }
+};
+
+const scheduleTranslationPoll = () => {
+  if (
+    !jobHero
+    || !["queued", "running"].includes(currentTranslationStatus)
+  ) {
+    return;
+  }
+  window.clearTimeout(translationPollTimer);
+  translationPollTimer = window.setTimeout(async () => {
+    try {
+      const response = await apiFetch(
+        `/api/jobs/${encodeURIComponent(jobHero.dataset.jobId)}/translations/en`
+      );
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(apiErrorMessage(payload, "readTranslationFailed"));
+      }
+      renderTranslationState(payload);
+      if (payload.status === "completed") {
+        await loadPlaybackTrack();
+        return;
+      }
+    } catch {
+      // Translation is optional; keep the Chinese playback available.
+    }
+    scheduleTranslationPoll();
+  }, 3500);
+};
+
+const requestEnglishTranslation = async () => {
+  if (!jobHero || !canRequestTranslation) return;
+  translationRequestStarted = true;
+  if (translationRetry) translationRetry.disabled = true;
+  try {
+    const response = await apiFetch(
+      `/api/jobs/${encodeURIComponent(jobHero.dataset.jobId)}/translations/en`,
+      { method: "POST" }
+    );
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(apiErrorMessage(payload, "startTranslationFailed"));
+    }
+    renderTranslationState(payload);
+    scheduleTranslationPoll();
+  } catch (requestError) {
+    if (translationState) {
+      translationState.textContent = requestError instanceof Error
+        ? requestError.message
+        : t("startTranslationFailed");
+    }
+    if (translationRetry) translationRetry.hidden = false;
+  } finally {
+    if (translationRetry) translationRetry.disabled = false;
+  }
+};
+
+async function loadPlaybackTrack() {
+  if (!jobHero || !replayPlayer || !playbackSyncState) return;
+  try {
+    const response = await apiFetch(
+      `/api/jobs/${encodeURIComponent(jobHero.dataset.jobId)}/playback-track`
+    );
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(apiErrorMessage(payload, "loadPlaybackTrackFailed"));
+    }
+    playbackTrack = payload;
+    updateClipEnglishOptions();
+    activeSubtitleKey = "";
+    lastMediaTimeMs = null;
+    renderTranslationState(payload.translation);
+    renderPlaybackAt(replayPlayer.currentTime * 1000, true);
+    playbackSyncPayload = payload;
+    renderPlaybackSyncSummary();
+    playbackSyncState.className = "sync-state ready";
+    scheduleTranslationPoll();
+  } catch (requestError) {
+    playbackSyncState.textContent = requestError instanceof Error
+      ? requestError.message
+      : t("playbackTrackFailed");
+    playbackSyncState.className = "sync-state error";
+  }
+}
+
+function renderPlaybackSyncSummary() {
+  if (!playbackSyncState || !playbackSyncPayload || !replayPlayer) return;
+  const precision = "requestVideoFrameCallback" in replayPlayer
+    ? t("frameSync")
+    : t("mediaClockSync");
+  setLocalizedText(playbackSyncState, "syncSummary", {
+    precision,
+    subtitles: playbackSyncPayload.subtitles.length,
+    danmaku: playbackSyncPayload.danmaku.length
+  });
+}
+
+if (replayPlayer && replayPlayerPanel) {
+  void loadPlaybackTrack();
+  replayPlayer.addEventListener("play", () => {
+    if (
+      canRequestTranslation
+      && !translationRequestStarted
+      && ["not_requested", "failed"].includes(currentTranslationStatus)
+    ) {
+      void requestEnglishTranslation();
+    }
+    renderPlaybackAt(replayPlayer.currentTime * 1000, true);
+    startPlaybackClock();
+  });
+  replayPlayer.addEventListener("pause", () => {
+    cancelPlaybackClock();
+    renderPlaybackAt(replayPlayer.currentTime * 1000);
+  });
+  replayPlayer.addEventListener("ended", cancelPlaybackClock);
+  replayPlayer.addEventListener("seeked", () => {
+    renderPlaybackAt(replayPlayer.currentTime * 1000, true);
+    startPlaybackClock();
+  });
+  replayPlayer.addEventListener("loadedmetadata", () => {
+    renderPlaybackAt(replayPlayer.currentTime * 1000, true);
+  });
+}
+
+subtitleMode?.addEventListener("change", () => {
+  activeSubtitleKey = "";
+  renderSubtitle(playbackMediaTimeMs());
+});
+
+const updateDanmakuPanelVisibility = () => {
+  if (!danmakuEnabled || !liveDanmakuPanel || !playbackLayout) return;
+  const collapsed = !danmakuEnabled.checked;
+  liveDanmakuPanel.hidden = collapsed;
+  playbackLayout.classList.toggle("is-danmaku-collapsed", collapsed);
+};
+
+danmakuEnabled?.addEventListener("change", () => {
+  updateDanmakuPanelVisibility();
+  lastMediaTimeMs = null;
+  if (danmakuEnabled.checked) {
+    rebuildDanmakuContext(playbackMediaTimeMs());
+  } else {
+    clearDanmakuStream("danmakuDisabled");
+  }
+});
+
+danmakuDensity?.addEventListener("change", () => {
+  lastMediaTimeMs = null;
+  rebuildDanmakuContext(playbackMediaTimeMs());
+});
+
+const handleMobileDanmakuLayoutChange = () => {
+  lastMediaTimeMs = null;
+  rebuildDanmakuContext(playbackMediaTimeMs());
+};
+if (typeof mobileDanmakuMedia.addEventListener === "function") {
+  mobileDanmakuMedia.addEventListener(
+    "change",
+    handleMobileDanmakuLayoutChange
+  );
+} else {
+  mobileDanmakuMedia.addListener(handleMobileDanmakuLayoutChange);
+}
+
+syncOffset?.addEventListener("input", () => {
+  const milliseconds = Number(syncOffset.value);
+  if (syncOffsetValue) {
+    syncOffsetValue.textContent = `${milliseconds >= 0 ? "+" : ""}${(milliseconds / 1000).toFixed(1)}s`;
+  }
+  activeSubtitleKey = "";
+  lastMediaTimeMs = null;
+  renderPlaybackAt(replayPlayer?.currentTime * 1000 || 0, true);
+});
+
+translationRetry?.addEventListener("click", () => {
+  translationRequestStarted = false;
+  void requestEnglishTranslation();
+});
+
+updateDanmakuPanelVisibility();
+
+const showLoadFailure = (countElement, count, retry) => {
+  setLocalizedText(countElement, "displayedLoadFailed", { count });
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "load-retry";
+  button.dataset.i18n = "continueLoading";
+  button.textContent = t("continueLoading");
+  button.addEventListener("click", () => {
+    button.remove();
+    void retry();
+  });
+  countElement.after(button);
+};
+
+const transcriptList = document.querySelector("#transcript-list");
+const transcriptCount = document.querySelector("#transcript-count");
+
+const loadAllTranscript = async () => {
+  if (!jobHero || !transcriptList || !transcriptCount) return;
+  let offset = Number(transcriptList.dataset.loaded || 0);
+  let hasMore = transcriptList.dataset.hasMore === "true";
+  if (!hasMore) {
+    setLocalizedText(transcriptCount, "totalCount", { count: offset });
+    return;
+  }
+  setLocalizedText(transcriptCount, "loadingAll", { count: offset });
+  try {
+    while (hasMore) {
+      const response = await apiFetch(
+        `/api/jobs/${encodeURIComponent(jobHero.dataset.jobId)}/transcript?offset=${offset}&limit=500`
+      );
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(apiErrorMessage(payload, "loadTranscriptFailed"));
+      }
+      const fragment = document.createDocumentFragment();
+      for (const segment of payload.segments) {
+        const article = document.createElement("article");
+        article.id = `segment-${segment.sequence}`;
+        const time = document.createElement("button");
+        time.type = "button";
+        time.className = "timestamp-link";
+        time.dataset.seekMs = String(segment.start_ms);
+        time.dataset.i18nTitle = "jumpTo";
+        time.dataset.i18nParamTime = formatClock(segment.start_ms);
+        time.title = t("jumpTo", {
+          time: formatClock(segment.start_ms)
+        });
+        time.textContent = formatClock(segment.start_ms);
+        const text = document.createElement("p");
+        text.textContent = segment.text;
+        article.append(time, text);
+        fragment.append(article);
+      }
+      transcriptList.append(fragment);
+      offset = payload.next_offset;
+      hasMore = payload.has_more;
+      transcriptList.dataset.loaded = String(offset);
+      transcriptList.dataset.hasMore = String(hasMore);
+      setLocalizedText(
+        transcriptCount,
+        hasMore ? "loadingAll" : "totalCount",
+        { count: offset }
+      );
+    }
+  } catch {
+    showLoadFailure(transcriptCount, offset, loadAllTranscript);
+  }
+};
+
+const danmakuList = document.querySelector("#danmaku-list");
+const danmakuCount = document.querySelector("#danmaku-count");
+const danmakuAuthorFilter = document.querySelector("#danmaku-author-filter");
+const clearDanmakuAuthor = document.querySelector("#clear-danmaku-author");
+let activeDanmakuAuthor = null;
+
+const updateDanmakuAuthorFilter = () => {
+  if (!danmakuList || !danmakuCount || !danmakuAuthorFilter) return;
+  const articles = danmakuList.querySelectorAll("article[data-author]");
+  let matchingCount = 0;
+  for (const article of articles) {
+    const matches = activeDanmakuAuthor === null || article.dataset.author === activeDanmakuAuthor;
+    article.hidden = !matches;
+    if (matches) matchingCount += 1;
+  }
+  const totalCount = Number(danmakuList.dataset.loaded || articles.length);
+  const hasMore = danmakuList.dataset.hasMore === "true";
+  if (activeDanmakuAuthor === null) {
+    danmakuAuthorFilter.hidden = true;
+    setLocalizedText(
+      danmakuCount,
+      hasMore ? "loadingAll" : "totalCount",
+      { count: totalCount }
+    );
+    return;
+  }
+  danmakuAuthorFilter.hidden = false;
+  const label = danmakuAuthorFilter.querySelector("span");
+  if (label) {
+    setLocalizedText(
+      label,
+      hasMore ? "loadingFanDanmaku" : "fanDanmakuTotal",
+      {
+        author: activeDanmakuAuthor,
+        count: matchingCount
+      }
+    );
+  }
+  setLocalizedText(
+    danmakuCount,
+    hasMore ? "foundLoading" : "filteredTotal",
+    {
+      count: matchingCount,
+      total: totalCount
+    }
+  );
+};
+
+if (danmakuList) {
+  danmakuList.addEventListener("click", (event) => {
+    const author = event.target.closest(".danmaku-author");
+    if (!author) return;
+    activeDanmakuAuthor = author.dataset.danmakuAuthor || "";
+    updateDanmakuAuthorFilter();
+    danmakuList.scrollTop = 0;
+  });
+}
+
+if (clearDanmakuAuthor) {
+  clearDanmakuAuthor.addEventListener("click", () => {
+    activeDanmakuAuthor = null;
+    updateDanmakuAuthorFilter();
+    if (danmakuList) danmakuList.scrollTop = 0;
+  });
+}
+
+const loadAllDanmaku = async () => {
+  if (!jobHero || !danmakuList || !danmakuCount) return;
+  let count = Number(danmakuList.dataset.loaded || 0);
+  let afterMs = Number(danmakuList.dataset.afterMs || -1);
+  let hasMore = danmakuList.dataset.hasMore === "true";
+  if (!hasMore) {
+    setLocalizedText(danmakuCount, "totalCount", { count });
+    return;
+  }
+  setLocalizedText(danmakuCount, "loadingAll", { count });
+  try {
+    while (hasMore) {
+      const response = await apiFetch(
+        `/api/jobs/${encodeURIComponent(jobHero.dataset.jobId)}/danmaku?after_ms=${afterMs}&limit=500`
+      );
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(apiErrorMessage(payload, "loadDanmakuFailed"));
+      }
+      const fragment = document.createDocumentFragment();
+      for (const entry of payload.entries) {
+        const article = document.createElement("article");
+        article.dataset.author = entry.author || "";
+        const time = document.createElement("time");
+        time.textContent = formatClock(entry.timestamp_ms);
+        const text = document.createElement("p");
+        if (entry.author) {
+          const author = document.createElement("button");
+          author.type = "button";
+          author.className = "danmaku-author";
+          author.dataset.danmakuAuthor = entry.author;
+          author.textContent = entry.author;
+          text.append(author);
+        }
+        text.append(document.createTextNode(`${entry.author ? " " : ""}${entry.text}`));
+        article.append(time, text);
+        fragment.append(article);
+      }
+      danmakuList.append(fragment);
+      count += payload.entries.length;
+      afterMs = payload.next_after_ms;
+      hasMore = payload.has_more;
+      danmakuList.dataset.loaded = String(count);
+      danmakuList.dataset.afterMs = String(afterMs);
+      danmakuList.dataset.hasMore = String(hasMore);
+      updateDanmakuAuthorFilter();
+    }
+  } catch {
+    showLoadFailure(danmakuCount, count, loadAllDanmaku);
+  }
+};
+
+void loadAllTranscript();
+void loadAllDanmaku();
+
+document.addEventListener("p48:languagechange", () => {
+  roomVoicePlaylists.forEach((playlist) => playlist.refreshLanguage?.());
+  if (lastTranslationPayload) renderTranslationState(lastTranslationPayload);
+  renderPlaybackSyncSummary();
+  renderClipExports();
+  updateClipRangeUI();
+  updateDanmakuAuthorFilter();
+});

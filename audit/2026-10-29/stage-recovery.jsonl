@@ -1,0 +1,37 @@
+{"at": "2026-10-29T12:48:46.523Z", "event": "started", "freeGiB": 10.34, "thresholdGiB": 6}
+{"at": "2026-10-29T12:49:33.327Z", "event": "download_start", "liveId": "1321966661005021184", "durationSeconds": 9704, "adoptedSegments": 1612, "freeGiB": 7.08}
+{"at": "2026-10-29T12:49:34.034Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 2334960, "freeGiB": 7.08}
+{"at": "2026-10-29T12:49:34.054Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 4542644, "freeGiB": 7.07}
+{"at": "2026-10-29T12:49:34.068Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 6699944, "freeGiB": 7.07}
+{"at": "2026-10-29T12:49:34.083Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 8679208, "freeGiB": 7.07}
+{"at": "2026-10-29T12:49:34.156Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 10836696, "freeGiB": 7.07}
+{"at": "2026-10-29T12:49:34.251Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 13007720, "freeGiB": 7.07}
+{"at": "2026-10-29T12:49:34.278Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 15159192, "freeGiB": 7.06}
+{"at": "2026-10-29T12:49:34.287Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 17314988, "freeGiB": 7.06}
+{"at": "2026-10-29T12:49:34.318Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 19474544, "freeGiB": 7.06}
+{"at": "2026-10-29T12:49:34.409Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 21629964, "freeGiB": 7.06}
+{"at": "2026-10-29T12:49:34.445Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 23815276, "freeGiB": 7.06}
+{"at": "2026-10-29T12:49:34.474Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 25956972, "freeGiB": 7.06}
+{"at": "2026-10-29T12:49:34.490Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 28104308, "freeGiB": 7.06}
+{"at": "2026-10-29T12:49:34.549Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 30277588, "freeGiB": 7.05}
+{"at": "2026-10-29T12:49:34.572Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 32431880, "freeGiB": 7.05}
+{"at": "2026-10-29T12:49:34.619Z", "event": "progress", "liveId": "1321966661005021184", "pct": 0, "bytes": 34591812, "freeGiB": 7.05}
+{"at": "2026-10-29T12:50:02.017Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 717088588, "freeGiB": 6.4}
+{"at": "2026-10-29T12:50:02.035Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 719236488, "freeGiB": 6.4}
+{"at": "2026-10-29T12:50:02.159Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 721405068, "freeGiB": 6.4}
+{"at": "2026-10-29T12:50:02.328Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 723567632, "freeGiB": 6.39}
+{"at": "2026-10-29T12:50:02.360Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 725732076, "freeGiB": 6.39}
+{"at": "2026-10-29T12:50:02.521Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 727901408, "freeGiB": 6.39}
+{"at": "2026-10-29T12:50:02.535Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 730050248, "freeGiB": 6.39}
+{"at": "2026-10-29T12:50:02.546Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 732205292, "freeGiB": 6.39}
+{"at": "2026-10-29T12:50:02.680Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 734367104, "freeGiB": 6.39}
+{"at": "2026-10-29T12:50:02.736Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 736523652, "freeGiB": 6.38}
+{"at": "2026-10-29T12:50:02.869Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 738701632, "freeGiB": 6.38}
+{"at": "2026-10-29T12:50:02.918Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 740885064, "freeGiB": 6.38}
+{"at": "2026-10-29T12:50:03.061Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 743047252, "freeGiB": 6.38}
+{"at": "2026-10-29T12:50:03.079Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 745200604, "freeGiB": 6.38}
+{"at": "2026-10-29T12:50:03.212Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 747364108, "freeGiB": 6.37}
+{"at": "2026-10-29T12:50:03.309Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 749522348, "freeGiB": 6.37}
+{"at": "2026-10-29T12:50:03.434Z", "event": "progress", "liveId": "1321966661005021184", "pct": 20, "bytes": 751685664, "freeGiB": 6.37}
+{"at": "2026-10-29T12:50:35.080Z", "event": "failed", "liveId": "1321966661005021184", "code": "RECOVERY_RESERVE", "message": "暂缓：为直播预留6GiB空间", "freeGiB": 5.99}
+{"at": "2026-10-29T12:50:35.082Z", "event": "finished", "results": [{"liveId": "1321966661005021184", "status": "failed"}], "freeGiB": 5.99}

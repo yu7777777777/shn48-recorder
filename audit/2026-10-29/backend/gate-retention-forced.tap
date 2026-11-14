@@ -1,0 +1,142 @@
+﻿TAP version 13
+# [auto-recorder] not starting: 磁盘可用空间不足，无法保证录完这场直播；清理空间后自动恢复
+# [auto-recorder] not starting: 磁盘可用空间不足，无法保证录完这场直播；清理空间后自动恢复
+# [auto-recorder] start gate cleared; recording can resume
+# [auto-recorder] disk space check failed; recording will not start: ENOENT
+# [auto-recorder] disk space check failed; recording will not start: ENOENT
+# [auto-recorder] disk space check failed; recording will not start: ENOENT
+# [auto-recorder] not starting: 无法读取录像目录的剩余空间，自动录制已暂停；请检查录像目录与挂载
+# [auto-recorder] disk space check failed; recording will not start: ENOENT
+# [auto-recorder] disk space check failed; recording will not start: ENOENT
+# [auto-recorder] disk space check failed; recording will not start: ENOENT
+# [auto-recorder] not starting: 磁盘可用空间不足，无法保证录完这场直播；清理空间后自动恢复
+# [auto-recorder] start gate cleared; recording can resume
+# [auto-recorder] not starting: 磁盘可用空间不足，无法保证录完这场直播；清理空间后自动恢复
+# [retention] on-demand reclaim removed 1 fragment/cache files (4096 bytes, free 4096)
+# Subtest: a small disk still records when reclaim can make room for the estimated live
+ok 1 - a small disk still records when reclaim can make room for the estimated live
+  ---
+  duration_ms: 26.5939
+  type: 'test'
+  ...
+# Subtest: space above the floor is sufficient once it covers the estimated live
+ok 2 - space above the floor is sufficient once it covers the estimated live
+  ---
+  duration_ms: 4.362
+  type: 'test'
+  ...
+# Subtest: a live is refused and reported when nothing can be reclaimed
+ok 3 - a live is refused and reported when nothing can be reclaimed
+  ---
+  duration_ms: 15.9165
+  type: 'test'
+  ...
+# Subtest: the block is cleared and recording resumes once space returns
+ok 4 - the block is cleared and recording resumes once space returns
+  ---
+  duration_ms: 6.9628
+  type: 'test'
+  ...
+# Subtest: a failing space probe is reported as its own reason, not as a full disk
+ok 5 - a failing space probe is reported as its own reason, not as a full disk
+  ---
+  duration_ms: 5.0112
+  type: 'test'
+  ...
+# Subtest: the space probe measures the directory recordings are actually written to
+ok 6 - the space probe measures the directory recordings are actually written to
+  ---
+  duration_ms: 4.0559
+  type: 'test'
+  ...
+# Subtest: the capacity limit is reported separately and does not masquerade as a disk problem
+ok 7 - the capacity limit is reported separately and does not masquerade as a disk problem
+  ---
+  duration_ms: 4.3689
+  type: 'test'
+  ...
+# Subtest: a blocked state is cleared when the operator disables automatic recording
+ok 8 - a blocked state is cleared when the operator disables automatic recording
+  ---
+  duration_ms: 6.5518
+  type: 'test'
+  ...
+# Subtest: the block is reported once per edge so a 30s poll cannot flood the log
+ok 9 - the block is reported once per edge so a 30s poll cannot flood the log
+  ---
+  duration_ms: 8.2917
+  type: 'test'
+  ...
+# Subtest: the default policy no longer demands a flat 10 GiB
+ok 10 - the default policy no longer demands a flat 10 GiB
+  ---
+  duration_ms: 0.2822
+  type: 'test'
+  ...
+# Subtest: the goal is measured from past recordings, not a fixed constant
+ok 11 - the goal is measured from past recordings, not a fixed constant
+  ---
+  duration_ms: 2.4333
+  type: 'test'
+  ...
+# Subtest: an explicit bitrate assumption overrides measurement
+ok 12 - an explicit bitrate assumption overrides measurement
+  ---
+  duration_ms: 2.2123
+  type: 'test'
+  ...
+# Subtest: low space is reclaimed from fragments before a start is refused
+ok 13 - low space is reclaimed from fragments before a start is refused
+  ---
+  duration_ms: 7.401
+  type: 'test'
+  ...
+# Subtest: reclaimNow deletes unlocked cache files and keeps archive main files
+ok 14 - reclaimNow deletes unlocked cache files and keeps archive main files
+  ---
+  duration_ms: 4.239
+  type: 'test'
+  ...
+# [retention] removed 1 duplicate/cache files (2048 bytes)
+# [retention] on-demand reclaim removed 1 fragment/cache files (1024 bytes, free 1024)
+# Subtest: sweep never deletes the verified main file of an official_replay archive
+ok 15 - sweep never deletes the verified main file of an official_replay archive
+  ---
+  duration_ms: 25.088
+  type: 'test'
+  ...
+# Subtest: sweep still reclaims genuine source fragments of an archived recording
+ok 16 - sweep still reclaims genuine source fragments of an archived recording
+  ---
+  duration_ms: 20.8634
+  type: 'test'
+  ...
+# Subtest: water-level purge never deletes an archive main file either
+ok 17 - water-level purge never deletes an archive main file either
+  ---
+  duration_ms: 5.685
+  type: 'test'
+  ...
+# Subtest: reclaimNow refuses any path that is a record main file
+ok 18 - reclaimNow refuses any path that is a record main file
+  ---
+  duration_ms: 5.9912
+  type: 'test'
+  ...
+# [auto-recorder] not starting: 磁盘可用空间不足，无法保证录完这场直播；清理空间后自动恢复
+# AUDIT_SEMANTICS: no candidates -> blocked cleared, hasSpace=false, starts=0
+# Subtest: no candidates clears the block and logs cleared while disk remains below requirement; no recording is created
+ok 19 - no candidates clears the block and logs cleared while disk remains below requirement; no recording is created
+  ---
+  duration_ms: 12.4903
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 485.9634

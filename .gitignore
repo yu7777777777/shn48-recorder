@@ -1,0 +1,42 @@
+# Credentials and machine-local configuration.
+#
+# The server connection sheet holds the production root password in plaintext.
+# It must never enter a source package, an archive, or any synced location that
+# is shared with a third party. Read it from the environment instead.
+阿里云服务器.txt
+.env
+.env.*
+!.env.example
+
+# One-off deployment helpers that used to embed the connection path.
+ssh_stage.py
+ssh_stage_*.py
+
+# Local runtime state, recordings and caches.
+runtime/
+_debug/
+uploadchunks/
+
+# Local archives and intermediate build output.
+archives/
+release/
+.tools/
+*.tar.gz
+*.tar
+*.b64
+
+# Dependency trees.
+node_modules/
+client/node_modules*/
+server/node_modules*/
+
+# Logs and editor noise.
+*.log
+.DS_Store
+Thumbs.db
+
+# Old deployment staging (1.19.0-era artifacts with connection details).
+.deploy/
+
+# Frontend build output (rebuilt inside Docker at release time).
+client/dist/

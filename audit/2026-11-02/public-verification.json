@@ -1,0 +1,22 @@
+{
+  "health": {
+    "success": true,
+    "data": {
+      "status": "ok",
+      "version": "1.32.1"
+    }
+  },
+  "frontendAssetsVerified": 48,
+  "unauthenticatedGuards": {
+    "/api/admin/recordings": 401,
+    "/api/admin/notify/settings": 401,
+    "/api/admin/analysis/search?q=test": 401,
+    "/api/admin/exports": 401,
+    "/api/admin/pocket48/keyword-monitor": 401
+  },
+  "daily": {
+    "published": false,
+    "days": 0
+  },
+  "rss": "passed"
+}

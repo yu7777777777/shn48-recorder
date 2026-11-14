@@ -1,0 +1,55 @@
+python : test_account_mismatch_no_upload (__main__.WorkerTests.test_account_mismatch_no_upload) ... ok
+所在位置 行:1 字符: 194
++ ... NG='utf-8'; python -B app/server/test/backup115-worker.test.py *> aud ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (test_account_mi..._upload) ... ok:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+test_all_required_remote_fields_fail_closed (__main__.WorkerTests.test_all_required_remote_fields_fail_closed) ... ok
+test_atomic_cookie_permissions_and_no_temporary_residue (__main__.WorkerTests.test_atomic_cookie_permissions_and_no_tem
+porary_residue) ... ok
+test_check_authorized_and_sanitized (__main__.WorkerTests.test_check_authorized_and_sanitized) ... ok
+test_check_no_cookie_waits_for_explicit_login (__main__.WorkerTests.test_check_no_cookie_waits_for_explicit_login) ... 
+ok
+test_error_mapping_never_uses_exception_text (__main__.WorkerTests.test_error_mapping_never_uses_exception_text) ... ok
+test_existing_same_hash_skips_upload_and_still_fresh_verifies (__main__.WorkerTests.test_existing_same_hash_skips_uploa
+d_and_still_fresh_verifies) ... ok
+test_local_root_escape_and_prefix_confusion (__main__.WorkerTests.test_local_root_escape_and_prefix_confusion) ... ok
+test_logout_only_fixed_cookie_and_idempotent (__main__.WorkerTests.test_logout_only_fixed_cookie_and_idempotent) ... ok
+test_metadata_root_allowed_but_private_state_excluded (__main__.WorkerTests.test_metadata_root_allowed_but_private_stat
+e_excluded) ... ok
+test_missing_source_and_missing_remote_fail_closed (__main__.WorkerTests.test_missing_source_and_missing_remote_fail_cl
+osed) ... ok
+test_protocol_bad_json_and_missing_newline (__main__.WorkerTests.test_protocol_bad_json_and_missing_newline) ... ok
+test_protocol_status_offline_valid_ndjson_and_empty_stderr (__main__.WorkerTests.test_protocol_status_offline_valid_ndj
+son_and_empty_stderr) ... ok
+test_qr_connection_failures_are_not_hidden_as_waiting (__main__.WorkerTests.test_qr_connection_failures_are_not_hidden_
+as_waiting) ... ok
+test_qr_expired_rejected_without_provider (__main__.WorkerTests.test_qr_expired_rejected_without_provider) ... ok
+test_qr_long_poll_read_timeout_remains_waiting_with_bounded_request (__main__.WorkerTests.test_qr_long_poll_read_timeou
+t_remains_waiting_with_bounded_request) ... ok
+test_qr_provider_long_poll_code_is_waiting_not_authentication (__main__.WorkerTests.test_qr_provider_long_poll_code_is_
+waiting_not_authentication) ... ok
+test_qr_states_and_cookie_never_returned (__main__.WorkerTests.test_qr_states_and_cookie_never_returned) ... ok
+test_remote_file_id_verified_not_trusted (__main__.WorkerTests.test_remote_file_id_verified_not_trusted) ... ok
+test_remote_path_invalid_segments_and_root (__main__.WorkerTests.test_remote_path_invalid_segments_and_root) ... ok
+test_sdk_home_isolated_before_import (__main__.WorkerTests.test_sdk_home_isolated_before_import) ... ok
+test_source_mutation_during_upload_fails (__main__.WorkerTests.test_source_mutation_during_upload_fails) ... ok
+test_source_size_hash_and_ordinary_file (__main__.WorkerTests.test_source_size_hash_and_ordinary_file) ... ok
+test_status_missing_runtime (__main__.WorkerTests.test_status_missing_runtime) ... ok
+test_status_no_network_and_does_not_claim_authorization (__main__.WorkerTests.test_status_no_network_and_does_not_claim
+_authorization) ... ok
+test_status_probe_does_not_import_sdk_or_create_state (__main__.WorkerTests.test_status_probe_does_not_import_sdk_or_cr
+eate_state) ... ok
+test_symlink_escape (__main__.WorkerTests.test_symlink_escape) ... ok
+test_unknown_cookie_path_and_unknown_fields_rejected (__main__.WorkerTests.test_unknown_cookie_path_and_unknown_fields_
+rejected) ... ok
+test_upload_new_fixed_partsize_fresh_id_verification_local_retained (__main__.WorkerTests.test_upload_new_fixed_partsiz
+e_fresh_id_verification_local_retained) ... ok
+test_wrong_hash_or_parent_fail_fresh_verification (__main__.WorkerTests.test_wrong_hash_or_parent_fail_fresh_verificati
+on) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 0.978s
+
+OK

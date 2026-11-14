@@ -1,0 +1,180 @@
+"use strict";
+const fs = require("fs");
+const path = require("path");
+const manager = require("./manager");
+const storage = require("./storage");
+const media = require("./replay-download");
+const backupLeases = require("../backup115/leases");
+const DAY = 86400000;
+const GiB = 1024 ** 3;
+// Reclaiming starts below the reserve line and stops above the target line, so a
+// sweep does not oscillate around a single threshold.
+const DEFAULT_RESERVE_GIB = 8;
+const DEFAULT_TARGET_GIB = 12;
+let timer;
+
+function numberFromEnv(name, fallback) {
+  const value = Number(process.env[name]);
+  return Number.isFinite(value) && value >= 0 ? value : fallback;
+}
+function config() {
+  const reserve = numberFromEnv("STORAGE_RESERVE_GIB", DEFAULT_RESERVE_GIB);
+  return {
+    reserveBytes: reserve * GiB,
+    // The target must stay above the reserve line or the purge would never stop.
+    targetBytes: Math.max(reserve, numberFromEnv("STORAGE_TARGET_GIB", Math.max(DEFAULT_TARGET_GIB, reserve))) * GiB,
+  };
+}
+function freeBytes(dir) {
+  try {
+    const stat = fs.statfsSync(dir, { bigint: true });
+    return Number(stat.bavail * stat.bsize);
+  } catch { return Number.POSITIVE_INFINITY; }
+}
+
+function dropReference(filePath, records) {
+  // Remove the reference from every owner, including merged segment records, so
+  // no page keeps pointing at a file that is gone.
+  for (const owner of records) {
+    if (!storage.paths(owner).includes(filePath)) continue;
+    const update = { sourceFiles: (owner.sourceFiles || []).filter((p) => path.resolve(p) !== filePath) };
+    if (owner.replayRecovery?.replayFilePath && path.resolve(owner.replayRecovery.replayFilePath) === filePath) {
+      update.replayRecovery = { ...owner.replayRecovery, replayFilePath: null };
+    }
+    manager.updateRecording(owner.id, update);
+  }
+}
+
+async function sweep(now = Date.now()) {
+  const root = fs.realpathSync(require("../pocket48/recorder")._internals.recordingsDir());
+  const records = manager.getRecordings({ includeDeleted: true, includeMerged: true });
+  const protectedFiles = new Set(records.filter(r => !["deleted", "merged"].includes(r.status)).map(r => path.resolve(r.filePath || root)));
+  for (const q of manager.getQueue().filter(q => ["queued", "waiting_credentials", "uploading", "paused_recording"].includes(q.status))) if (q.file) protectedFiles.add(path.resolve(q.file));
+  let bytes = 0, files = 0;
+  const safe = file => {
+    const full = path.resolve(file);
+    if (!full.startsWith(root + path.sep)) return false;
+    try { return fs.realpathSync(full) === full && fs.lstatSync(full).isFile(); } catch { return false; }
+  };
+  for (const rec of records) {
+    if (rec.status !== "done" || storage.locked(rec) || require("./replay-audit").busy(rec.id) || !safe(rec.filePath) || fs.statSync(rec.filePath).size <= 0) continue;
+    // New archives receive a full retention window after successful verification.
+    // Existing archives start that window when first seen, rather than being deleted on deployment.
+    const currentStat = fs.statSync(rec.filePath);
+    const fingerprint = { path: rec.filePath, size: currentStat.size, mtimeMs: currentStat.mtimeMs };
+    if (!rec.retentionVerifiedAt || JSON.stringify(rec.retentionFingerprint) !== JSON.stringify(fingerprint)) {
+      const state = rec.replayRecovery?.status;
+      if (["pending", "downloading", "verifying", "waiting_replay", "awaiting_archive"].includes(state)) continue;
+      try { await media.verifyFull(rec.filePath); } catch { continue; }
+      if (storage.locked(rec) || require("./replay-audit").busy(rec.id)) continue;
+      manager.updateRecording(rec.id, { retentionVerifiedAt: new Date(now).toISOString(), retentionFingerprint: fingerprint });
+      continue;
+    }
+    if (now - Date.parse(rec.retentionVerifiedAt) < DAY) continue;
+    const candidates = [...new Set([...(rec.sourceFiles || []), rec.replayRecovery?.replayFilePath].filter(Boolean))];
+    for (const file of candidates) {
+      const full = path.resolve(file);
+      if (protectedFiles.has(full) || !safe(full) || records.some(r => r.id !== rec.id && storage.paths(r).includes(full) && storage.locked(r))) continue;
+      const size = fs.statSync(full).size;
+      if (backupLeases.lockedPath(full) || backupLeases.lockedRecording(rec)) continue;
+      fs.unlinkSync(full); bytes += size; files++;
+      // Remove stale references from every owner, including merged segment records.
+      for (const owner of records.filter(r => storage.paths(r).includes(full))) {
+        const update = { sourceFiles: (owner.sourceFiles || []).filter(p => path.resolve(p) !== full) };
+        if (owner.replayRecovery?.replayFilePath && path.resolve(owner.replayRecovery.replayFilePath) === full) update.replayRecovery = { ...owner.replayRecovery, replayFilePath: null };
+        manager.updateRecording(owner.id, update);
+      }
+    }
+  }
+  const cache = path.join(root, ".official-replays");
+  if (fs.existsSync(cache) && fs.realpathSync(cache) === cache) for (const entry of fs.readdirSync(cache, { withFileTypes: true })) {
+    if (!entry.isDirectory() || !/^\d+$/.test(entry.name)) continue;
+    const dir = path.join(cache, entry.name);
+    if (fs.realpathSync(dir) !== dir) continue;
+    const owners = records.filter(r => String(r.liveId) === entry.name);
+    if (owners.some(r => storage.locked(r) || require("./replay-audit").busy(r.id))) continue;
+    const transient = fs.readdirSync(dir).filter(n => /^asset-\d{5}\.[a-z0-9]{1,8}(?:\.part)?$/i.test(n) || ["local.m3u8", "replay.processing.mp4", "plan.json"].includes(n));
+    if (!transient.length || transient.some(n => !safe(path.join(dir, n)))) continue;
+    const newest = Math.max(...transient.map(n => fs.statSync(path.join(dir, n)).mtimeMs));
+    if (now - newest < DAY) continue;
+    const transientBytes = transient.reduce((n, f) => n + fs.statSync(path.join(dir, f)).size, 0);
+    if (transient.some(n => backupLeases.lockedPath(path.join(dir, n)))) continue;
+    files += media.cleanupTransient(dir);
+    bytes += transientBytes;
+  }
+  if (files) console.log(`[retention] removed ${files} duplicate/cache files (${bytes} bytes)`);
+  return { files, bytes };
+}
+
+// Water-level purge. The operator keeps every archive main file and removes them
+// by hand, so this pass only reclaims fragments and cache until the target line.
+// A broken archive is decoded once per process, not on every sweep: re-verifying
+// a large file every ten minutes would cost more than it reclaims.
+const brokenMemo = new Set();
+async function purge(root) {
+  const limits = config();
+  const free = freeBytes(root);
+  if (free >= limits.reserveBytes) return { files: 0, bytes: 0, free, skipped: "above-reserve" };
+  const records = manager.getRecordings({ includeDeleted: true, includeMerged: true });
+  // Fragments of an archive whose main file failed verification are the last
+  // complete copy; that archive's fragments are never reclaimed by the purge.
+  const brokenArchives = new Set();
+  const heldArchives = new Set();
+  for (const rec of records) {
+    if (rec.status !== "done" || !rec.filePath) continue;
+    // An archive that has not served its verified retention window yet keeps its
+    // fragments: only the main file is known good, and deleting the source is
+    // sweep()'s decision, made after that window elapses.
+    if (!rec.retentionVerifiedAt) { heldArchives.add(rec.id); continue; }
+    const state = rec.replayRecovery?.status;
+    if (["pending", "downloading", "verifying", "waiting_replay", "awaiting_archive"].includes(state)) continue;
+    const fingerprint = `${rec.filePath}|${rec.size || 0}`;
+    if (brokenMemo.has(fingerprint)) { brokenArchives.add(rec.id); continue; }
+    try {
+      await media.verifyFull(rec.filePath);
+      brokenMemo.delete(fingerprint);
+    } catch { brokenArchives.add(rec.id); brokenMemo.add(fingerprint); }
+  }
+  const brokenFiles = new Set();
+  for (const rec of records) {
+    if (!brokenArchives.has(rec.id) && !heldArchives.has(rec.id)) continue;
+    for (const file of storage.paths(rec)) brokenFiles.add(path.resolve(file));
+  }
+  const { files: inventory } = storage.inventory(root);
+  const queueFiles = new Set(manager.getQueue()
+    .filter((q) => ["queued", "waiting_credentials", "uploading", "paused_recording"].includes(q.status))
+    .map((q) => path.resolve(q.file || "")));
+  const candidates = inventory
+    .filter((file) => file.kind !== "main")
+    .filter((file) => !file.locked)
+    .filter((file) => !brokenFiles.has(path.resolve(file.filePath)))
+    .filter((file) => !queueFiles.has(path.resolve(file.filePath)))
+    .sort((a, b) => a.size - b.size);
+  let bytes = 0, files = 0, current = free;
+  for (const file of candidates) {
+    if (current >= limits.targetBytes) break;
+    try {
+      const size = fs.statSync(file.filePath).size;
+      if (backupLeases.lockedPath(file.filePath)) continue;
+      fs.unlinkSync(file.filePath);
+      dropReference(path.resolve(file.filePath), records);
+      current += size; bytes += size; files++;
+    } catch { /* A file that vanished or is unreadable is simply skipped. */ }
+  }
+  if (files) console.log(`[retention] water-level purge removed ${files} fragment/cache files (${bytes} bytes, free ${current})`);
+  return { files, bytes, free: current, broken: brokenArchives.size };
+}
+
+let running = false;
+async function tick() {
+  if (running) return;
+  running = true;
+  try {
+    await sweep();
+    const root = fs.realpathSync(require("../pocket48/recorder")._internals.recordingsDir());
+    await purge(root);
+  } catch (e) { console.error("[retention]", e.message); } finally { running = false; }
+}
+function start() { if (!timer) { timer = setInterval(() => { void tick(); }, 600000); timer.unref(); } }
+function stop() { clearInterval(timer); timer = null; }
+module.exports = { sweep, purge, start, stop, _internals: { config, freeBytes, DEFAULT_RESERVE_GIB, DEFAULT_TARGET_GIB } };

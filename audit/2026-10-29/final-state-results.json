@@ -1,0 +1,8 @@
+[
+  {
+    "name": "node_probe",
+    "exit": 0,
+    "stdout": "{\"sampledAt\":\"2026-10-30T02:00:23.190Z\",\"host\":\"5764ea4c846f\",\"version\":\"1.31.1\",\"freeGiB\":17.85,\"diskTotalGiB\":39.2,\"activeRecordings\":[],\"preserved\":[{\"liveId\":\"1321966661005021184\",\"status\":\"failed\"}],\"cachedSegments\":{\"1321966661005021184\":1612,\"1322332610476445696\":0},\"verifiedMaster\":{\"exists\":false,\"size\":null,\"manifest\":null}}\n",
+    "stderr": ""
+  }
+]

@@ -1,0 +1,18 @@
+const fs = require("fs");
+const raw = fs.readFileSync("/hosttmp/am0.txt", "utf8");
+const start = raw.indexOf("("), end = raw.lastIndexOf(")");
+const json = JSON.parse(raw.slice(start + 1, end));
+const rows = json.rows;
+console.log("top keys:", Object.keys(json).join(","), "total:", json.total);
+console.log("rows:", rows.length);
+const keys = new Set();
+for (const r of rows) for (const k of Object.keys(r)) keys.add(k);
+console.log("row keys:", [...keys].join(","));
+const groups = new Map();
+for (const r of rows) groups.set(r.gid, (groups.get(r.gid) || 0) + 1);
+console.log("by gid:", [...groups].join(" "));
+const teams = new Map();
+for (const r of rows) teams.set(`${r.gid}/${r.tname}`, (teams.get(`${r.gid}/${r.tname}`) || 0) + 1);
+console.log("teams:", [...teams].map(([k, v]) => `${k}=${v}`).join(" "));
+console.log("with pocket_id:", rows.filter(r => r.pocket_id).length);
+console.log("sample:", JSON.stringify(rows[0]).slice(0, 500));

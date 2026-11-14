@@ -1,0 +1,98 @@
+import {
+  createSlice,
+  createEntityAdapter,
+  type Slice,
+  type PayloadAction,
+  type CaseReducer,
+  type CaseReducerActions,
+  type EntityAdapter,
+  type EntityState,
+  type EntitySelectors
+} from '@reduxjs/toolkit';
+import { ProgressSet } from '../../../components/ProgressNative/index';
+import type { DownloadItem } from '../types';
+import type { MessageEventData } from '../../../utils/worker/download.worker/download.worker';
+import type { WebWorkerChildItem } from '../../../commonTypes';
+
+// 下载列表
+type BilibiliDownloadEntityState = EntityState<DownloadItem, string>;
+
+export const bilibiliDownloadListAdapter: EntityAdapter<DownloadItem, string> = createEntityAdapter({
+  selectId: (item: DownloadItem): string => item.qid
+});
+export const bilibiliDownloadListSelectors: EntitySelectors<DownloadItem, BilibiliDownloadEntityState, string>
+  = bilibiliDownloadListAdapter.getSelectors();
+
+export interface BilibiliDownloadInitialState extends BilibiliDownloadEntityState {
+  downloadProgress: { [key: string]: ProgressSet };
+  downloadWorkerList: Array<WebWorkerChildItem>;
+}
+
+type SliceReducers = {
+  setAddDownloadList: CaseReducer<BilibiliDownloadInitialState, PayloadAction<DownloadItem>>;
+  setAddMoreDownloadLists: CaseReducer<BilibiliDownloadInitialState, PayloadAction<Array<DownloadItem>>>;
+  setDeleteDownloadList: CaseReducer<BilibiliDownloadInitialState, PayloadAction<string>>;
+  setDownloadProgress: CaseReducer<BilibiliDownloadInitialState, PayloadAction<MessageEventData>>;
+  setAddDownloadWorker: CaseReducer<BilibiliDownloadInitialState, PayloadAction<WebWorkerChildItem>>;
+  setDeleteDownloadWorker: CaseReducer<BilibiliDownloadInitialState, PayloadAction<DownloadItem>>;
+};
+
+const sliceName: 'bilibiliDownload' = 'bilibiliDownload';
+const { actions, reducer }: Slice<BilibiliDownloadInitialState, SliceReducers, typeof sliceName> = createSlice({
+  name: sliceName,
+  initialState: bilibiliDownloadListAdapter.getInitialState({
+    downloadProgress: {},  // 下载进度
+    downloadWorkerList: [] // 下载的worker
+  }),
+  reducers: {
+    setAddDownloadList: bilibiliDownloadListAdapter.addOne,       // 添加下载
+    setAddMoreDownloadLists: bilibiliDownloadListAdapter.addMany, // 添加多个下载
+    setDeleteDownloadList: bilibiliDownloadListAdapter.removeOne, // 删除下载
+
+    // 设置下载进度
+    setDownloadProgress(state: BilibiliDownloadInitialState, action: PayloadAction<MessageEventData>): void {
+      const { type, qid, data }: MessageEventData = action.payload;
+
+      if (type === 'progress') {
+        if (!state.downloadProgress[qid]) {
+          state.downloadProgress[qid] = new ProgressSet(qid);
+          state.downloadProgress = { ...state.downloadProgress };
+        }
+
+        state.downloadProgress[qid].value = data;
+      } else if (type === 'success') {
+        delete state.downloadProgress[qid]; // 下载完成
+        state.downloadProgress = { ...state.downloadProgress };
+      }
+    },
+
+    // 添加一个下载线程
+    setAddDownloadWorker(state: BilibiliDownloadInitialState, action: PayloadAction<WebWorkerChildItem>): void {
+      state.downloadWorkerList = state.downloadWorkerList.concat([action.payload]);
+    },
+
+    // 删除一个下载线程
+    setDeleteDownloadWorker(state: BilibiliDownloadInitialState, action: PayloadAction<DownloadItem>): void {
+      const index: number = state.downloadWorkerList.findIndex(
+        (o: WebWorkerChildItem): boolean => o.id === action.payload.qid);
+
+      if (index >= 0) {
+        state.downloadWorkerList.splice(index, 1);
+        delete state.downloadProgress[action.payload.qid];
+
+        state.downloadWorkerList = [...state.downloadWorkerList];
+        state.downloadProgress = { ...state.downloadProgress };
+      }
+    }
+  }
+});
+
+export const {
+  setAddDownloadList,
+  setAddMoreDownloadLists,
+  setDeleteDownloadList,
+  setDownloadProgress,
+  setAddDownloadWorker,
+  setDeleteDownloadWorker
+}: CaseReducerActions<SliceReducers, typeof sliceName> = actions;
+export default { [sliceName]: reducer };

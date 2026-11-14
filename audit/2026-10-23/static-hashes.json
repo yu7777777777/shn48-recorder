@@ -1,0 +1,361 @@
+{
+  "sampledAt": "2026-10-23T10:44:28.047Z",
+  "base": "http://<SERVER_IP>:3000",
+  "count": 44,
+  "remoteMatches": 44,
+  "auditBuildMatches": 44,
+  "rows": [
+    {
+      "path": "assets/AdminLogin-7hce9mp-.js",
+      "httpStatus": 200,
+      "localSha256": "36c99cffdd485591e4c6546b91a59628aaa67e66e84514b01d6455bf5a1ff20b",
+      "remoteSha256": "36c99cffdd485591e4c6546b91a59628aaa67e66e84514b01d6455bf5a1ff20b",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/AnalysisPanel-BkQ8dXnA.css",
+      "httpStatus": 200,
+      "localSha256": "464cd33d8f2d13eda62fdf2778959eef5616b7889921c4018d998b2d6e191a68",
+      "remoteSha256": "464cd33d8f2d13eda62fdf2778959eef5616b7889921c4018d998b2d6e191a68",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/AnalysisSettings-D81RFfco.js",
+      "httpStatus": 200,
+      "localSha256": "721ae7092fc15c3ef4dc182423249cbd87a9160b6ab497048d6f2ffda36d15a4",
+      "remoteSha256": "721ae7092fc15c3ef4dc182423249cbd87a9160b6ab497048d6f2ffda36d15a4",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/AutoRecord-TX2GGUxe.js",
+      "httpStatus": 200,
+      "localSha256": "70ca72005017d9e6e1362139d14ceed2678388379186db9273b2dd9576ed9b54",
+      "remoteSha256": "70ca72005017d9e6e1362139d14ceed2678388379186db9273b2dd9576ed9b54",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/Backup115-EI98zjVG.css",
+      "httpStatus": 200,
+      "localSha256": "8cd180b24850e5d920cb7fb5f58009f3fd10922f751a89fccc46765d79ab7109",
+      "remoteSha256": "8cd180b24850e5d920cb7fb5f58009f3fd10922f751a89fccc46765d79ab7109",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/Badge-DkvgeXE1.js",
+      "httpStatus": 200,
+      "localSha256": "0628ff7dffc0c7bbfa5d25e7bd6898b595672b5d5ad9ecf5826f8fb0c1db860a",
+      "remoteSha256": "0628ff7dffc0c7bbfa5d25e7bd6898b595672b5d5ad9ecf5826f8fb0c1db860a",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/Bilibili-B0EHqDOG.js",
+      "httpStatus": 200,
+      "localSha256": "fe095163e4b14cd1e2f7db5089072bd73cfbfc74dc4b244f20bbf39cb2ecad18",
+      "remoteSha256": "fe095163e4b14cd1e2f7db5089072bd73cfbfc74dc4b244f20bbf39cb2ecad18",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/Config-aE97IUwf.js",
+      "httpStatus": 200,
+      "localSha256": "d61801bbc8d74b804b6009eefdaa7b7af4b5eafd9e187f5159ec3a3bf87c26bd",
+      "remoteSha256": "d61801bbc8d74b804b6009eefdaa7b7af4b5eafd9e187f5159ec3a3bf87c26bd",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/ConfirmModal-DiD-DPu2.js",
+      "httpStatus": 200,
+      "localSha256": "38d79e9a6d1dc34d8fefdd55c8e43d2f4435bdbb327713e6b5f7901c15411495",
+      "remoteSha256": "38d79e9a6d1dc34d8fefdd55c8e43d2f4435bdbb327713e6b5f7901c15411495",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/CoverPicker-BCfen5px.js",
+      "httpStatus": 200,
+      "localSha256": "82534166dee11947efc4cfb02f05f019665bf2ae00b63e3a19e933d84f544e40",
+      "remoteSha256": "82534166dee11947efc4cfb02f05f019665bf2ae00b63e3a19e933d84f544e40",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/Dashboard-pIJDWEbS.js",
+      "httpStatus": 200,
+      "localSha256": "26e33b49cebcb6bf083f68de15155a7369ea0fcf5dd2f64c34a423aafad5109b",
+      "remoteSha256": "26e33b49cebcb6bf083f68de15155a7369ea0fcf5dd2f64c34a423aafad5109b",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/EmptyState-CdfQLKix.js",
+      "httpStatus": 200,
+      "localSha256": "baf94a52322ac8c4aebd139f977c11d2dfc51cbedf8cc90af4e7ae5cd5d3aaff",
+      "remoteSha256": "baf94a52322ac8c4aebd139f977c11d2dfc51cbedf8cc90af4e7ae5cd5d3aaff",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/flv-CwS9Olga.js",
+      "httpStatus": 200,
+      "localSha256": "edcc4640166b31184436cc126394ef9efcf8f5c124875832e511d2128f2f8477",
+      "remoteSha256": "edcc4640166b31184436cc126394ef9efcf8f5c124875832e511d2128f2f8477",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/hls-bsuTaLC4.js",
+      "httpStatus": 200,
+      "localSha256": "cec67e93b2b991370728742027028a312b77a07cabbe476e8ab4c2e3048ff435",
+      "remoteSha256": "cec67e93b2b991370728742027028a312b77a07cabbe476e8ab4c2e3048ff435",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/index-BNOVxFIP.css",
+      "httpStatus": 200,
+      "localSha256": "68f0072843ca29c1db6bfcc542f84b50224b13a02b3e1defd86207c3f694b5b7",
+      "remoteSha256": "68f0072843ca29c1db6bfcc542f84b50224b13a02b3e1defd86207c3f694b5b7",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/index-DSP0cXTF.js",
+      "httpStatus": 200,
+      "localSha256": "299a164aaaec0810e115cc684d416ffb2bfe8e55c17e5d37b656105530c7b9e7",
+      "remoteSha256": "299a164aaaec0810e115cc684d416ffb2bfe8e55c17e5d37b656105530c7b9e7",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/Live-BHi5x5c9.js",
+      "httpStatus": 200,
+      "localSha256": "735f00fbf7b13541f2dd82035b8588087493957a6b900249c4e40a261aae31a5",
+      "remoteSha256": "735f00fbf7b13541f2dd82035b8588087493957a6b900249c4e40a261aae31a5",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/PlatformIcon-B6krSZ4-.js",
+      "httpStatus": 200,
+      "localSha256": "6d2b100daf303bb58f81aff9c4cb6e95811ba2acc2ddb4eb3d786baa361eaa96",
+      "remoteSha256": "6d2b100daf303bb58f81aff9c4cb6e95811ba2acc2ddb4eb3d786baa361eaa96",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/Pocket48-1WTYQRH1.js",
+      "httpStatus": 200,
+      "localSha256": "e672e3cef60f2a220efe1db7e5f7d41f24740253dcdec4481fc5cff7fb61eb9d",
+      "remoteSha256": "e672e3cef60f2a220efe1db7e5f7d41f24740253dcdec4481fc5cff7fb61eb9d",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/Pocket48-DknBhtid.css",
+      "httpStatus": 200,
+      "localSha256": "a26e95d0f5edd4db1205341b1637c8fffd98767f5e863fecff516039240ffe3e",
+      "remoteSha256": "a26e95d0f5edd4db1205341b1637c8fffd98767f5e863fecff516039240ffe3e",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/pocket48-message-56SyfPP3.js",
+      "httpStatus": 200,
+      "localSha256": "a90d570839c6016c821a86e542f2859f28f6c7eb222d0a84d5f5cd656ed29c24",
+      "remoteSha256": "a90d570839c6016c821a86e542f2859f28f6c7eb222d0a84d5f5cd656ed29c24",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/ProgressBar-CWbzFSLF.js",
+      "httpStatus": 200,
+      "localSha256": "f81acda05929470c541fb2d9448f16ad0448bb6e4fa0baf5373f043b168bb424",
+      "remoteSha256": "f81acda05929470c541fb2d9448f16ad0448bb6e4fa0baf5373f043b168bb424",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/PublicLive-BJFe1wdg.js",
+      "httpStatus": 200,
+      "localSha256": "2bc3253a17e5155dbbe8e4e34f6a8cca8283a324c278d371261440179b4710a9",
+      "remoteSha256": "2bc3253a17e5155dbbe8e4e34f6a8cca8283a324c278d371261440179b4710a9",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/PublicMediaTabs-en3W-jMI.js",
+      "httpStatus": 200,
+      "localSha256": "1ffe08626c005ac40670e1bd363a9041e70ed9c4d0a873e685e05673f353736b",
+      "remoteSha256": "1ffe08626c005ac40670e1bd363a9041e70ed9c4d0a873e685e05673f353736b",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/PublicReplay-BNUVdUW0.js",
+      "httpStatus": 200,
+      "localSha256": "ce47c7d14cb18b5c6ee10ba235fd8ce4fe6f78eca8104730a96a18b491d15354",
+      "remoteSha256": "ce47c7d14cb18b5c6ee10ba235fd8ce4fe6f78eca8104730a96a18b491d15354",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/PublicReplay-DL9DTqPo.css",
+      "httpStatus": 200,
+      "localSha256": "0514c0e758f18a7b83f8e7e59f0e1cf799aa03f2fa0b68a0ea8ff9066d0c8b6a",
+      "remoteSha256": "0514c0e758f18a7b83f8e7e59f0e1cf799aa03f2fa0b68a0ea8ff9066d0c8b6a",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/PublicSocial-DxXxzPK5.js",
+      "httpStatus": 200,
+      "localSha256": "cd4be62428405597764962ba8d28ed73b440b894a00cc468c51a5914f10fcfab",
+      "remoteSha256": "cd4be62428405597764962ba8d28ed73b440b894a00cc468c51a5914f10fcfab",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/RecordingDetail-34FAXwMZ.js",
+      "httpStatus": 200,
+      "localSha256": "d036ef7019f42284e2b99f16addecc266b5da9c3794fd54c22f58b67cbcfd290",
+      "remoteSha256": "d036ef7019f42284e2b99f16addecc266b5da9c3794fd54c22f58b67cbcfd290",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/RecordingDetail-mbL4JAjz.css",
+      "httpStatus": 200,
+      "localSha256": "9838b7d6e3eba2ecd8d4e758fbd6c4684ed1798b2e50b9df0ce8eefbe302fa11",
+      "remoteSha256": "9838b7d6e3eba2ecd8d4e758fbd6c4684ed1798b2e50b9df0ce8eefbe302fa11",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/ReplayAnalysisImport-Cv6EXZeu.js",
+      "httpStatus": 200,
+      "localSha256": "38b58400d1e6a01f2b78b271ffc79fae47356157d04b95fefe954a1cb20bb8d6",
+      "remoteSha256": "38b58400d1e6a01f2b78b271ffc79fae47356157d04b95fefe954a1cb20bb8d6",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/ReplayAnalysisImport-Dd1tXUgP.css",
+      "httpStatus": 200,
+      "localSha256": "3ebd798811c19dcb27ea0f5e82189a4b4e00998f940124c0026bbb775400b13b",
+      "remoteSha256": "3ebd798811c19dcb27ea0f5e82189a4b4e00998f940124c0026bbb775400b13b",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/ReplayAudit-BJr3-GM5.css",
+      "httpStatus": 200,
+      "localSha256": "b6ed402a9fe27f6e0775bace82de608a159cfde6624956cd6da3cf65568079a6",
+      "remoteSha256": "b6ed402a9fe27f6e0775bace82de608a159cfde6624956cd6da3cf65568079a6",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/ReplayAudit-CBTLqRiE.js",
+      "httpStatus": 200,
+      "localSha256": "57bd9ec515c92b68d7f78bc7bd68c485659657f8219cade4be7c2bdd7701518a",
+      "remoteSha256": "57bd9ec515c92b68d7f78bc7bd68c485659657f8219cade4be7c2bdd7701518a",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/ReplayRecovery-D9tPCPyJ.js",
+      "httpStatus": 200,
+      "localSha256": "cf61a12fdce3d87711046b7781e25f6642dab0d2077b4c7bc38194c397307b16",
+      "remoteSha256": "cf61a12fdce3d87711046b7781e25f6642dab0d2077b4c7bc38194c397307b16",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/SafeImage-BW8xs7Pb.js",
+      "httpStatus": 200,
+      "localSha256": "7931ddc0136aa94aacf58d6554d6f2908009300d7de81fda6c4c6e02814deb76",
+      "remoteSha256": "7931ddc0136aa94aacf58d6554d6f2908009300d7de81fda6c4c6e02814deb76",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/Security-F2KQ95vl.js",
+      "httpStatus": 200,
+      "localSha256": "7339c8f5cf4e5527466904868fd17fe56d89d6361256542958b72ad49c70db75",
+      "remoteSha256": "7339c8f5cf4e5527466904868fd17fe56d89d6361256542958b72ad49c70db75",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/SocialAccounts-DgmigfAS.js",
+      "httpStatus": 200,
+      "localSha256": "6e31f76ebdfb811de850af751741ebe24585b45e11a595f6e550aafb4f7180c3",
+      "remoteSha256": "6e31f76ebdfb811de850af751741ebe24585b45e11a595f6e550aafb4f7180c3",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/SocialAccounts-DRTAAXZm.css",
+      "httpStatus": 200,
+      "localSha256": "44076ee99abb33e9111e6a8692b8ac7e121a66750930d564b2399fddfa648bcd",
+      "remoteSha256": "44076ee99abb33e9111e6a8692b8ac7e121a66750930d564b2399fddfa648bcd",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/usePolling-BAQwvtF_.js",
+      "httpStatus": 200,
+      "localSha256": "4a0a959bf4d3e630d54d2d3d5e3353db173b6fb7175fb299609e0bf0aca81830",
+      "remoteSha256": "4a0a959bf4d3e630d54d2d3d5e3353db173b6fb7175fb299609e0bf0aca81830",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/vendor-react-CUnftwWn.js",
+      "httpStatus": 200,
+      "localSha256": "7eef454e6e1f5970ae9a2d31c77e36cfa6c22ab42575afa1209cbad75273245c",
+      "remoteSha256": "7eef454e6e1f5970ae9a2d31c77e36cfa6c22ab42575afa1209cbad75273245c",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/Video-BA5XYIvP.js",
+      "httpStatus": 200,
+      "localSha256": "4ad3850dfce7fe4de2d4ca6ef05c3a11cf0b96d3c6edd6f90a18326239ad63e2",
+      "remoteSha256": "4ad3850dfce7fe4de2d4ca6ef05c3a11cf0b96d3c6edd6f90a18326239ad63e2",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "assets/VideoPlayer-DV9v6Wmm.js",
+      "httpStatus": 200,
+      "localSha256": "10c1836309cf51aeeb8a29ec790aab3f7f40105e714b7407153322c74d62d390",
+      "remoteSha256": "10c1836309cf51aeeb8a29ec790aab3f7f40105e714b7407153322c74d62d390",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "favicon.svg",
+      "httpStatus": 200,
+      "localSha256": "48e4515f1ddc21080f297326124c47f69735b1daa88a445d70c65718923390a1",
+      "remoteSha256": "48e4515f1ddc21080f297326124c47f69735b1daa88a445d70c65718923390a1",
+      "matches": true,
+      "matchesAuditBuild": true
+    },
+    {
+      "path": "index.html",
+      "httpStatus": 200,
+      "localSha256": "14cb17ad1c10e4ae3e497cb6b5f13e44edba349bccc471d12d70e5c3eac51f70",
+      "remoteSha256": "14cb17ad1c10e4ae3e497cb6b5f13e44edba349bccc471d12d70e5c3eac51f70",
+      "matches": true,
+      "matchesAuditBuild": true
+    }
+  ]
+}

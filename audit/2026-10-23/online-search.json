@@ -1,0 +1,10 @@
+{
+  "sampledAt": "2026-10-23T10:46:02.609Z",
+  "probe": "online-live-search",
+  "liveCardsBefore": 1,
+  "query": "audit-no-match-7f3c",
+  "errors": [
+    "l.category.toLowerCase is not a function"
+  ],
+  "rootLengthAfter": 0
+}

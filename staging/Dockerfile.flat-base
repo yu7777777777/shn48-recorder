@@ -1,0 +1,7 @@
+FROM scratch
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV BACKUP115_PYTHON=/opt/backup115/venv/bin/python
+WORKDIR /app/server
+EXPOSE 3000/tcp
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["/entrypoint.sh"]

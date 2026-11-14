@@ -1,0 +1,520 @@
+from __future__ import annotations
+
+from enum import StrEnum
+from typing import Any, Literal
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+AICoverLayoutStyle = Literal[
+    "sticker_pop",
+    "editorial_arc",
+    "banner_energy",
+]
+
+
+class JobStatus(StrEnum):
+    QUEUED = "queued"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class JobStage(StrEnum):
+    QUEUED = "queued"
+    RESOLVING = "resolving"
+    FETCHING_DANMAKU = "fetching_danmaku"
+    EXTRACTING_AUDIO = "extracting_audio"
+    UPLOADING_AUDIO = "uploading_audio"
+    TRANSCRIBING = "transcribing"
+    NORMALIZING_TRANSCRIPT = "normalizing_transcript"
+    SUMMARIZING_CHUNKS = "summarizing_chunks"
+    SUMMARIZING_FINAL = "summarizing_final"
+    CLEANING_UP = "cleaning_up"
+    COMPLETED = "completed"
+
+
+class RoomVoiceProcessingStage(StrEnum):
+    QUEUED = "queued"
+    PREPARING_AUDIO = "preparing_audio"
+    UPLOADING_AUDIO = "uploading_audio"
+    TRANSCRIBING = "transcribing"
+    NORMALIZING_TRANSCRIPT = "normalizing_transcript"
+    SUMMARIZING_CHUNKS = "summarizing_chunks"
+    SUMMARIZING_FINAL = "summarizing_final"
+    CLEANING_UP = "cleaning_up"
+    COMPLETED = "completed"
+
+
+class SubtitleTranslationStatus(StrEnum):
+    QUEUED = "queued"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class GlossaryTermType(StrEnum):
+    CP_NAME = "cp_name"
+    TEAM_ABBREVIATION = "team_abbreviation"
+    STAGE = "stage"
+    SONG = "song"
+    UNIT = "unit"
+    EVENT = "event"
+    FANDOM = "fandom"
+    OTHER = "other"
+
+
+class MemberCatalogEntry(BaseModel):
+    member_id: str
+    canonical_name: str
+    pinyin: str = ""
+    group_id: str = ""
+    group_name: str = ""
+    team_id: str = ""
+    team_name: str = ""
+    status: str
+    ranking: int = 0
+    active: bool
+
+
+class MemberCatalogRecord(MemberCatalogEntry):
+    source_present: bool
+    source: str
+    # Whether the official feed still lists the member. `active` is the
+    # effective flag, derived as `source_active and not admin_disabled`.
+    source_active: bool = False
+    admin_disabled: bool = False
+    first_seen_at: str
+    last_seen_at: str
+
+
+class MemberCatalogGroupRecord(BaseModel):
+    group_id: str
+    group_name: str = ""
+    member_count: int = 0
+    disabled_count: int = 0
+    active_count: int = 0
+
+
+class MemberCatalogTeamRecord(BaseModel):
+    group_id: str
+    group_name: str = ""
+    team_name: str = ""
+    member_count: int = 0
+    disabled_count: int = 0
+    active_count: int = 0
+
+
+class MemberJobFilterRecord(BaseModel):
+    member_id: str
+    member_name: str
+    group_name: str = ""
+    job_count: int = Field(ge=1)
+
+
+class GlossaryTermRecord(BaseModel):
+    id: str
+    canonical_text: str
+    canonical_normalized: str
+    term_type: str
+    description_zh: str
+    description_en: str
+    source: str
+    active: bool
+    created_by_user_id: str | None = None
+    created_at: str
+    updated_at: str
+
+
+class GlossaryAliasRecord(BaseModel):
+    id: str
+    member_id: str | None = None
+    term_id: str | None = None
+    alias: str
+    alias_normalized: str
+    active: bool
+    created_by_user_id: str | None = None
+    created_at: str
+    updated_at: str
+    target_text: str
+    target_type: str
+
+
+class GlossarySyncStateRecord(BaseModel):
+    source_url: str
+    sync_status: str
+    source_hash: str | None = None
+    catalog_version: str | None = None
+    glossary_fingerprint: str | None = None
+    member_count: int
+    active_member_count: int
+    last_attempt_at: str | None = None
+    last_success_at: str | None = None
+    last_error: str | None = None
+    active_vocabulary_id: str | None = None
+    vocabulary_fingerprint: str | None = None
+    vocabulary_updated_at: str | None = None
+    vocabulary_error: str | None = None
+
+
+class ReplayMetadata(BaseModel):
+    live_id: str
+    member_id: str
+    member_name: str
+    title: str
+    cover_url: str | None = None
+    replay_started_at: str | None = None
+    duration_ms: int | None = None
+    media_url: str
+    danmaku_url: str | None = None
+
+
+class TranscriptSegment(BaseModel):
+    sequence: int
+    start_ms: int = Field(ge=0)
+    end_ms: int = Field(ge=0)
+    text: str
+    speaker_id: str | None = None
+
+
+class DanmakuEntry(BaseModel):
+    sequence: int
+    timestamp_ms: int = Field(ge=0)
+    author: str
+    text: str
+
+
+class DanmakuPeak(BaseModel):
+    rank: int
+    start_ms: int = Field(ge=0)
+    end_ms: int = Field(ge=0)
+    message_count: int = Field(ge=0)
+    score: float = Field(ge=0)
+    samples: list[dict[str, Any]] = Field(default_factory=list)
+    summary: str = ""
+
+
+class StrictSummaryModel(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class SummaryCandidate(StrictSummaryModel):
+    start_ms: int
+    end_ms: int
+    title: str
+    detail: str
+    evidence_segment_ids: list[int] = Field(min_length=1)
+
+
+class ChunkSummary(StrictSummaryModel):
+    start_ms: int
+    end_ms: int
+    summary: str
+    topics: list[str] = Field(default_factory=list)
+    timeline_candidates: list[SummaryCandidate] = Field(
+        min_length=1,
+        max_length=3,
+    )
+    highlight_candidates: list[SummaryCandidate] = Field(default_factory=list)
+    verification_needed: list[str] = Field(default_factory=list)
+    evidence_segment_ids: list[int] = Field(default_factory=list)
+
+
+class TimelineItem(StrictSummaryModel):
+    start_ms: int
+    end_ms: int
+    title: str
+    detail: str
+    evidence_segment_ids: list[int] = Field(min_length=1)
+
+
+class TopicItem(StrictSummaryModel):
+    name: str
+    detail: str
+    evidence_segment_ids: list[int] = Field(default_factory=list)
+
+
+class HighlightItem(StrictSummaryModel):
+    start_ms: int
+    end_ms: int
+    title: str
+    detail: str
+    evidence_segment_ids: list[int] = Field(min_length=1)
+    danmaku_evidence: str | None = None
+
+
+class DanmakuPeakSummary(StrictSummaryModel):
+    start_ms: int = Field(ge=0)
+    end_ms: int = Field(ge=0)
+    summary: str = Field(min_length=1)
+    evidence_segment_ids: list[int] = Field(default_factory=list)
+
+
+class FinalSummary(StrictSummaryModel):
+    overview: str
+    card_summary: str = ""
+    timeline: list[TimelineItem]
+    topics: list[TopicItem]
+    highlights: list[HighlightItem]
+    danmaku_peak_summaries: list[DanmakuPeakSummary] = Field(
+        default_factory=list
+    )
+    verification_needed: list[str] = Field(default_factory=list)
+
+
+class JobRecord(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    source_url: str
+    live_id: str
+    status: JobStatus
+    stage: JobStage
+    progress_percent: int
+    progress_message: str
+    member_id: str | None = None
+    member_name: str | None = None
+    title: str | None = None
+    cover_url: str | None = None
+    replay_started_at: str | None = None
+    duration_ms: int | None = None
+    media_url: str | None = None
+    danmaku_url: str | None = None
+    danmaku_loaded_at: str | None = None
+    audio_path: str | None = None
+    audio_extracted_at: str | None = None
+    oss_object_key: str | None = None
+    oss_uploaded_at: str | None = None
+    dashscope_task_id: str | None = None
+    dashscope_task_status: str | None = None
+    asr_vocabulary_id: str | None = None
+    asr_glossary_fingerprint: str | None = None
+    asr_raw_json: str | None = None
+    asr_completed_at: str | None = None
+    summary_json: str | None = None
+    summary_markdown: str | None = None
+    error_code: str | None = None
+    error_message: str | None = None
+    error_retryable: bool = False
+    cleanup_warning: str | None = None
+    retry_count: int = 0
+    worker_id: str | None = None
+    lease_expires_at: str | None = None
+    created_at: str
+    updated_at: str
+    started_at: str | None = None
+    completed_at: str | None = None
+
+
+class RoomVoiceProcessingRecord(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    session_id: str
+    monitor_id: str
+    member_name: str | None = None
+    member_id: str | None = None
+    room_id: str | None = None
+    channel_id: str | None = None
+    server_id: str | None = None
+    capture_started_at: str | None = None
+    capture_ended_at: str | None = None
+    status: JobStatus
+    stage: RoomVoiceProcessingStage
+    progress_percent: int
+    progress_message: str
+    segment_count: int
+    total_bytes: int
+    audio_path: str | None = None
+    oss_object_key: str | None = None
+    dashscope_task_id: str | None = None
+    dashscope_task_status: str | None = None
+    asr_raw_json: str | None = None
+    summary_json: str | None = None
+    summary_markdown: str | None = None
+    error_code: str | None = None
+    error_message: str | None = None
+    error_retryable: bool = False
+    retry_count: int = 0
+    worker_id: str | None = None
+    lease_expires_at: str | None = None
+    created_at: str
+    updated_at: str
+    started_at: str | None = None
+    completed_at: str | None = None
+    messages_status: JobStatus
+    messages_version: str | None = None
+    messages_error_code: str | None = None
+    messages_error_message: str | None = None
+    messages_error_retryable: bool = False
+    messages_worker_id: str | None = None
+    messages_lease_expires_at: str | None = None
+    messages_completed_at: str | None = None
+
+
+class RoomVoicePublicMessageRecord(BaseModel):
+    session_id: str
+    message_id: str
+    timestamp_ms: int = Field(ge=0)
+    sent_at: str
+    nickname: str = Field(min_length=1, max_length=100)
+    text: str = Field(min_length=1, max_length=1000)
+
+
+class VideoClipRecord(BaseModel):
+    job_id: str
+    timeline_index: int
+    start_ms: int
+    end_ms: int
+    filename: str
+    status: Literal["running", "completed", "failed"]
+    oss_object_key: str | None = None
+    error_message: str | None = None
+    created_at: str
+    updated_at: str
+    completed_at: str | None = None
+
+
+class ClipRange(BaseModel):
+    start_ms: int = Field(ge=0)
+    end_ms: int = Field(ge=1)
+
+    @model_validator(mode="after")
+    def validate_range(self) -> ClipRange:
+        if self.end_ms <= self.start_ms:
+            raise ValueError("clip range end must be after start")
+        return self
+
+
+class VideoClipExportRecord(BaseModel):
+    id: str
+    job_id: str
+    timeline_index: int
+    timeline_title: str
+    requested_by_user_id: str | None = None
+    request_id: str
+    start_ms: int
+    end_ms: int
+    kept_ranges: list[ClipRange]
+    subtitle_mode: Literal["off", "zh", "en", "bilingual"]
+    include_danmaku: bool
+    subtitle_font_scale: int
+    subtitle_text_color: str
+    subtitle_background_color: str
+    output_layout: Literal["portrait", "landscape"]
+    subtitle_font_family: Literal["wenkai", "serif", "sans"]
+    landscape_theme: Literal[
+        "cream", "denim", "mint", "sakura", "matcha", "ink"
+    ] = "cream"
+    cover_enabled: bool
+    cover_timestamp_ms: int | None = None
+    cover_title: str
+    cover_style: Literal["scrim", "display", "badge"]
+    ai_cover_generation_id: str | None = None
+    ai_cover_asset_id: str | None = None
+    ai_cover_final_oss_object_key: str | None = None
+    ai_cover_final_sha256: str | None = None
+    ai_cover_text_revision: int | None = None
+    render_version: str
+    filename: str
+    status: Literal["running", "completed", "failed"]
+    oss_object_key: str | None = None
+    error_message: str | None = None
+    warning_message: str | None = None
+    created_at: str
+    updated_at: str
+    completed_at: str | None = None
+
+
+class AICoverGenerationRecord(BaseModel):
+    id: str
+    job_id: str
+    timeline_index: int
+    requested_by_user_id: str | None = None
+    request_id: str
+    source_timestamp_ms: int
+    provider: str
+    model: str
+    prompt_version: str
+    prompt_template: str = ""
+    shared_seed: int | None = None
+    layout_style: AICoverLayoutStyle
+    title_text: str
+    highlight_text: str
+    extra_text: list[str]
+    status: Literal["queued", "running", "completed", "failed"]
+    error_code: str | None = None
+    error_message: str | None = None
+    created_at: str
+    updated_at: str
+    completed_at: str | None = None
+
+
+class AICoverAssetRecord(BaseModel):
+    id: str
+    generation_id: str
+    orientation: Literal["landscape", "four_three"]
+    width: int
+    height: int
+    status: Literal["queued", "running", "completed", "failed"]
+    provider_task_id: str | None = None
+    provider_request_id: str | None = None
+    background_oss_object_key: str | None = None
+    final_oss_object_key: str | None = None
+    background_sha256: str | None = None
+    final_sha256: str | None = None
+    text_revision: int
+    error_code: str | None = None
+    error_message: str | None = None
+    created_at: str
+    updated_at: str
+    completed_at: str | None = None
+
+
+class ClipBoundarySuggestionRecord(BaseModel):
+    job_id: str
+    cache_key: str
+    boundary_kind: Literal["start", "end"]
+    segment_sequence: int
+    anchor_ms: int
+    suggested_ms: int
+    silence_start_ms: int | None = None
+    silence_end_ms: int | None = None
+    analysis_version: str
+    created_at: str
+
+
+class SubtitleTranslationRequestRecord(BaseModel):
+    job_id: str
+    language: Literal["en"]
+    status: SubtitleTranslationStatus
+    retry_count: int
+    error_message: str | None = None
+    worker_id: str | None = None
+    lease_expires_at: str | None = None
+    requested_at: str
+    updated_at: str
+    started_at: str | None = None
+    completed_at: str | None = None
+
+
+class UserRecord(BaseModel):
+    id: str
+    username: str
+    username_normalized: str
+    password_hash: str
+    is_admin: bool
+    is_active: bool
+    failed_login_count: int
+    locked_until: str | None = None
+    created_at: str
+    last_login_at: str | None = None
+
+
+class SessionRecord(BaseModel):
+    id: str
+    user_id: str
+    token_hash: str
+    csrf_token_hash: str
+    created_at: str
+    expires_at: str
+    last_seen_at: str
+    user: UserRecord

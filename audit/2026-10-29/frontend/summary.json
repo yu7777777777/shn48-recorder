@@ -1,0 +1,824 @@
+{
+  "testFiles": 45,
+  "totals": [
+    "# tests 132",
+    "# suites 0",
+    "# pass 132",
+    "# fail 0",
+    "# cancelled 0",
+    "# skipped 0",
+    "# todo 0",
+    "# duration_ms 207651.42"
+  ],
+  "testNames": [
+    "admin credential form rejects incomplete and inconsistent values",
+    "admin credential form accepts a valid password change",
+    "lowercase and uppercase letters count as two password character types",
+    "clearing asks first, never fires without confirmation, and reports the empty result",
+    "an empty archive shows no clear action at all",
+    "evidence quotes the translations a reader actually needs",
+    "queue health explains parked work instead of hiding it",
+    "a healthy queue shows counts only, with no alarming filler",
+    "an older server without health data still renders",
+    "analysis evidence is strict source-indexed, expandable, safe text and seekable in both tabs",
+    "legacy entries do not invent evidence; unfinished exports hidden and old success survives failure",
+    "bilingual native WebVTT contains both languages and archive switch clears old UI and delayed responses",
+    "late task responses cannot add jobs or errors to a different archive",
+    "a batch audit lists every recording and never hides an unreadable one",
+    "batch failures show the server reason instead of an empty table",
+    "provenance stays collapsed until asked, then reports each stage honestly",
+    "a failed load shows the reason and retries without inventing data",
+    "the public summary switch is off by default and its children follow it",
+    "retry settings default off, disclose possible charges and save only explicit opt in",
+    "retrying tasks show bounded planned time and remain cancellable without scheduling extra work",
+    "archive cards keep cover, status and actions visible on desktop and mobile",
+    "archive UI explains segment joining and plays finalized MP4 files",
+    "archive UI exposes manual repost for repaired local archives",
+    "archive renders all six files and cleanup requires confirmation then refreshes totals",
+    "archive page displays available and total recording-disk capacity",
+    "F01 numeric live categories support empty, matching and nonmatching searches",
+    "F10 all replay types, fallback fields and map normalization remain usable",
+    "F11 first-load toggle aborts old fetch, retries, and ignores old success/error",
+    "F12 route: stale POST cannot restore state/timer or navigate",
+    "F12 unmount: stale POST cannot restore state/timer or navigate",
+    "F12 card-route: stale POST cannot restore state/timer or navigate",
+    "F12 route: stale GET cannot restore state/timer or navigate",
+    "F12 unmount: stale GET cannot restore state/timer or navigate",
+    "F12 card-route: stale GET cannot restore state/timer or navigate",
+    "F12 normal preparation, ready, failed retry, duplicate suppression and timer cleanup",
+    "F01/F10/F11/F14 current-source Chrome regression with mocked APIs only",
+    "auto-record page keeps the React namespace required by the production JSX transform",
+    "auto-record page uses alert severity classes without duplicating login errors",
+    "auto-record page distinguishes invalid credentials and does not make recording depend on login",
+    "auto-record page uses SMS verification as the primary Pocket48 login",
+    "auto-record page loads a searchable roster without asking users to discover ids",
+    "auto-record page preserves normalized backend member names",
+    "auto-record member filters select an organization before a team",
+    "member selection preserves the admin scroll position",
+    "auto-record page imports and renders without a missing React namespace",
+    "settings save independently, QR is requested only on click, and login/check/logout use separate endpoints",
+    "QR cancellation stops polling, expired QR and HTTP failures remain explicit",
+    "independent selection accepts Bilibili-uploaded archives and shows partial submission errors",
+    "all active states lock deletion, retries and file failures render, and only evidence-backed success is verified",
+    "periodic GET updates job facts and mobile backup controls fit the viewport",
+    "pending submissions and a newly active job also protect an already-open delete dialog",
+    "legacy 404 response keeps ordinary archive/settings usable",
+    "legacy empty response keeps ordinary archive/settings usable",
+    "115 backup built UI",
+    "cover picker keeps captions below images, accepts uploads and redirects retired settings",
+    "danmaku normalization exposes only bounded display text",
+    "danmaku normalization accepts safe server DTOs and rejects invalid live ids",
+    "dashboard reports partial and unavailable states from endpoint failures",
+    "the overview renders Chinese copy for a Chinese browser",
+    "the overview renders English copy for an English browser",
+    "draft cards confirm or cancel deletion and keep failed drafts visible",
+    "LoadingState stays a timeless spinner by default",
+    "LoadingState reports elapsed seconds and can offer a retry",
+    "the public live list shows a slow state instead of an indefinite spinner",
+    "the public replay list shows a slow state instead of an indefinite spinner",
+    "the slow state has styles for the elapsed badge and hint",
+    "the public live page performs a non-quiet load on mount",
+    "admin settings expose both live playback priorities",
+    "public live silently requests server fallback without displaying the strategy",
+    "hls.js wins when Chromium also claims native HLS support",
+    "native HLS is the fallback when hls.js is unavailable",
+    "HLS error facts exclude request URLs and response bodies",
+    "hls.js: the library is taken from the namespace default export",
+    "hls.js: taking the namespace itself would be wrong",
+    "flv.js: the already-unwrapped value is used as the library",
+    "flv.js: appending .default would break playback",
+    "both loaders are cached, so a second call reuses the promise",
+    "login methods isolate secrets, keep rejected credentials editable and preserve admin session expiry",
+    "follow manager toggles the account follow list and reads one transcript",
+    "a published summary appears under the replay and never shows model or subtitle text",
+    "an unpublished summary shows nothing at all instead of an empty panel",
+    "chapters-only mode shows the titles and says plainly that the prose is withheld",
+    "a valid code opens a readable member page with links and no notes",
+    "an expired or unknown code shows the same neutral message with no data",
+    "an English browser gets English copy and an English failure message",
+    "real detail export buttons send each profile in URL and unchanged encoding stays explicit",
+    "server 400 reason is visible verbatim and busy recovers for explicit retry and returned URL",
+    "share preview never downloads until the operator explicitly confirms",
+    "an existing archive is reused with no download request and stale previews cannot leak into new input",
+    "replay danmaku normalization is bounded, sorted and rejects invalid timestamps",
+    "replay danmaku cursor starts strictly after the current playback time",
+    "replay danmaku panel follows backward and forward seeks",
+    "replay danmaku loading is not cancelled by its own loading status update",
+    "replay danmaku list scrolls inside a height-constrained desktop player",
+    "replay group hierarchy exposes team choices only inside their parent group",
+    "replay import is idempotent by default but a manual retry keeps its 409",
+    "the import route can take a raw share link and exposes the job status",
+    "replay audit page exposes manual official replay import and polling",
+    "replay session dates accept timestamps and show Beijing time without Invalid Date",
+    "replay defaults to portrait, switches columns and 16:9 stage, persists on reload and leaves download unchanged",
+    "export choices and layout controls use the existing English language table",
+    "invalid saved layout and blocked localStorage safely keep portrait defaults",
+    "replay recovery returns progress, protects upload and remains usable on mobile",
+    "the account panel exposes the daily replay watch with its own save and manual run",
+    "retired tools leave no menu links and old bookmarks redirect safely",
+    "the share panel lists live codes, hides expired ones as such and exposes the new link once",
+    "social accounts use notes, safe nickname lookup, CRUD, groups and mobile navigation",
+    "the social account route is lazy-loaded and mounted under the admin guard",
+    "the sidebar exposes the page in the 内容工具 section",
+    "account descriptions use notes without a dedicated Weibo subtype UI",
+    "the page preserves social CRUD and reuses the existing Pocket48 roster",
+    "editor submits raw account input and provides native keyboard/error handling",
+    "nickname lookup stays advisory, debounced, accessible and separate from persistence",
+    "compact member layout keeps existing CSS hooks and semantic cards",
+    "directory uses equal columns, compact rows, truncated IDs and native action menus",
+    "no dead Weibo login helper remains reachable from the page or the server",
+    "every platform the API can return has a brand mark",
+    "toasts collapse repeated identical errors and cap the stack",
+    "auto-record page does not duplicate its inline alert with a toast",
+    "archive list polling reports failures inline instead of per-interval popups",
+    "the first visit is portrait and writes nothing to storage",
+    "toggle flips to landscape and persists it",
+    "a reload restores the stored landscape choice",
+    "setLayout accepts a value, persists it and rejects anything unknown",
+    "a stored value from an older build is ignored instead of trusted",
+    "a read-only storage does not break the page",
+    "the resolver checks ./VERSION before ../VERSION",
+    "a stale parent VERSION does not override the adjacent one",
+    "without an adjacent VERSION the parent one is used",
+    "with no VERSION file at all it falls back to package.json",
+    "whitespace in VERSION is trimmed",
+    "an empty VERSION file is skipped in favour of the next candidate"
+  ],
+  "warnings": {
+    "hmrPortConflicts": 14,
+    "closedViteRequests": 306,
+    "websocketClosed": 2
+  },
+  "sourceComparisons": [
+    {
+      "path": "src\\App.css",
+      "equal": true
+    },
+    {
+      "path": "src\\App.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\AdminLayout.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\AnalysisPanel.css",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\AnalysisPanel.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\AnalysisProvenance.css",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\AnalysisProvenance.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\AnalysisProvenanceBatch.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\AuthGuard.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\Backup115.css",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\Backup115Archive.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\Backup115Settings.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\Badge.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\ConfirmModal.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\CoverPicker.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\DanmakuOverlay.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\EmptyState.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\Icons.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\LoadingState.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\OfflineSettings.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\PlatformIcon.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\ProgressBar.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\PublicMediaTabs.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\ReplayDanmakuOverlay.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\ReplayRecovery.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\SafeImage.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\TimelineEditor.css",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\TimelineEditor.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\Toast.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\components\\VideoPlayer.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\hooks\\usePolling.js",
+      "equal": true
+    },
+    {
+      "path": "src\\hooks\\useReplayLayout.js",
+      "equal": true
+    },
+    {
+      "path": "src\\index.css",
+      "equal": true
+    },
+    {
+      "path": "src\\lib\\adminCredentials.js",
+      "equal": true
+    },
+    {
+      "path": "src\\lib\\api-auth.test.js",
+      "equal": true
+    },
+    {
+      "path": "src\\lib\\api.js",
+      "equal": true
+    },
+    {
+      "path": "src\\lib\\danmaku.js",
+      "equal": true
+    },
+    {
+      "path": "src\\lib\\playback.js",
+      "equal": true
+    },
+    {
+      "path": "src\\lib\\pocket48-message.js",
+      "equal": true
+    },
+    {
+      "path": "src\\lib\\pocket48-message.test.js",
+      "equal": true
+    },
+    {
+      "path": "src\\lib\\replayDanmaku.js",
+      "equal": true
+    },
+    {
+      "path": "src\\lib\\replayGroups.js",
+      "equal": true
+    },
+    {
+      "path": "src\\main.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\AdminLogin.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\AnalysisSettings.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\AutoRecord.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\Bilibili.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\Config.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\Dashboard.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\Live.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\Pocket48.css",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\Pocket48.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\PublicLive.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\PublicReplay.css",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\PublicReplay.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\PublicSocial.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\RecordingDetail.css",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\RecordingDetail.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\ReplayAnalysisImport.css",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\ReplayAnalysisImport.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\ReplayAudit.css",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\ReplayAudit.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\Security.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\SocialAccounts.css",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\SocialAccounts.jsx",
+      "equal": true
+    },
+    {
+      "path": "src\\pages\\Video.jsx",
+      "equal": true
+    },
+    {
+      "path": "test\\admin-credentials.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\analysis-clear-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\analysis-evidence-translation-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\analysis-health-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\analysis-panel-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\analysis-provenance-batch-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\analysis-provenance-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\analysis-publish-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\analysis-queue-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\archive-layout.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\archive-processing.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\archive-storage-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\archive-storage.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\audit-web-regressions.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\auto-record-page.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\backup115-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\cover-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\danmaku.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\dashboard-health.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\dashboard-i18n-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\draft-delete-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\loading-state-slow.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\playback-policy-page.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\playback.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\player-interop.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\pocket48-login-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\pocket48-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\public-replay-summary-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\public-social-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\recording-export-profiles.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\replay-analysis-import-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\replay-danmaku.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\replay-groups.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\replay-import-idempotent.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\replay-import-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\replay-layout-export.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\replay-recovery-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\replay-watch-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\retired-tools.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\social-access-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\social-browser.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\social-ui.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\toast-noise.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\use-replay-layout.test.js",
+      "equal": true
+    },
+    {
+      "path": "test\\version-resolution.test.js",
+      "equal": true
+    },
+    {
+      "path": "public\\favicon.svg",
+      "equal": true
+    }
+  ],
+  "buildFiles": [
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\AdminLogin-OR5prlJm.js",
+      "bytes": 3678,
+      "sha256": "1153c978ebcda55ae54c6e7cc916391185dae8d29ac91fe714594a74e92408ec"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\AnalysisPanel-BkQ8dXnA.css",
+      "bytes": 7032,
+      "sha256": "464cd33d8f2d13eda62fdf2778959eef5616b7889921c4018d998b2d6e191a68"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\AnalysisSettings-B5dOZgrC.js",
+      "bytes": 17953,
+      "sha256": "e5c453b540434ef657f4e279e881742162e4cc17c5dd2a3e0fab1224f2db7845"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\AutoRecord-PnbApuyn.js",
+      "bytes": 19468,
+      "sha256": "f4097e4106efc24ca2c9d51fe437d871a6ee0d7d0f13177f347b0032dcae2310"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\Backup115-EI98zjVG.css",
+      "bytes": 2092,
+      "sha256": "8cd180b24850e5d920cb7fb5f58009f3fd10922f751a89fccc46765d79ab7109"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\Badge-DkvgeXE1.js",
+      "bytes": 1242,
+      "sha256": "0628ff7dffc0c7bbfa5d25e7bd6898b595672b5d5ad9ecf5826f8fb0c1db860a"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\Bilibili-lZLJ2YqI.js",
+      "bytes": 14576,
+      "sha256": "cb83fd845f68837b1af0e3f8af3fc911d7902f7d6b306a7293ccc03ac252e0dc"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\Config-_vJIRhIp.js",
+      "bytes": 14209,
+      "sha256": "bb217a2631510256ea48ebde4adba27054b49c6c10d0a79f2235c0393cfdd348"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\ConfirmModal-DgXTMlJh.js",
+      "bytes": 1409,
+      "sha256": "a5d22759b5150da87ea6d783c848256a21b41f3dff67a4972234946067a85461"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\CoverPicker-CHWvE7LH.js",
+      "bytes": 5618,
+      "sha256": "249759bccdf3088fd1471c01fc813e881668996efdfb9520a3c81315edb4e8ff"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\Dashboard-DtQidOEj.js",
+      "bytes": 12215,
+      "sha256": "38c676da183ad73c93878820b116962d3cbeacc9c1988790186e2823faddb3f4"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\EmptyState-DtmaIPf6.js",
+      "bytes": 414,
+      "sha256": "bf833a6004ccef9a2d480aab2e30806170ee1472df13ac874b3fd81049baf3fa"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\flv-CwS9Olga.js",
+      "bytes": 156599,
+      "sha256": "edcc4640166b31184436cc126394ef9efcf8f5c124875832e511d2128f2f8477"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\hls-bsuTaLC4.js",
+      "bytes": 595074,
+      "sha256": "cec67e93b2b991370728742027028a312b77a07cabbe476e8ab4c2e3048ff435"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\index-BNOVxFIP.css",
+      "bytes": 51807,
+      "sha256": "68f0072843ca29c1db6bfcc542f84b50224b13a02b3e1defd86207c3f694b5b7"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\index-Dp3jllcc.js",
+      "bytes": 75373,
+      "sha256": "76d4ea2835851e84127fc4c0fc80b15aab89f7d894021487dc2101552d9d6b36"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\Live-CBTie-Z8.js",
+      "bytes": 6417,
+      "sha256": "61075f771446a209a9e8297af363e1378223d182c473c03da81b68b37184360d"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\PlatformIcon-B6krSZ4-.js",
+      "bytes": 2182,
+      "sha256": "6d2b100daf303bb58f81aff9c4cb6e95811ba2acc2ddb4eb3d786baa361eaa96"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\Pocket48-CKhY2-HO.js",
+      "bytes": 28401,
+      "sha256": "9994c010f26b715a31f1b6bd1188fb671361054ed67a045b71c1b741d27a7487"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\pocket48-message-56SyfPP3.js",
+      "bytes": 1976,
+      "sha256": "a90d570839c6016c821a86e542f2859f28f6c7eb222d0a84d5f5cd656ed29c24"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\Pocket48-Y86fP4VL.css",
+      "bytes": 18731,
+      "sha256": "11f6a3b6b1ac39d77bb32300cb2282519a90c2301608cba407cad0fd42086757"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\ProgressBar-CWbzFSLF.js",
+      "bytes": 502,
+      "sha256": "f81acda05929470c541fb2d9448f16ad0448bb6e4fa0baf5373f043b168bb424"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\PublicLive-Deqqnl6o.js",
+      "bytes": 10185,
+      "sha256": "211e10f8c408c8da696d6982cb467fee99c2841e1d253a3425af47c3e4f3a8f6"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\PublicMediaTabs-CJ5FIn1w.js",
+      "bytes": 705,
+      "sha256": "a9e1642fabb9debc6ff28bd98b42f4fc341bf69efe935daf0836342c66b0a46b"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\PublicReplay-Ct1f1hiJ.js",
+      "bytes": 25499,
+      "sha256": "a96e5591df91deccca3d36c0b928144befe86f7c3f229ea9072940ca39194e08"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\PublicReplay-DL9DTqPo.css",
+      "bytes": 1955,
+      "sha256": "0514c0e758f18a7b83f8e7e59f0e1cf799aa03f2fa0b68a0ea8ff9066d0c8b6a"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\PublicSocial-MO9vBLkc.js",
+      "bytes": 2900,
+      "sha256": "68c7002e8678017956413ce0dda57995f776e9c1f62b7c5834ff9ac6488982b6"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\RecordingDetail-DuIzNh3H.js",
+      "bytes": 38060,
+      "sha256": "986eeb0bff26849decde44a754ed10aaff7fcbbf906e829afe421ce2cf722074"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\RecordingDetail-mbL4JAjz.css",
+      "bytes": 8622,
+      "sha256": "9838b7d6e3eba2ecd8d4e758fbd6c4684ed1798b2e50b9df0ce8eefbe302fa11"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\ReplayAnalysisImport-Dd1tXUgP.css",
+      "bytes": 1098,
+      "sha256": "3ebd798811c19dcb27ea0f5e82189a4b4e00998f940124c0026bbb775400b13b"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\ReplayAnalysisImport-ys6AfbuT.js",
+      "bytes": 6612,
+      "sha256": "2e16ae8ea2319c0cf1e47df92ab0dbd7fdbdd5e1afbb7a110fac002044751496"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\ReplayAudit-BJr3-GM5.css",
+      "bytes": 2743,
+      "sha256": "b6ed402a9fe27f6e0775bace82de608a159cfde6624956cd6da3cf65568079a6"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\ReplayAudit-Cqrht1GX.js",
+      "bytes": 11237,
+      "sha256": "05bc928779848dac6895e341dad4c5d7e45bddc74f1a61474f7b5c789c56e91e"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\ReplayRecovery-D9tPCPyJ.js",
+      "bytes": 2112,
+      "sha256": "cf61a12fdce3d87711046b7781e25f6642dab0d2077b4c7bc38194c397307b16"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\SafeImage-BW8xs7Pb.js",
+      "bytes": 270,
+      "sha256": "7931ddc0136aa94aacf58d6554d6f2908009300d7de81fda6c4c6e02814deb76"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\Security-0zLoX9FX.js",
+      "bytes": 8038,
+      "sha256": "df9b9a3c14113e93009240f532d5188a9f448d94e8e9c64757ba19e5638d867c"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\SocialAccounts-DRTAAXZm.css",
+      "bytes": 13774,
+      "sha256": "44076ee99abb33e9111e6a8692b8ac7e121a66750930d564b2399fddfa648bcd"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\SocialAccounts-DwZEoaeo.js",
+      "bytes": 28470,
+      "sha256": "68830f227d01c7354622663551c3732366e31c0cb15e57c333bdc74a6eb921eb"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\usePolling-BAQwvtF_.js",
+      "bytes": 699,
+      "sha256": "4a0a959bf4d3e630d54d2d3d5e3353db173b6fb7175fb299609e0bf0aca81830"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\vendor-react-CUnftwWn.js",
+      "bytes": 166196,
+      "sha256": "7eef454e6e1f5970ae9a2d31c77e36cfa6c22ab42575afa1209cbad75273245c"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\Video-BIbXXvCM.js",
+      "bytes": 27858,
+      "sha256": "b8657f45e8542effc7bd6d66d48efcf7a655b4c845365ae9c69548a290d6fd0f"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\assets\\VideoPlayer-BhiimPZo.js",
+      "bytes": 14659,
+      "sha256": "965d7bfff39edd2f3d31660fabc4459eb0bbc2c7ff1d540010fdbde69c2ec1e0"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\favicon.svg",
+      "bytes": 487,
+      "sha256": "48e4515f1ddc21080f297326124c47f69735b1daa88a445d70c65718923390a1"
+    },
+    {
+      "path": "workspace\\app\\client\\dist\\index.html",
+      "bytes": 579,
+      "sha256": "5636a0da4e2f7ca3916eedbec6bdd04aaa33dbccb1c476a7153f54fa1d7426ff"
+    }
+  ]
+}

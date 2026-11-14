@@ -1,0 +1,37 @@
+{
+  "localVsHost": {
+    "changed": [
+      "docker-compose.public.yml",
+      "docker-compose.yml",
+      "docs/pocket48-linked-accounts.md",
+      "server/test/backend.test.js"
+    ],
+    "onlyLeft": [
+      "config/config.example.yaml",
+      "docs/archive-storage-20260908.md",
+      "docs/archive-storage-preview.png",
+      "docs/deployment-20260904.md",
+      "docs/deployment-bubbles-20260913.md",
+      "docs/deployment-chatrooms-20260913.md",
+      "docs/deployment-checkin-20260913.md",
+      "docs/deployment-covers-20260912.md",
+      "docs/deployment-login-20260912.md",
+      "docs/deployment-merged-20260913.md",
+      "docs/deployment-pocket48-20260912.md",
+      "docs/deployment-queryfix-20260912.md",
+      "docs/deployment-roomfix-20260913.md",
+      "docs/migration-aliyun-20260913.md",
+      "docs/pocket48-mobile.png",
+      "docs/pocket48-preview.png",
+      "scripts/deploy-archive-20260904.sh"
+    ],
+    "onlyRight": [
+      "docker-compose.egress.yml"
+    ]
+  },
+  "hostVsRuntime": {
+    "changed": [],
+    "onlyLeft": [],
+    "onlyRight": []
+  }
+}

@@ -1,0 +1,41 @@
+﻿TAP version 13
+# Subtest: manual replay import archives a verified official replay and queues draft after download
+ok 1 - manual replay import archives a verified official replay and queues draft after download
+  ---
+  duration_ms: 60.0326
+  type: 'test'
+  ...
+# Subtest: an import without member metadata takes them from the replay list, not today's date
+ok 2 - an import without member metadata takes them from the replay list, not today's date
+  ---
+  duration_ms: 20.5251
+  type: 'test'
+  ...
+# Subtest: manual replay import rejects a second valid archive for the same live ID
+ok 3 - manual replay import rejects a second valid archive for the same live ID
+  ---
+  duration_ms: 2.836
+  type: 'test'
+  ...
+# Subtest: done is published only after a failed auto upload enqueue is recorded
+ok 4 - done is published only after a failed auto upload enqueue is recorded
+  ---
+  duration_ms: 18.735
+  type: 'test'
+  ...
+# AUDIT_TIMESTAMP_DEFECT {"since":1793229595318,"expectedEach":["990081"],"rows":[{"input":"1793229596318","normalizedStartedAt":"1793229596318","dateParseFinite":false,"selected":[]},{"input":1793229596318,"normalizedStartedAt":1793229596318,"dateParseFinite":false,"selected":[]},{"input":"2026-10-28T23:19:56.318Z","normalizedStartedAt":"2026-10-28T23:19:56.318Z","dateParseFinite":true,"selected":["990081"]}]}
+# Subtest: audit reproduces watch omission for normalized numeric timestamps against an ISO control
+ok 5 - audit reproduces watch omission for normalized numeric timestamps against an ISO control
+  ---
+  duration_ms: 2.9248
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 298.1627

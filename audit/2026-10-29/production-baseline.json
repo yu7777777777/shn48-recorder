@@ -1,0 +1,50 @@
+[
+  {
+    "name": "identity",
+    "exit": 0,
+    "stdout": "iZbp1c7vz67w25bdjwukttZ\n2026-10-29T17:58:54+08:00\n",
+    "stderr": ""
+  },
+  {
+    "name": "container",
+    "exit": 0,
+    "stdout": "shn48-shn48:1.31.1-fe /app/server running healthy 2026-10-29T09:35:59.749275621Z restarts=0\n",
+    "stderr": ""
+  },
+  {
+    "name": "mounts",
+    "exit": 0,
+    "stdout": "/opt/shn48/runtime/biliup -> /app/biliup\n/opt/shn48/runtime/recordings -> /app/recordings\n/opt/shn48/runtime/data -> /app/data\n/opt/shn48/config -> /app/config\n\n",
+    "stderr": ""
+  },
+  {
+    "name": "version",
+    "exit": 0,
+    "stdout": "1.31.1\n",
+    "stderr": ""
+  },
+  {
+    "name": "capacity",
+    "exit": 0,
+    "stdout": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/vda1        40G   20G   19G  52% /\n               total        used        free      shared  buff/cache   available\nMem:            1740         359         787           2         594        1226\nSwap:              0           0           0\nCONTAINER ID   NAME             CPU %     MEM USAGE / LIMIT   MEM %     NET I/O         BLOCK I/O         PIDS\n5764ea4c846f   shn48-recorder   0.09%     23.67MiB / 1.7GiB   1.36%     152kB / 212kB   32.8kB / 3.05MB   13\n",
+    "stderr": ""
+  },
+  {
+    "name": "processes",
+    "exit": 0,
+    "stdout": "PID                 PPID                COMMAND\n1349303             1349281             tini\n1349351             1349303             tini\n1349354             1349351             node\n",
+    "stderr": ""
+  },
+  {
+    "name": "recent_logs",
+    "exit": 0,
+    "stdout": "2026-10-29T09:35:59.070085364Z [server] SIGTERM received; starting graceful shutdown\n2026-10-29T09:35:59.086453511Z [server] shutdown complete (exit 0)\n2026-10-29T09:35:59.751509981Z Xvfb disabled (set ENABLE_XVFB=1 only when DDTalks support is needed)\n2026-10-29T09:35:59.752886137Z [WARN  tini (8)] Tini is not running as PID 1 and isn't registered as a child subreaper.\n2026-10-29T09:35:59.752943396Z Zombie processes will not be re-parented to Tini, so zombie reaping won't work.\n2026-10-29T09:35:59.752948608Z To fix the problem, use the -s option or set the environment variable TINI_SUBREAPER to register Tini as a child subreaper, or run Tini as PID 1.\n2026-10-29T09:36:00.020860619Z 48tools 1.31.1 recording hub listening on http://0.0.0.0:3000\n",
+    "stderr": ""
+  },
+  {
+    "name": "stopped_containers",
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

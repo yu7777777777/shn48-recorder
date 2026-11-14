@@ -1,0 +1,23 @@
+.timeline-editor { margin-top: 28px; padding: 26px; min-width: 0; }
+.timeline-header, .timeline-output-heading { display:flex; justify-content:space-between; gap:16px; align-items:center; }
+.timeline-header h2 { margin:8px 0; }.timeline-header p, .timeline-caption, .timeline-output-heading>span { color:var(--text-muted); font-size:12px; }
+.timeline-zoom { display:flex; align-items:center; border:1px solid var(--border); border-radius:var(--radius-sm); flex-shrink:0; }.timeline-zoom button { padding:10px 14px; }.timeline-zoom output { min-width:40px; text-align:center; font-family:"JetBrains Mono",monospace; }
+.timeline-scroll { overflow-x:auto; margin-top:24px; border:1px solid #283449; border-radius:var(--radius); background:#101827; }
+.timeline-track { position:relative; height:150px; min-width:100%; cursor:crosshair; user-select:none; }
+.timeline-ruler { height:44px; overflow:hidden; position:relative; color:#a6b5cd; font:10px "JetBrains Mono",monospace; }.timeline-ruler span { position:absolute; top:10px; border-left:1px solid #425069; padding-left:5px; white-space:nowrap; }
+.timeline-source { position:absolute; top:60px; left:0; right:0; height:54px; background:repeating-linear-gradient(135deg,#263247 0 6px,#1b2639 6px 12px); }
+.timeline-region { position:absolute; top:58px; height:58px; border:1px solid #6f9fe7; background:#315c9d; color:#e9f2ff; min-width:2px; }.timeline-region.selected { background:#3977ce; border:2px solid #bed9ff; }
+.timeline-region-label { display:block; padding:18px; overflow:hidden; white-space:nowrap; font-size:11px; }
+.timeline-handle { position:absolute; top:-2px; bottom:-2px; width:15px; background:#b9d6ff; color:#16375f; cursor:ew-resize; touch-action:none; justify-content:center; z-index:3; }.timeline-handle.start{left:-1px}.timeline-handle.end{right:-1px}
+.timeline-playhead { position:absolute; top:36px; bottom:10px; border-left:2px solid #fbad55; pointer-events:none; z-index:4; }.timeline-playhead span { position:absolute; top:-12px; left:-7px; color:#fbad55; font-size:12px; }
+.timeline-caption { display:flex; justify-content:space-between; margin:9px 0 20px; font-family:"JetBrains Mono",monospace; }
+.timeline-tools { display:flex; flex-wrap:wrap; gap:10px; }.timeline-fine { display:flex; gap:20px; align-items:center; flex-wrap:wrap; padding:22px 0; border-bottom:1px solid var(--border); margin-bottom:24px; }
+.timeline-fine label { display:flex; gap:10px; align-items:center; font-size:12px; }.timeline-fine input { width:100px; }.timeline-editor input { padding:10px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); min-width:0; }
+.timeline-editor button:focus-visible, .timeline-track:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.timeline-output { display:flex; gap:10px; flex-wrap:wrap; margin:14px 0 24px; }.timeline-output-item { padding:12px 15px; gap:12px; border:1px solid var(--border); border-radius:var(--radius); text-align:left; background:var(--bg-panel); }.timeline-output-item.selected { border-color:var(--accent); background:var(--accent-soft); }.timeline-output-item b { color:var(--accent); }.timeline-output-item span { font:11px "JetBrains Mono",monospace; }.timeline-output-item small { display:block; margin-top:5px; color:var(--text-muted); }
+.timeline-export { display:flex; justify-content:space-between; align-items:end; gap:20px; flex-wrap:wrap; }.timeline-export>label { display:grid; gap:8px; flex:1; min-width:220px; font-size:12px; }.timeline-export input{width:100%}
+.recording-detail .detail-workspace { grid-template-columns:1fr; }
+.recording-detail .detail-preview { position:static; }
+.recording-detail .detail-preview .video-player { height:65vh; min-height:360px; max-height:800px; aspect-ratio:auto; object-fit:contain; }
+@media(max-width:600px){.recording-detail .detail-preview .video-player{height:55vh;min-height:280px;max-height:600px}}
+@media(max-width:600px){.timeline-editor{padding:16px}.timeline-header{align-items:flex-start}.timeline-header h2{font-size:18px}.timeline-zoom button{padding:8px}.timeline-fine{gap:14px}.timeline-fine>strong{width:100%}.timeline-fine label{flex-wrap:wrap}.timeline-export>label{min-width:100%}}

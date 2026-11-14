@@ -1,0 +1,11 @@
+.env
+.git/
+.gitignore
+runtime/
+client/node_modules*/
+# Keep client/dist for Dockerfile.release; the full build replaces it with Vite output.
+server/node_modules*/
+*.log
+**/__pycache__/
+**/*.pyc
+deploy.ps1
