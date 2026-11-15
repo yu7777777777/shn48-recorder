@@ -1,2 +1,275 @@
-.audit-overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}.audit-overview>div{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;gap:4px}.audit-overview strong{font-size:var(--text-2xl);color:var(--text-main)}.audit-overview span{font-size:12px;color:var(--text-muted)}.audit-card{padding:20px}.audit-list{display:grid;gap:8px}.audit-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:20px;padding:14px;border:1px solid var(--border);border-radius:var(--radius)}.audit-title{display:block;margin-top:7px;font-weight:700;color:var(--text-main)}.audit-row p{font-size:12px;color:var(--text-muted);margin:5px 0 0}.audit-row small{display:block;color:var(--danger);margin-top:5px}.audit-state{font-size:11px;border-radius:var(--radius-full);padding:4px 8px;background:var(--surface-hover);color:var(--text-muted)}.audit-state-repairable,.audit-state-published_needs_repair{color:#9c6713;background:#fff2d6}.audit-state-repaired_local,.audit-state-repaired_local_published,.audit-state-healthy{color:#1c7056;background:#e3f6ed}.audit-times{display:flex;gap:14px;font-size:12px;color:var(--text-muted)}.audit-times b{color:var(--text-main);font-variant-numeric:tabular-nums}.audit-actions{display:flex;align-items:center;gap:8px}.audit-posted{font-size:11px;color:var(--text-muted)}.audit-empty{padding:28px;text-align:center;color:var(--text-muted)}.audit-header-actions{display:flex;gap:8px;align-items:center}.replay-import-card{margin-bottom:20px}.replay-import-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:end}.replay-import-form label{display:grid;gap:6px;font-size:12px;color:var(--text-muted)}.replay-import-form input:not([type=checkbox]){width:100%;box-sizing:border-box;padding:9px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text-main)}.replay-import-check{display:flex!important;grid-template-columns:auto 1fr;display:flex!important;align-items:center;gap:7px;min-height:36px}.replay-import-check input{accent-color:var(--accent)}.replay-import-status{margin-top:14px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--surface-hover);color:var(--text-muted)}.replay-import-status p{margin:5px 0 0;font-size:12px}.replay-import-status.is-done{color:#1c7056;background:#e3f6ed}.replay-import-status.is-error{color:var(--danger);background:#fff0f0}@media(max-width:950px){.audit-row{grid-template-columns:1fr}.audit-times{flex-wrap:wrap}.audit-overview{grid-template-columns:repeat(2,minmax(0,1fr))}.replay-import-form{grid-template-columns:1fr}.audit-header-actions{flex-wrap:wrap}}
-.audit-state-repaired_source_limited,.audit-state-repaired_source_limited_published{color:#285ea8;background:#edf4ff}
+/* ==========================================================================
+   历史录像审计：概览统计 / 逐条核对结果 / 手动补录表单
+   （此前引用了不存在的 --surface/--surface-hover 变量，整体失效；本次按
+   设计令牌重写。）
+   ========================================================================== */
+.audit-header-actions {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* 概览统计 */
+.audit-overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.audit-overview > div {
+  background: var(--bg-layer-1);
+  border: 1px solid var(--border-l1);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.audit-overview strong {
+  font-size: 24px;
+  font-weight: var(--fw-semibold);
+  color: var(--label-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.audit-overview span {
+  font-size: var(--fs-caption);
+  color: var(--label-secondary);
+}
+
+.audit-card {
+  padding: var(--space-5);
+}
+
+.audit-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.audit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-5);
+  padding: 14px;
+  border: 1px solid var(--border-l1);
+  border-radius: var(--radius-lg);
+  background: var(--bg-base);
+}
+
+.audit-title {
+  display: block;
+  margin-top: 7px;
+  font-weight: var(--fw-semibold);
+  color: var(--label-primary);
+}
+
+.audit-row p {
+  font-size: var(--fs-caption);
+  color: var(--label-secondary);
+  margin: 5px 0 0;
+}
+
+.audit-row small {
+  display: block;
+  color: var(--danger);
+  margin-top: 5px;
+}
+
+/* 状态胶囊：语义色只表达状态 */
+.audit-state {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--fs-caption);
+  border-radius: var(--radius-full);
+  padding: 3px 9px;
+  background: var(--bg-layer-2);
+  color: var(--label-secondary);
+  font-weight: var(--fw-medium);
+}
+
+.audit-state-repairable,
+.audit-state-published_needs_repair {
+  color: var(--warn);
+  background: var(--warn-weak);
+}
+
+.audit-state-repaired_local,
+.audit-state-repaired_local_published,
+.audit-state-healthy {
+  color: var(--success);
+  background: var(--success-weak);
+}
+
+.audit-state-repaired_source_limited,
+.audit-state-repaired_source_limited_published {
+  color: var(--brand);
+  background: var(--brand-weak);
+}
+
+.audit-state-manual {
+  color: var(--danger);
+  background: var(--danger-weak);
+}
+
+.audit-times {
+  display: flex;
+  gap: 14px;
+  font-size: var(--fs-caption);
+  color: var(--label-secondary);
+}
+
+.audit-times b {
+  color: var(--label-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.audit-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.audit-posted {
+  font-size: var(--fs-caption);
+  color: var(--label-tertiary);
+}
+
+.audit-empty {
+  padding: 28px;
+  text-align: center;
+  color: var(--label-secondary);
+}
+
+.detail-error {
+  color: var(--danger);
+  font-size: var(--fs-caption);
+  margin: 0 0 var(--space-3);
+}
+
+/* 手动补录表单 */
+.replay-import-card {
+  margin-bottom: var(--space-5);
+}
+
+.replay-import-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  align-items: end;
+}
+
+.replay-import-form label {
+  display: grid;
+  gap: 6px;
+  font-size: var(--fs-caption);
+  color: var(--label-secondary);
+}
+
+.replay-import-form select {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid var(--border-l2);
+  border-radius: var(--radius);
+  background: var(--bg-base);
+  color: var(--label-primary);
+  outline: none;
+}
+
+.replay-import-form select:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-weak);
+}
+
+.replay-import-form input:not([type=checkbox]) {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid var(--border-l2);
+  border-radius: var(--radius);
+  background: var(--bg-base);
+  color: var(--label-primary);
+  outline: none;
+}
+
+.replay-import-form input:not([type=checkbox]):focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-weak);
+}
+
+.replay-import-form .text-button {
+  justify-self: start;
+}
+
+.replay-import-check {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  color: var(--label-secondary);
+}
+
+.replay-import-check input {
+  accent-color: var(--brand);
+  width: 16px;
+  height: 16px;
+}
+
+.replay-import-status {
+  margin-top: 14px;
+  padding: 10px var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--bg-layer-2);
+  color: var(--label-secondary);
+  font-size: var(--fs-body);
+}
+
+.replay-import-status strong {
+  color: var(--label-primary);
+}
+
+.replay-import-status p {
+  margin: 5px 0 0;
+  font-size: var(--fs-caption);
+}
+
+.replay-import-status.is-done {
+  color: var(--success);
+  background: var(--success-weak);
+}
+
+.replay-import-status.is-done strong {
+  color: var(--success);
+}
+
+.replay-import-status.is-error {
+  color: var(--danger);
+  background: var(--danger-weak);
+}
+
+.replay-import-status.is-error strong {
+  color: var(--danger);
+}
+
+@media (max-width: 950px) {
+  .audit-row {
+    grid-template-columns: 1fr;
+  }
+  .audit-times {
+    flex-wrap: wrap;
+  }
+  .audit-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .replay-import-form {
+    grid-template-columns: 1fr;
+  }
+  .audit-header-actions {
+    flex-wrap: wrap;
+  }
+}

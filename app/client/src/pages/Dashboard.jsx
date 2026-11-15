@@ -388,7 +388,7 @@ export default function DashboardPage() {
                       </StatusBadge>
                     </td>
                     <td>{formatTime(item.createdAt || item.startTime)}</td>
-                    <td style={{ fontVariantNumeric: "tabular-nums" }}>
+                    <td className="td-num">
                       {formatBytes(item.fileSize || item.size)}
                     </td>
                   </tr>

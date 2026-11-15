@@ -1,18 +1,19 @@
-/* Replay Detail Stage & Segmented Layout Switch */
+/* ==========================================================================
+   重播详情舞台与横竖版式切换
+   ========================================================================== */
 .replay-layout-toolbar {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
   padding: 3px;
-  background: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+  background: var(--bg-layer-1);
+  border-radius: var(--radius);
 }
 
 .replay-layout-toolbar-label {
   padding: 0 6px 0 8px;
-  color: var(--text-muted);
-  font-size: var(--text-xs);
+  color: var(--label-secondary);
+  font-size: var(--fs-caption);
   font-weight: var(--fw-medium);
 }
 
@@ -20,22 +21,23 @@
   min-height: 26px;
   padding: 0 10px;
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   background: transparent;
   box-shadow: none;
-  color: var(--text-muted);
-  font-size: var(--text-xs);
+  color: var(--label-secondary);
+  font-size: var(--fs-caption);
 }
 
 .replay-layout-toolbar .btn:hover:not(:disabled) {
-  color: var(--text-main);
+  color: var(--label-primary);
   background: transparent;
 }
 
 .replay-layout-toolbar .btn[aria-pressed="true"] {
-  background: var(--bg-surface);
-  color: var(--accent);
-  box-shadow: var(--shadow-xs);
+  background: var(--bg-base);
+  color: var(--label-primary);
+  font-weight: var(--fw-semibold);
+  box-shadow: var(--shadow-1);
 }
 
 .featured-replay.replay-layout-portrait .replay-detail-columns {
@@ -59,7 +61,7 @@
 .featured-replay.replay-layout-landscape .replay-detail-columns {
   display: grid;
   grid-template-columns: minmax(0, 1.85fr) minmax(260px, 1fr);
-  gap: 20px;
+  gap: var(--space-5);
   align-items: start;
 }
 
@@ -88,88 +90,15 @@
 
 .detail-note {
   margin-top: 10px;
-  padding: 8px 12px;
+  padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
-  background: var(--warning-soft);
-  color: var(--warning);
-  font-size: var(--text-xs);
+  background: var(--warn-weak);
+  color: var(--warn);
+  font-size: var(--fs-caption);
 }
 
 @media (max-width: 900px) {
   .featured-replay.replay-layout-landscape .replay-detail-columns {
     grid-template-columns: 1fr;
   }
-}
-
-/* 公开总结日报页 */
-.daily-page {
-  max-width: 860px;
-  margin: 0 auto;
-}
-
-.daily-header {
-  margin-bottom: 18px;
-}
-
-.daily-header h1 {
-  margin: 0 0 4px;
-}
-
-.daily-header p {
-  margin: 0 0 8px;
-  color: var(--text-muted);
-  font-size: var(--text-sm);
-}
-
-.daily-rss {
-  font-size: var(--text-xs);
-  color: var(--accent);
-}
-
-.daily-day {
-  margin-bottom: 22px;
-}
-
-.daily-day > h2 {
-  font-size: var(--text-md);
-  margin: 0 0 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.daily-item {
-  padding: 12px 14px;
-  margin-bottom: 10px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  background: var(--bg-surface);
-}
-
-.daily-item h3 {
-  margin: 0 0 2px;
-  font-size: var(--text-sm);
-}
-
-.daily-item h3 a {
-  color: var(--text-main);
-}
-
-.daily-item time {
-  display: block;
-  color: var(--text-muted);
-  font-size: var(--text-xs);
-  margin-bottom: 6px;
-}
-
-.daily-item p {
-  margin: 0 0 6px;
-  font-size: var(--text-sm);
-  line-height: 1.7;
-  color: var(--text-muted);
-  white-space: pre-line;
-}
-
-.daily-more {
-  font-size: var(--text-xs);
-  color: var(--accent);
 }

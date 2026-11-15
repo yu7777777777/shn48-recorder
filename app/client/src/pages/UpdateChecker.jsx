@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { adminApi, errorMessage, payload } from "../lib/api";
 import { useToast } from "../components/Toast";
 
-// Same masking contract as the notify page: the server never returns the
-// token; `tokenSet` only says whether one is stored. The input starts empty
-// and only overwrites when the user types something. Removing a stored token
-// goes through the "清除已存 Token" button, which sends `clear: ["token"]`.
+// Same masking contract as the other credential fields: the server never
+// returns the token; `tokenSet` only says whether one is stored. The input
+// starts empty and only overwrites when the user types something. Removing a
+// stored token goes through the "清除已存 Token" button, which sends
+// `clear: ["token"]`.
 function Field({ label, children, hint }) {
   return (
     <div className="form-group">
@@ -91,7 +92,7 @@ export default function UpdateChecker() {
       <div className="page-header admin-page-header">
         <div>
           <h1>版本更新</h1>
-          <p>定时比对 GitHub 仓库发布版本与当前运行版本；发现新版本时通过通知推送提醒，更新由人工确认后在服务器执行。</p>
+          <p>定时比对 GitHub 仓库发布版本与当前运行版本；发现新版本时在上方「检测状态」提示，更新由人工确认后在服务器执行。</p>
         </div>
         <button type="button" className="btn btn-secondary" onClick={checkNow} disabled={checking}>
           {checking ? "检测中…" : "立即检查"}
@@ -159,7 +160,7 @@ export default function UpdateChecker() {
         <div className="card-title-row"><h2>更新流程</h2></div>
         <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.9 }}>
           <li>新版本发布到 GitHub 仓库后，检测器按间隔比对 <code>app/VERSION</code> 与运行版本。</li>
-          <li>发现新版本时通过「通知推送」的通道发送提醒（事件：新版本可用），每个版本只提醒一次。</li>
+          <li>发现新版本时把结果记录在「检测状态」中，每个版本只提示一次；不会自动部署。</li>
           <li>确认发布说明无误后，在服务器执行更新脚本完成构建、切换与健康核验；更新期间会等待录制/上传任务空闲。</li>
         </ol>
       </section>

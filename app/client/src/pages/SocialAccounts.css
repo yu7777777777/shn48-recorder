@@ -1,11 +1,11 @@
-/* Member social account book. Light-card layout that reuses the admin tokens
-   in index.css; every rule is scoped under .social-page so nothing leaks into
-   other admin pages. */
+/* 成员社交账号管理页。所有颜色取自 index.css 令牌；规则全部限定在
+   .social-page / .sa-* 作用域内，不泄漏到其他页面。 */
 
 .social-page {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  min-width: 0;
 }
 
 .social-page .sa-header-actions {
@@ -15,96 +15,89 @@
   flex-shrink: 0;
 }
 
-/* ---- Overview numbers ------------------------------------------------ */
+.social-page .sa-header-actions,
+.sa-member-actions,
+.sa-card-actions {
+  flex-wrap: wrap;
+}
+
+.sa-member-actions {
+  gap: 4px;
+  margin-left: auto;
+}
+
+.sa-card-actions {
+  margin-left: auto;
+}
+
+/* ---- 概览统计：与全站 KPI 卡同配方，不做彩色渐变装饰 -------------------- */
 .sa-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .sa-stat {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 16px 18px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  gap: var(--space-1);
+  padding: var(--space-4) 18px;
+  background: var(--bg-layer-1);
+  border: 1px solid var(--border-l1);
+  border-radius: var(--radius-lg);
   min-width: 0;
 }
 
 .sa-stat-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-  letter-spacing: 0.02em;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  color: var(--label-secondary);
 }
 
 .sa-stat-value {
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1.1;
-  color: var(--text-main);
+  font-size: 24px;
+  font-weight: var(--fw-semibold);
+  line-height: 1.2;
+  color: var(--label-primary);
   font-variant-numeric: tabular-nums;
 }
 
 .sa-stat small {
-  font-size: 11px;
-  color: var(--text-dim);
+  font-size: var(--fs-caption);
+  color: var(--label-tertiary);
   line-height: 1.5;
 }
 
-.sa-stat.is-weibo {
-  background: linear-gradient(180deg, #fff8f8 0%, #ffffff 60%);
-  border-color: #f6d6d9;
-}
-
-.sa-stat.is-weibo .sa-stat-value {
-  color: #c81e2c;
-}
-
-.sa-stat.is-group {
-  background: linear-gradient(180deg, #f7f4ff 0%, #ffffff 60%);
-  border-color: #e3d9fb;
-}
-
-.sa-stat.is-group .sa-stat-value {
-  color: #6d35d6;
-}
-
-/* ---- Toolbar --------------------------------------------------------- */
+/* ---- 工具栏 -------------------------------------------------------------- */
 .sa-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--space-3);
   align-items: center;
-  padding: 12px 14px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  padding: var(--space-3) 14px;
+  background: var(--bg-layer-1);
+  border: 1px solid var(--border-l1);
+  border-radius: var(--radius-lg);
 }
 
 .sa-search {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   flex: 1 1 240px;
   min-width: 200px;
-  padding: 0 12px;
+  padding: 0 var(--space-3);
   height: 36px;
-  color: var(--text-muted);
-  background: var(--bg-panel);
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  color: var(--label-secondary);
+  background: var(--bg-base);
+  border: 1px solid var(--border-l2);
+  border-radius: var(--radius);
 }
 
 .sa-search:focus-within {
-  border-color: var(--accent);
-  background: var(--bg-surface);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-weak);
 }
 
 .sa-search input {
@@ -112,10 +105,14 @@
   height: 100%;
   border: 0;
   background: transparent;
-  color: var(--text-main);
+  color: var(--label-primary);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--fs-body);
   outline: none;
+}
+
+.sa-search input::placeholder {
+  color: var(--label-tertiary);
 }
 
 .sa-filter {
@@ -124,98 +121,105 @@
   gap: 6px;
 }
 
+/* 平台筛选 chip：胶囊形，选中 brand 填充白字 */
 .sa-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 30px;
-  padding: 0 12px;
-  border: 1px solid var(--border);
+  min-height: 30px;
+  padding: 4px 12px;
+  border: 1px solid var(--border-l2);
   border-radius: var(--radius-full);
-  background: var(--bg-surface);
-  color: var(--text-soft);
-  font-size: 12px;
-  font-weight: 600;
+  background: var(--bg-base);
+  color: var(--label-secondary);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: color var(--motion-fast), border-color var(--motion-fast),
+    background var(--motion-fast);
 }
 
 .sa-chip em {
   font-style: normal;
-  font-size: 11px;
-  color: var(--text-muted);
-  background: var(--bg-panel);
+  font-size: var(--fs-caption);
+  color: var(--label-tertiary);
+  background: var(--bg-layer-2);
   border-radius: var(--radius-full);
   padding: 1px 6px;
+  font-variant-numeric: tabular-nums;
 }
 
 .sa-chip:hover {
-  border-color: #c6d4e6;
-  color: var(--text-main);
+  border-color: var(--label-tertiary);
+  color: var(--label-primary);
 }
 
 .sa-chip.active {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  color: var(--accent);
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--label-inverse);
+  font-weight: var(--fw-semibold);
 }
 
 .sa-chip.active em {
-  background: #ffffff;
-  color: var(--accent);
+  background: rgba(255, 255, 255, 0.24);
+  color: var(--label-inverse);
 }
 
 .sa-view-toggle {
   display: inline-flex;
   margin-left: auto;
+  gap: 2px;
   padding: 3px;
-  background: var(--bg-panel);
-  border-radius: var(--radius-sm);
+  background: var(--bg-layer-2);
+  border-radius: var(--radius);
 }
 
 .sa-view-toggle button {
   border: 0;
   background: transparent;
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 700;
+  color: var(--label-secondary);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
   padding: 6px 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
+  transition: color var(--motion-fast), background var(--motion-fast);
 }
 
 .sa-view-toggle button.active {
-  background: #ffffff;
-  color: var(--text-main);
-  box-shadow: var(--shadow-sm);
+  background: var(--bg-base);
+  color: var(--label-primary);
+  font-weight: var(--fw-semibold);
+  box-shadow: var(--shadow-1);
 }
 
-/* ---- Member groups --------------------------------------------------- */
+/* ---- 成员 / 平台分组 ------------------------------------------------------ */
 .sa-members {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .sa-platforms {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .sa-member,
 .sa-platform {
   min-width: 0;
-  padding: 14px 16px 4px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  padding: 14px var(--space-4) var(--space-1);
+  background: var(--bg-layer-1);
+  border: 1px solid var(--border-l1);
   border-radius: var(--radius-lg);
 }
 
 .sa-member-head {
   padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-l1);
 }
 
 .sa-member-head > div:first-child {
@@ -233,7 +237,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-3);
   margin-bottom: 0;
   flex-wrap: nowrap;
 }
@@ -241,27 +245,26 @@
 .sa-member-head h2,
 .sa-platform-head h2 {
   margin: 0;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--text-main);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-semibold);
+  color: var(--label-primary);
 }
 
 .sa-member-head small {
   display: block;
   margin-top: 3px;
-  color: var(--text-muted);
-  font-size: 12px;
+  color: var(--label-secondary);
+  font-size: var(--fs-caption);
 }
 
 .sa-flag {
-  color: #b45309;
-  font-weight: 700;
+  color: var(--warn);
+  font-weight: var(--fw-semibold);
 }
 
 .sa-member-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
   align-items: center;
 }
 
@@ -271,20 +274,20 @@
   gap: 4px;
   border: 0;
   background: transparent;
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 700;
+  color: var(--brand);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-semibold);
   padding: 4px 6px;
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
 
 .social-page .text-button:hover {
-  background: var(--accent-soft);
+  background: var(--brand-weak);
 }
 
 .social-page .text-button.muted {
-  color: var(--text-dim);
+  color: var(--label-tertiary);
 }
 
 .social-page .text-button.danger {
@@ -292,7 +295,7 @@
 }
 
 .social-page .text-button.danger:hover {
-  background: var(--danger-soft);
+  background: var(--danger-weak);
 }
 
 .sa-platform-head .sa-card-name {
@@ -302,19 +305,20 @@
 }
 
 .sa-count {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-  background: var(--bg-panel);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
+  color: var(--label-secondary);
+  background: var(--bg-layer-2);
   border-radius: var(--radius-full);
   padding: 2px 8px;
+  font-variant-numeric: tabular-nums;
 }
 
 .sa-platform-hint {
-  margin: -4px 0 12px;
-  font-size: 12px;
-  color: #b45309;
-  background: var(--warning-soft);
+  margin: -4px 0 var(--space-3);
+  font-size: var(--fs-caption);
+  color: var(--warn);
+  background: var(--warn-weak);
   border-radius: var(--radius-sm);
   padding: 6px 10px;
 }
@@ -323,13 +327,13 @@
   margin: 0;
   padding: 14px;
   text-align: center;
-  font-size: 12px;
-  color: var(--text-dim);
-  background: var(--bg-panel);
+  font-size: var(--fs-caption);
+  color: var(--label-tertiary);
+  background: var(--bg-layer-2);
   border-radius: var(--radius);
 }
 
-/* ---- Compact account directory rows ---------------------------------- */
+/* ---- 账号目录行 ----------------------------------------------------------- */
 .sa-cards {
   display: flex;
   flex-direction: column;
@@ -340,13 +344,13 @@
   position: relative;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: var(--space-3);
   min-width: 0;
   padding: 10px 0;
 }
 
 .sa-card + .sa-card {
-  border-top: 1px solid var(--border-soft);
+  border-top: 1px solid var(--border-l1);
 }
 
 .sa-card > .sa-brand {
@@ -362,9 +366,9 @@
 }
 
 .sa-card-member {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  color: var(--label-secondary);
 }
 
 .sa-card-name {
@@ -377,9 +381,9 @@
 .sa-card-name strong {
   display: block;
   min-width: 0;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-main);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  color: var(--label-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -392,35 +396,32 @@
   gap: 6px;
   min-width: 0;
   max-width: 100%;
-  color: var(--text-main);
+  color: var(--label-primary);
   text-decoration: none;
   border-radius: 3px;
 }
 
 .sa-account-link svg {
-  color: var(--text-dim);
+  color: var(--label-tertiary);
   flex-shrink: 0;
 }
 
 .sa-account-link:hover strong {
-  color: var(--accent);
+  color: var(--brand);
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .sa-account-secondary,
 .sa-card-note {
   display: block;
   margin: 0;
-  font-size: 12px;
+  font-size: var(--fs-caption);
   line-height: 1.6;
-  color: var(--text-muted);
+  color: var(--label-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.sa-card-note {
-  color: var(--text-soft);
 }
 
 .sa-card-actions {
@@ -428,15 +429,14 @@
   margin-top: -5px;
 }
 
-/* A native disclosure is intentionally not an ARIA menu: buttons retain normal
-   Tab/Shift+Tab behavior. Actions remain visible on touch, never hover-only. */
+/* 原生 disclosure 菜单：按钮保持正常 Tab 行为，操作在触屏上始终可见 */
 .sa-more {
   position: relative;
   flex-shrink: 0;
 }
 
 .sa-more[open] {
-  z-index: 5;
+  z-index: var(--z-dropdown);
 }
 
 .sa-more > summary {
@@ -445,10 +445,10 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border-radius: 8px;
-  color: var(--text-muted);
-  font-size: 22px;
-  font-weight: 700;
+  border-radius: var(--radius);
+  color: var(--label-secondary);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-bold);
   line-height: 1;
   cursor: pointer;
   list-style: none;
@@ -461,8 +461,8 @@
 
 .sa-more > summary:hover,
 .sa-more[open] > summary {
-  background: var(--bg-panel);
-  color: var(--text-main);
+  background: var(--bg-layer-2);
+  color: var(--label-primary);
 }
 
 .sa-more-options {
@@ -475,30 +475,30 @@
   display: flex;
   flex-direction: column;
   padding: 5px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg-surface);
-  box-shadow: 0 8px 24px rgb(15 23 42 / 12%);
+  border: 1px solid var(--border-l1);
+  border-radius: var(--radius-lg);
+  background: var(--bg-base);
+  box-shadow: var(--shadow-2);
 }
 
 .sa-more-options button {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   min-height: 38px;
-  padding: 8px 12px;
+  padding: var(--space-2) var(--space-3);
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: transparent;
-  color: var(--text-main);
+  color: var(--label-primary);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--fs-body);
   text-align: left;
   cursor: pointer;
 }
 
 .sa-more-options button:hover {
-  background: var(--bg-panel);
+  background: var(--bg-layer-1);
 }
 
 .sa-more-options button.danger {
@@ -506,15 +506,24 @@
 }
 
 .social-page :is(.sa-more > summary, .sa-more-options button, .sa-account-link):focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--brand);
   outline-offset: 3px;
 }
 
-/* ---- Editor modal ---------------------------------------------------- */
+.social-page :is(button, a):focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.social-page .sa-card:focus-within {
+  border-color: var(--brand);
+}
+
+/* ---- 编辑弹窗 ------------------------------------------------------------- */
 .sa-editor {
   width: min(560px, 100%);
-  max-height: calc(100vh - 40px);
-  max-height: calc(100dvh - 40px);
+  max-height: 88vh;
+  max-height: min(88vh, calc(100dvh - 40px));
   margin: 0;
   display: flex;
   flex-direction: column;
@@ -537,7 +546,7 @@
 .sa-platform-picker {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .sa-platform-option {
@@ -546,26 +555,26 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 10px 4px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  padding: 10px var(--space-1);
+  background: var(--bg-base);
+  border: 1px solid var(--border-l2);
   border-radius: var(--radius);
-  color: var(--text-soft);
-  font-size: 12px;
-  font-weight: 700;
+  color: var(--label-secondary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: border-color var(--motion-fast), background var(--motion-fast),
+    color var(--motion-fast);
 }
 
 .sa-platform-option:hover:not(:disabled) {
-  border-color: #c6d4e6;
+  border-color: var(--label-tertiary);
 }
 
 .sa-platform-option.active {
-  border-color: var(--accent);
-  background: var(--accent-soft);
-  color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent) inset;
+  border-color: var(--brand);
+  background: var(--brand-weak);
+  color: var(--brand);
 }
 
 .sa-platform-option .lucide-icon {
@@ -576,9 +585,10 @@
 
 .sa-segmented {
   display: inline-flex;
+  gap: 2px;
   padding: 3px;
-  background: var(--bg-panel);
-  border-radius: var(--radius-sm);
+  background: var(--bg-layer-2);
+  border-radius: var(--radius);
   width: fit-content;
 }
 
@@ -586,51 +596,51 @@
   min-width: 84px;
   border: 0;
   background: transparent;
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 700;
-  padding: 7px 16px;
+  color: var(--label-secondary);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  padding: 7px var(--space-4);
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
 
 .sa-segmented button.active {
-  background: #ffffff;
-  color: #b42318;
-  box-shadow: var(--shadow-sm);
+  background: var(--bg-base);
+  color: var(--label-primary);
+  font-weight: var(--fw-semibold);
+  box-shadow: var(--shadow-1);
 }
 
 .sa-hint {
   display: block;
   margin-top: 6px;
-  font-size: 11px;
+  font-size: var(--fs-caption);
   line-height: 1.6;
-  color: var(--text-dim);
+  color: var(--label-secondary);
 }
 
 .sa-loading {
   padding: 48px;
   text-align: center;
-  font-size: 13px;
-  color: var(--text-muted);
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
+  font-size: var(--fs-body);
+  color: var(--label-secondary);
+  background: var(--bg-layer-1);
+  border: 1px solid var(--border-l1);
   border-radius: var(--radius-lg);
 }
 
 .sa-editor-intro {
-  margin: 0 0 12px;
-  color: var(--text-muted);
-  font-size: 12px;
+  margin: 0 0 var(--space-3);
+  color: var(--label-secondary);
+  font-size: var(--fs-caption);
   line-height: 1.6;
 }
 
 .sa-editor-error {
-  padding: 10px 12px;
-  margin-bottom: 12px;
-  border: 1px solid var(--danger);
+  padding: 10px var(--space-3);
+  margin-bottom: var(--space-3);
   border-radius: var(--radius-sm);
-  background: var(--danger-soft);
+  background: var(--danger-weak);
   color: var(--danger);
   overflow-wrap: anywhere;
 }
@@ -639,7 +649,7 @@
   display: block;
   margin-top: 5px;
   color: var(--danger);
-  font-size: 12px;
+  font-size: var(--fs-caption);
   line-height: 1.5;
 }
 
@@ -647,64 +657,16 @@
 .sa-editor [aria-invalid="true"] { border-color: var(--danger); }
 .sa-editor .modal-header,
 .sa-editor .modal-footer { flex-shrink: 0; }
-.sa-editor .modal-footer { flex-wrap: wrap; gap: 8px; }
-.sa-save-status { margin-right: auto; font-size: 11px; color: var(--text-muted); }
-.sa-editor :is(button, input, select, textarea):focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
+.sa-editor .modal-footer { flex-wrap: wrap; gap: var(--space-2); }
+.sa-save-status { margin-right: auto; font-size: var(--fs-caption); color: var(--label-tertiary); }
 
-@media (max-width: 700px) {
-  .sa-editor :is(input, select, textarea) { font-size: 16px; }
-  .sa-editor .modal-footer .btn { min-height: 44px; }
-  .sa-editor .sa-platform-option { min-height: 56px; }
-  .sa-save-status { flex-basis: 100%; }
-}
-
-/* ---- Compact controls and lookup feedback ----------------------------- */
-.social-page {
-  min-width: 0;
-}
-
-.social-page .sa-header-actions,
-.sa-member-actions,
-.sa-card-actions {
-  flex-wrap: wrap;
-}
-
-.sa-member-actions {
-  gap: 4px;
-  margin-left: auto;
-}
-
-.sa-card header > :first-child {
-  flex-shrink: 0;
-}
-
-.sa-card footer {
-  flex-wrap: wrap;
-  border-top-style: solid;
-}
-
-.sa-card-actions {
-  margin-left: auto;
-}
-
+/* ---- 触屏目标与窄屏 ------------------------------------------------------- */
 .social-page :is(.text-button, .sa-link) {
   min-height: 44px;
 }
 
 .social-page .text-button {
   min-width: 44px;
-}
-
-.social-page :is(button, a):focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-
-.social-page .sa-card:focus-within {
-  border-color: var(--accent);
 }
 
 .sa-chip {
@@ -744,21 +706,18 @@
 }
 
 .sa-editor .sa-hint {
-  color: var(--text-muted);
-  font-size: 12px;
+  color: var(--label-secondary);
+  font-size: var(--fs-caption);
   overflow-wrap: anywhere;
 }
 
-/* Frontend contract: a .sa-lookup-row may wrap input + .sa-lookup-button.
-   Below it render .sa-lookup-status with ONE modifier: sa-lookup-loading,
-   sa-lookup-success, sa-lookup-error, or sa-lookup-unsupported.
-   Status copy belongs in real DOM (role=status / aria-live=polite), never CSS.
-   CSS provides feedback only; it does not initiate or simulate a lookup. */
+/* 昵称自动识别反馈：状态文案在真实 DOM（role=status），CSS 只提供样式。
+   .sa-lookup-status 配一个修饰类：loading / success / error / unsupported。 */
 .sa-editor .sa-lookup-row {
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  gap: 8px;
+  gap: var(--space-2);
   min-width: 0;
 }
 
@@ -774,18 +733,18 @@
   justify-content: center;
   gap: 6px;
   min-height: 44px;
-  padding: 8px 12px;
-  border: 1px solid #b6c6f7;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid rgba(0, 112, 243, 0.35);
   border-radius: var(--radius-sm);
-  background: var(--accent-soft);
-  color: var(--accent-hover);
-  font-size: 12px;
-  font-weight: 700;
+  background: var(--brand-weak);
+  color: var(--brand);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-semibold);
   cursor: pointer;
 }
 
 .sa-editor .sa-lookup-button:hover:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--brand);
 }
 
 .sa-editor .sa-lookup-button:disabled {
@@ -797,15 +756,15 @@
   flex: 1 1 200px;
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--space-2);
   min-width: 0;
-  margin-top: 8px;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
+  margin-top: var(--space-2);
+  padding: var(--space-2) 10px;
+  border: 1px solid var(--border-l2);
   border-radius: var(--radius-sm);
-  background: var(--bg-panel);
-  color: var(--text-soft);
-  font-size: 12px;
+  background: var(--bg-layer-1);
+  color: var(--label-secondary);
+  font-size: var(--fs-caption);
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
@@ -824,35 +783,67 @@
 }
 
 .sa-editor .sa-lookup-loading {
-  border-color: #c6d4fa;
-  background: #f0f4ff;
-  color: #2448c7;
+  border-color: rgba(0, 112, 243, 0.35);
+  background: var(--brand-weak);
+  color: var(--brand);
 }
 
 .sa-editor .sa-lookup-success {
-  border-color: #b7dfcb;
-  background: #f0fdf4;
-  color: #166534;
+  border-color: rgba(47, 133, 90, 0.35);
+  background: var(--success-weak);
+  color: var(--success);
 }
 
 .sa-editor .sa-lookup-error {
-  border-color: #f3c6c6;
-  background: #fff5f5;
-  color: #b42318;
+  border-color: rgba(229, 62, 62, 0.35);
+  background: var(--danger-weak);
+  color: var(--danger);
 }
 
 .sa-editor .sa-lookup-unsupported {
-  border-color: #ecd4a8;
-  background: #fffbeb;
-  color: #92400e;
+  border-color: rgba(183, 121, 31, 0.35);
+  background: var(--warn-weak);
+  color: var(--warn);
 }
 
 .sa-editor .sa-lookup-name {
-  font-weight: 700;
+  font-weight: var(--fw-semibold);
   overflow-wrap: anywhere;
 }
 
-/* ---- Narrow screens -------------------------------------------------- */
+/* ---- 分享成员资料 ---------------------------------------------------------- */
+.sa-share {
+  border: 1px solid var(--border-l1);
+  border-radius: var(--radius-lg);
+  padding: 14px var(--space-4);
+  margin-bottom: var(--space-4);
+  background: var(--bg-layer-1);
+}
+
+.sa-share h2 { font-size: var(--fs-h3); margin: 0 0 6px; color: var(--label-primary); }
+.sa-share-hint { color: var(--label-secondary); font-size: var(--fs-caption); margin: 0 0 10px; line-height: 1.6; }
+.sa-share-form { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.sa-share-form select {
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-l2);
+  border-radius: var(--radius-sm);
+  background: var(--bg-base);
+  color: var(--label-primary);
+  outline: none;
+}
+.sa-share-form select:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-weak);
+}
+.sa-share-fresh { margin-top: 10px; display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; color: var(--label-secondary); font-size: var(--fs-caption); }
+.sa-share-fresh p { margin: 0; }
+.sa-share-fresh code { word-break: break-all; font-size: var(--fs-caption); color: var(--brand); background: var(--brand-weak); border-radius: var(--radius-sm); padding: 3px 8px; }
+.sa-share-list { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; }
+.sa-share-list li { display: flex; gap: var(--space-3); align-items: center; justify-content: space-between; font-size: var(--fs-caption); color: var(--label-secondary); flex-wrap: wrap; }
+.sa-share-list li span:first-child { color: var(--label-primary); font-weight: var(--fw-medium); }
+
+/* ---- 窄屏 ----------------------------------------------------------------- */
 @media (max-width: 1100px) {
   .sa-stats {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -882,7 +873,7 @@
 
   .sa-member,
   .sa-platform {
-    padding: 12px;
+    padding: var(--space-3);
   }
 
   .social-page .sa-header-actions {
@@ -901,6 +892,11 @@
   .sa-search input {
     font-size: 16px;
   }
+
+  .sa-editor :is(input, select, textarea) { font-size: 16px; }
+  .sa-editor .modal-footer .btn { min-height: 44px; }
+  .sa-editor .sa-platform-option { min-height: 56px; }
+  .sa-save-status { flex-basis: 100%; }
 
   .social-page :is(.text-button, .sa-account-link, .sa-more > summary, .sa-more-options button, .sa-chip),
   .sa-view-toggle button {
@@ -937,12 +933,3 @@
     animation: none;
   }
 }
-
-.sa-share { border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px; }
-.sa-share h2 { font-size: var(--text-md); margin: 0 0 6px; }
-.sa-share-hint { color: var(--text-muted); font-size: var(--text-sm); margin: 0 0 10px; }
-.sa-share-form { display: flex; gap: 8px; flex-wrap: wrap; }
-.sa-share-fresh { margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.sa-share-fresh code { word-break: break-all; font-size: var(--text-sm); }
-.sa-share-list { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 6px; }
-.sa-share-list li { display: flex; gap: 12px; align-items: center; justify-content: space-between; font-size: var(--text-sm); }

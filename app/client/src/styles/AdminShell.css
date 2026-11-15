@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Admin Console Shell, Sidebar Navigation & Login Page
+   管理端壳层：侧栏导航 / 移动端头部 / 页面骨架 / 登录页
    ========================================================================== */
 .admin-app {
   height: 100vh;
@@ -8,57 +8,56 @@
   background: var(--bg-base);
 }
 
+/* ---- 侧栏：240px，条目 36px 高 8px 圆角，选中 = layer-1 底 + 600 字重 --- */
 .sidebar {
-  width: 224px;
+  width: 240px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  background: var(--bg-surface);
-  border-right: 1px solid var(--border-subtle);
-  z-index: 100;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--bg-base);
+  border-right: 1px solid var(--border-l1);
+  z-index: var(--z-dropdown);
+  transition: transform var(--motion-drawer);
 }
 
 .sidebar-brand {
   height: 56px;
-  padding: 0 16px;
+  padding: 0 var(--space-4);
   display: flex;
   align-items: center;
   gap: 10px;
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-l1);
 }
 
 .brand-mark {
   width: 28px;
   height: 28px;
-  border-radius: 8px;
-  background: var(--accent);
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.24);
+  border-radius: var(--radius);
+  background: var(--brand);
   display: grid;
   place-items: center;
-  color: #ffffff;
+  color: var(--label-inverse);
 }
 
 .brand-text {
   display: flex;
   align-items: baseline;
   gap: 6px;
-  font-size: 15px;
-  font-weight: var(--fw-bold);
-  letter-spacing: -0.02em;
-  color: var(--text-main);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-semibold);
+  color: var(--label-primary);
 }
 
 .brand-text em {
   font-style: normal;
-  font-size: 11px;
+  font-size: var(--fs-caption);
   font-weight: var(--fw-medium);
-  color: var(--text-muted);
+  color: var(--label-tertiary);
 }
 
 .sidebar-nav {
   flex: 1;
-  padding: 14px 10px;
+  padding: var(--space-3) 10px;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -67,14 +66,15 @@
 
 .sidebar-section-label {
   padding: 0 10px;
-  margin: 2px 0 6px;
-  color: var(--text-muted);
-  font-size: var(--text-xs);
-  font-weight: var(--fw-semibold);
+  margin: var(--space-1) 0 6px;
+  color: var(--label-tertiary);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.04em;
 }
 
 .sidebar-section-label-secondary {
-  margin-top: 16px;
+  margin-top: var(--space-4);
 }
 
 .nav-item {
@@ -83,23 +83,27 @@
   padding: 0 10px;
   display: flex;
   align-items: center;
-  gap: 9px;
-  color: var(--text-soft);
-  border-radius: 8px;
-  font-size: var(--text-sm);
-  font-weight: var(--fw-medium);
-  transition: color 0.15s ease, background 0.15s ease;
+  gap: 10px;
+  color: var(--label-secondary);
+  border-radius: var(--radius);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  transition: color var(--motion-fast), background var(--motion-fast);
 }
 
 .nav-item:hover {
-  color: var(--text-main);
-  background: var(--bg-subtle);
+  color: var(--label-primary);
+  background: var(--bg-layer-1);
 }
 
 .nav-item.active {
-  color: var(--accent);
-  background: var(--accent-soft);
+  color: var(--label-primary);
+  background: var(--bg-layer-1);
   font-weight: var(--fw-semibold);
+}
+
+.nav-item.active svg {
+  color: var(--brand);
 }
 
 .nav-item.active::before {
@@ -110,38 +114,38 @@
   bottom: 8px;
   width: 2.5px;
   border-radius: var(--radius-full);
-  background: var(--accent);
+  background: var(--brand);
 }
 
 .sidebar-footer {
-  padding: 12px 14px;
+  padding: var(--space-3) 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border-l1);
 }
 
 .sidebar-logout {
-  color: var(--text-muted);
-  font-size: var(--text-xs);
-  font-weight: var(--fw-semibold);
+  color: var(--label-secondary);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 4px 6px;
+  padding: 4px 8px;
   border-radius: var(--radius-sm);
-  transition: color 0.15s ease, background 0.15s ease;
+  transition: color var(--motion-fast), background var(--motion-fast);
 }
 
 .sidebar-logout:hover {
   color: var(--danger);
-  background: var(--danger-soft);
+  background: var(--danger-weak);
 }
 
 .version-badge {
-  font-size: 11px;
+  font-size: var(--fs-caption);
   font-weight: var(--fw-medium);
-  color: var(--text-muted);
+  color: var(--label-tertiary);
   font-variant-numeric: tabular-nums;
 }
 
@@ -155,6 +159,7 @@
   vertical-align: 1px;
 }
 
+/* ---- 移动端头部 --------------------------------------------------------- */
 .mobile-header-bar {
   display: none;
   position: fixed;
@@ -162,9 +167,8 @@
   left: 0;
   right: 0;
   height: 52px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-l1);
   z-index: 90;
   padding: 0 14px;
   align-items: center;
@@ -174,16 +178,16 @@
 .mobile-sidebar-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.36);
-  backdrop-filter: blur(2px);
+  background: var(--bg-overlay);
   z-index: 95;
 }
 
+/* ---- 主内容区 ----------------------------------------------------------- */
 .admin-main {
   flex: 1;
   min-width: 0;
   overflow-y: auto;
-  padding: 28px clamp(20px, 3.5vw, 48px) 64px;
+  padding: var(--space-6) clamp(20px, 3.5vw, 48px) 64px;
   background: var(--bg-base);
 }
 
@@ -193,40 +197,47 @@
   margin: 0 auto;
 }
 
+/* 页面标题区：H1 + 副标题 + 右侧操作，与内容用 1px 分隔线 */
 .page-header {
-  margin-bottom: 20px;
+  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
+  border-bottom: 1px solid var(--border-l1);
 }
 
 .admin-page-header {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 14px;
   flex-wrap: wrap;
 }
 
+.admin-page-header > div:first-child {
+  min-width: 0;
+  flex: 1 1 320px;
+}
+
 .page-header h1 {
-  font-size: var(--text-2xl);
-  font-weight: var(--fw-bold);
-  letter-spacing: -0.025em;
-  color: var(--text-main);
-  line-height: 1.25;
+  font-size: var(--fs-h1);
+  font-weight: var(--fw-semibold);
+  color: var(--label-primary);
+  line-height: 1.3;
 }
 
 .page-header p {
-  margin-top: 3px;
-  font-size: var(--text-sm);
+  margin-top: 4px;
+  font-size: var(--fs-body);
   max-width: 640px;
   line-height: 1.5;
-  color: var(--text-muted);
+  color: var(--label-secondary);
 }
 
 .sync-state {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--text-muted);
-  font-size: var(--text-xs);
+  color: var(--label-secondary);
+  font-size: var(--fs-caption);
   font-weight: var(--fw-medium);
 }
 
@@ -235,60 +246,60 @@
   height: 7px;
   border-radius: 50%;
   background: var(--success);
-  box-shadow: 0 0 0 3px var(--success-soft);
+  box-shadow: 0 0 0 3px var(--success-weak);
 }
 
 .sync-state-warning .service-state-dot,
 .sync-state-pending .service-state-dot {
-  background: var(--warning);
-  box-shadow: 0 0 0 3px var(--warning-soft);
+  background: var(--warn);
+  box-shadow: 0 0 0 3px var(--warn-weak);
 }
 
 .sync-state-failed .service-state-dot {
   background: var(--danger);
-  box-shadow: 0 0 0 3px var(--danger-soft);
+  box-shadow: 0 0 0 3px var(--danger-weak);
 }
 
-/* Admin Login Page */
+/* ---- 登录页 ------------------------------------------------------------- */
 .login-page {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 24px;
-  background: radial-gradient(circle at 50% 0%, #eff6ff 0%, var(--bg-base) 55%);
+  padding: var(--space-6);
+  background: var(--bg-layer-1);
 }
 
 .login-card {
   width: min(380px, 100%);
-  padding: 32px 28px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  padding: var(--space-8) 28px;
+  background: var(--bg-base);
+  border: 1px solid var(--border-l1);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-2);
 }
 
 .login-brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 22px;
+  margin-bottom: var(--space-5);
 }
 
 .login-heading {
-  margin-bottom: 20px;
+  margin-bottom: var(--space-5);
 }
 
 .login-heading h1 {
-  font-size: 21px;
-  font-weight: var(--fw-bold);
-  letter-spacing: -0.02em;
-  color: var(--text-main);
+  font-size: var(--fs-display);
+  font-weight: var(--fw-semibold);
+  color: var(--label-primary);
+  line-height: 1.25;
 }
 
 .login-heading p {
   margin-top: 4px;
-  color: var(--text-muted);
-  font-size: var(--text-sm);
+  color: var(--label-secondary);
+  font-size: var(--fs-body);
 }
 
 .login-password-wrap {
@@ -300,22 +311,22 @@
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--text-muted);
+  color: var(--label-secondary);
   padding: 4px;
   border-radius: var(--radius-sm);
 }
 
 .login-password-toggle:hover {
-  color: var(--text-main);
+  color: var(--label-primary);
 }
 
 .login-remember {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 4px 0 16px;
-  font-size: var(--text-sm);
-  color: var(--text-soft);
+  gap: var(--space-2);
+  margin: var(--space-1) 0 var(--space-4);
+  font-size: var(--fs-body);
+  color: var(--label-secondary);
   cursor: pointer;
 }
 
@@ -323,25 +334,49 @@
   width: 16px;
   height: 16px;
   margin: 0;
-  accent-color: var(--accent);
+  accent-color: var(--brand);
 }
 
 .login-remember-duration {
-  color: var(--text-muted);
-  font-size: var(--text-xs);
+  color: var(--label-tertiary);
+  font-size: var(--fs-caption);
 }
 
 .login-submit {
   width: 100%;
-  min-height: 40px;
-  font-size: var(--text-base);
+  min-height: 38px;
+  font-size: var(--fs-h3);
 }
 
 .login-footer-row {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-subtle);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-l1);
   text-align: center;
+}
+
+/* 登录页内的行内提示复用 toast 卡片类名，按行内提示排版 */
+.login-card .toast-card {
+  width: 100%;
+  display: block;
+}
+
+.login-card .toast-card.toast-error {
+  color: var(--danger);
+  background: var(--danger-weak);
+  border-color: rgba(229, 62, 62, 0.3);
+  border-left: 3px solid var(--danger);
+}
+
+.login-card .toast-card.toast-success {
+  color: var(--success);
+  background: var(--success-weak);
+  border-color: rgba(47, 133, 90, 0.3);
+  border-left: 3px solid var(--success);
+}
+
+.login-card .toast-card .toast-message {
+  color: inherit;
 }
 
 @media (max-width: 768px) {
@@ -351,7 +386,7 @@
     bottom: 0;
     left: 0;
     transform: translateX(-100%);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-3);
   }
   .sidebar.open {
     transform: translateX(0);
@@ -363,7 +398,7 @@
     padding: 68px 14px 44px;
   }
   .page-header {
-    margin-bottom: 16px;
+    margin-bottom: var(--space-4);
   }
   .page-header h1 {
     font-size: 20px;

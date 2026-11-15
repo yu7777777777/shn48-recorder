@@ -171,6 +171,7 @@ export default function BilibiliPage() {
   const [coverTarget, setCoverTarget] = useState(null);
   const [drafts, setDrafts] = useState([]);
   const [draftState, setDraftState] = useState("loading");
+  const [draftError, setDraftError] = useState("");
   const [draftTotal, setDraftTotal] = useState(null);
   const [queue, setQueue] = useState([]);
   const [queueError, setQueueError] = useState("");
@@ -208,6 +209,7 @@ export default function BilibiliPage() {
       setDraftState("ready");
     } else {
       setDraftTotal(null);
+      setDraftError(errorMessage(results[0].reason, "草稿列表暂时无法获取"));
       setDraftState("error");
     }
     if (results[1].status === "fulfilled") {
@@ -393,14 +395,10 @@ export default function BilibiliPage() {
               <div className="bili-name-row">
                 <strong>{account.uname || (account.authenticated ? "B站用户" : "未登录账号")}</strong>
                 {account.level !== null && (
-                  <span className="badge badge-queued" style={{ fontSize: "10px", padding: "1px 6px" }}>
-                    LV{account.level}
-                  </span>
+                  <span className="badge badge-default bili-level-badge">LV{account.level}</span>
                 )}
                 {account.vipStatus && (
-                  <span className="badge" style={{ background: "rgba(251, 114, 153, 0.2)", color: "#fb7299", fontSize: "10px" }}>
-                    大会员
-                  </span>
+                  <span className="badge bili-vip-badge">大会员</span>
                 )}
               </div>
               <span>
@@ -508,7 +506,7 @@ export default function BilibiliPage() {
             <span>正在获取草稿箱列表…</span>
           </div>
         ) : draftState === "error" ? (
-          <EmptyState icon={IconAlertCircle} title="草稿列表暂时无法获取" detail="请刷新状态后重试，当前不会显示未经核实的草稿。" />
+          <EmptyState icon={IconAlertCircle} title="草稿列表暂时无法获取" detail={`${draftError}。请刷新状态后重试，当前不会显示未经核实的草稿。`} />
         ) : drafts.length > 0 ? (
           <div className="public-live-grid">
             {drafts.map((d, index) => (

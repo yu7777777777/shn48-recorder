@@ -146,11 +146,11 @@ test('115 backup built UI', async t => {
       const { page, state } = f;
       try {
         await f.goto('archive'); await page.getByText('附件未完整备份', { exact: true }).waitFor();
-        for (let i = 0; i < 6; i++) assert.equal(await page.locator('.archive-record-card').filter({ has: page.getByRole('link', { name: '归档' + i, exact: true }) }).getByRole('button', { name: '删除', exact: true }).isDisabled(), true);
+        for (let i = 0; i < 6; i++) assert.equal(await page.locator('.archive-record-card').filter({ has: page.getByText('归档' + i, { exact: true }) }).getByRole('button', { name: '删除', exact: true }).isDisabled(), true);
         await page.getByText('字幕.srt：字幕上传失败', { exact: true }).waitFor();
         assert.equal(await page.getByRole('button', { name: '使用中', exact: true }).isDisabled(), true);
         await page.getByText('已校验', { exact: true }).waitFor();
-        const partial = page.locator('.archive-record-card').filter({ has: page.getByRole('link', { name: '归档7', exact: true }) });
+        const partial = page.locator('.archive-record-card').filter({ has: page.getByText('归档7', { exact: true }) });
         await partial.getByRole('button', { name: '重试115备份', exact: true }).click();
         await partial.getByText('等待备份', { exact: true }).waitFor();
         assert.ok(state.calls.find(c => c.path === base + '/jobs/j7/retry'));

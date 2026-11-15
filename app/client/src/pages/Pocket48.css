@@ -46,7 +46,7 @@
    子集要把整张名单滚一遍。同一份名单切一个视图，比再复制一份列表更省视线。
    四个选项挤在一行时每个只有 60px 左右，标签全部折成两行；改成 2×2 后每个
    格子一行放得下，整块也比折行版的单行更矮。 */
-.p48-rooms-scope { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; padding: 3px; margin-bottom: var(--space-3); background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); }
+.p48-rooms-scope { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; padding: 3px; margin-bottom: var(--space-3); background: var(--bg-layer-2); border-radius: var(--radius); }
 .p48-rooms-scope button { display: flex; align-items: center; justify-content: center; gap: 5px; min-width: 0; border: 0; background: transparent; color: var(--text-muted); font-size: var(--text-xs); font-weight: var(--fw-semibold); padding: 6px 6px; border-radius: var(--radius-sm); cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease; }
 .p48-rooms-scope button > svg { flex-shrink: 0; }
 .p48-rooms-scope button:hover { color: var(--text-main); }
@@ -116,7 +116,7 @@
 
 /* 全部 / 仅成员 分段控件。以前是两个并排的消息列，读者要在两栏之间来回比对
    才能回答"成员说了什么"，那本质是一个筛选，不是第二个窗格。 */
-.p48-scope { display: inline-flex; gap: 2px; padding: 3px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); }
+.p48-scope { display: inline-flex; gap: 2px; padding: 3px; background: var(--bg-layer-2); border-radius: var(--radius); }
 .p48-scope button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--text-muted); font-size: var(--text-sm); font-weight: var(--fw-semibold); padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer; transition: background .15s ease, color .15s ease; }
 .p48-scope button:hover { color: var(--text-main); }
 .p48-scope button.on { background: var(--bg-surface); color: var(--accent); box-shadow: var(--shadow-sm, 0 1px 2px rgba(15, 23, 42, .06)); }
@@ -276,11 +276,11 @@
    It gets its own group, an inline tag and a muted name, so the operator stops
    clicking rows that can only ever answer "频道不存在". */
 .p48-room-open.gone strong { color: var(--text-dim); font-weight: var(--fw-medium); }
-.p48-room-gone { flex-shrink: 0; font-size: var(--text-2xs); font-weight: var(--fw-semibold); color: #b45309; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 999px; padding: 1px 6px; letter-spacing: .02em; }
-.p48-rooms-scope .p48-scope-gone.on { color: #b45309; }
+.p48-room-gone { flex-shrink: 0; font-size: var(--text-2xs); font-weight: var(--fw-semibold); color: var(--warn); background: var(--warn-weak); border-radius: 999px; padding: 1px 8px; letter-spacing: .02em; }
+.p48-rooms-scope .p48-scope-gone.on { color: var(--warn); }
 .p48-rooms-scope .p48-scope-gone em { font-style: normal; }
 /* The healthy counterpart: same shape as 已收回 so the pair reads as one
    comparison, but green instead of amber. */
-.p48-rooms-scope .p48-scope-open.on { color: #15803d; }
+.p48-rooms-scope .p48-scope-open.on { color: var(--success); }
 .p48-rooms-scope .p48-scope-open em { font-style: normal; }
 @media (max-width: 720px) { .p48-room-gone { display: none; } }

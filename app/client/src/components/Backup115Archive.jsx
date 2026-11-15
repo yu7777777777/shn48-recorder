@@ -122,24 +122,32 @@ export function Backup115Card({ recording, backup, selected, onSelect, disabled 
   const selectable = ready(recording) && !active && !disabled;
   const progress = Math.max(0, Math.min(100, Number(job?.progress) || 0));
   const verified = job?.status === "succeeded" && Boolean(job?.verifiedAt);
+  const fileErrors = Array.isArray(job?.files) ? job.files.filter(file => file.error) : [];
+  const fileCount = Array.isArray(job?.files) ? job.files.length : 0;
+  // 非活动任务把阶段/校验/目录合并成一行小字，避免卡片被明细撑高。
+  const detailParts = job && !active ? [
+    `阶段：${labels[job.phase] || job.phase || labels[job.status] || "—"} · ${bytes(job.uploadedBytes)} / ${bytes(job.totalBytes)}`,
+    verified ? `校验时间：${new Date(job.verifiedAt).toLocaleString("zh-CN", { hour12: false })}` : "",
+    job.remotePath ? `115目录：${job.remotePath}` : "",
+  ].filter(Boolean) : [];
   return <div className="backup115-record" aria-label={"115备份 " + (recording.title || recording.id)}>
     <div className="backup115-record-head">
       <label className="backup115-toggle"><input type="checkbox" aria-label={"选择115备份 " + (recording.title || recording.id)} disabled={!backup.available || backup.busy || !selectable} checked={selected} onChange={e => onSelect(e.target.checked)} />115备份</label>
-      <span className={verified ? "backup115-verified" : "muted"} role="status">{job ? verified ? "已校验" : job.status === "succeeded" ? "上传完成 · 尚无校验证据" : labels[job.status] || job.status : "未备份"}</span>
+      <span className={verified ? "backup115-verified" : "backup115-state"} role="status">{job ? verified ? "已校验" : job.status === "succeeded" ? "上传完成 · 尚无校验证据" : labels[job.status] || job.status : "未备份"}</span>
+      {/* pending 提交中 job 还未返回，active 为真而 job 为空；进度只在有任务时渲染 */}
+      {active && job && <progress className="backup115-progress" aria-label="115备份进度" max="100" value={progress} />}
+      {active && job && <span className="backup115-detail">{bytes(job.uploadedBytes)} / {bytes(job.totalBytes)}</span>}
+      <div className="backup115-actions">
+        <button type="button" className="btn btn-secondary btn-sm" disabled={!backup.available || backup.busy || !selectable} onClick={() => backup.start([recording.id])}>{job?.status === "succeeded" ? "再次备份到115" : "备份到115"}</button>
+        {job && retryable(job.status) && <button type="button" className="btn btn-secondary btn-sm" disabled={disabled || backup.busy || active || !ready(recording)} onClick={() => backup.retry(job)}>重试115备份</button>}
+        {job && backup115Active(job.status) && <button type="button" className="btn btn-secondary btn-sm" disabled={backup.busy} onClick={() => backup.cancel(job)}>取消115备份</button>}
+      </div>
     </div>
+    {detailParts.length > 0 && <div className="backup115-detail backup115-detail-line">{detailParts.join(" · ")}</div>}
     {job && <>
-      <div className="backup115-detail">阶段：{labels[job.phase] || job.phase || labels[job.status] || "—"} · {bytes(job.uploadedBytes)} / {bytes(job.totalBytes)}</div>
-      {active && <progress aria-label="115备份进度" max="100" value={progress} />}
-      {verified && <div className="backup115-detail">校验时间：{new Date(job.verifiedAt).toLocaleString("zh-CN", { hour12: false })}</div>}
-      {job.remotePath && <div className="backup115-detail">115目录：{job.remotePath}</div>}
       {job.error && <p className="backup115-error" role="alert">{job.error}</p>}
-      {Array.isArray(job.files) && job.files.filter(file => file.error).map((file, i) => <p key={i} className="backup115-error" role="alert">{file.name || file.role}：{file.error}</p>)}
-      {Array.isArray(job.files) && job.files.length > 0 && <details><summary>备份文件明细（{job.files.length}）</summary><ul className="backup115-files">{job.files.map((file, i) => <li key={i}><strong>{file.name || file.role}</strong> · {file.role} · {bytes(file.size)} · {labels[file.status] || file.status}{file.remoteFileId && <span> · 远端ID：{String(file.remoteFileId)}</span>}{file.error && <span className="backup115-error"> · {file.error}</span>}</li>)}</ul></details>}
+      {fileErrors.map((file, i) => <p key={i} className="backup115-error" role="alert">{file.name || file.role}：{file.error}</p>)}
+      {fileCount > 0 && <details className="backup115-files-details"><summary>备份文件明细（{fileCount}）</summary><ul className="backup115-files">{job.files.map((file, i) => <li key={i}><strong>{file.name || file.role}</strong> · {file.role} · {bytes(file.size)} · {labels[file.status] || file.status}{file.remoteFileId && <span> · 远端ID：{String(file.remoteFileId)}</span>}{file.error && <span className="backup115-error"> · {file.error}</span>}</li>)}</ul></details>}
     </>}
-    <div className="backup115-actions">
-      <button type="button" className="btn btn-secondary btn-sm" disabled={!backup.available || backup.busy || !selectable} onClick={() => backup.start([recording.id])}>{job?.status === "succeeded" ? "再次备份到115" : "备份到115"}</button>
-      {job && retryable(job.status) && <button type="button" className="btn btn-secondary btn-sm" disabled={disabled || backup.busy || active || !ready(recording)} onClick={() => backup.retry(job)}>重试115备份</button>}
-      {job && backup115Active(job.status) && <button type="button" className="btn btn-secondary btn-sm" disabled={backup.busy} onClick={() => backup.cancel(job)}>取消115备份</button>}
-    </div>
   </div>;
 }

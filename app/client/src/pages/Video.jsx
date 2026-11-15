@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import usePolling from "../hooks/usePolling";
 import Backup115Archive, { Backup115Card, useBackup115 } from "../components/Backup115Archive";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { StatusBadge } from "../components/Badge";
 import SafeImage from "../components/SafeImage";
 import ConfirmModal from "../components/ConfirmModal";
@@ -45,9 +45,6 @@ function formatDate(value) {
 }
 
 const statusText = {
-  clip_queued: "等待剪辑",
-  clip_processing: "剪辑中",
-  clip_failed: "剪辑失败",
   recording: "录制中",
   processing: "归档中",
   waiting_merge: "等待续播",
@@ -333,17 +330,16 @@ export default function ArchivePage() {
           <h1>录像归档</h1>
         </div>
         <div className="archive-header-actions">
-          <Link className="btn btn-secondary btn-sm" to="/admin/replay-analysis">官方回放分析</Link>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={loadRecordings}
+            disabled={loading}
+          >
+            <IconRefresh size={13} className={loading ? "spinner" : ""} />
+            <span>刷新归档</span>
+          </button>
         </div>
-        <button
-          type="button"
-          className="btn btn-secondary btn-sm"
-          onClick={loadRecordings}
-          disabled={loading}
-        >
-          <IconRefresh size={13} className={loading ? "spinner" : ""} />
-          <span>刷新归档</span>
-        </button>
       </div>
 
       {listError && (
@@ -551,7 +547,7 @@ export default function ArchivePage() {
                   const uploadDisabled =
                     !ready || replayWorking(item) || item.mediaType === "audio" || uploaded || active || uploading;
                   const deleteDisabled =
-                    ["recording", "waiting_merge", "processing", "clip_queued", "clip_processing"].includes(item.status) ||
+                    ["recording", "waiting_merge", "processing"].includes(item.status) ||
                     replayWorking(item) || active || backupDeleteLocked(item) ||
                     uploading;
                   const buttonText = item.mediaType === "audio" ? "音频请下载" : archiveFailed
@@ -583,7 +579,7 @@ export default function ArchivePage() {
                       <div className="archive-record-main">
                         <div className="archive-record-title-row">
                           <div className="archive-record-title-wrap">
-                            <Link className="archive-record-title" to={`/admin/archive/${encodeURIComponent(item.id)}`}>{item.title || item.name || item.id}</Link>
+                            <span className="archive-record-title">{item.title || item.name || item.id}</span>
                             <span className="source-chip">{item.source === "room_voice" ? "房间上麦" : item.source || "Pocket48"}</span>
                           </div>
                           <div className="archive-record-badges">
@@ -591,17 +587,15 @@ export default function ArchivePage() {
                             {uploadState === "not_uploaded" ? <span className="archive-upload-state muted">未上传</span> : <StatusBadge status={uploadState}>{statusText[uploadState] || uploadState}</StatusBadge>}
                           </div>
                         </div>
-                        <div className="cover-actions archive-cover-actions">
-                          {ready && !active && (!uploaded || item.draftId) && <button className="btn btn-secondary btn-sm" disabled={Boolean(busy)} onClick={() => setCoverTarget(item)}>选择封面</button>}
-                          <small className="muted">{item.coverFile ? ({ original: "原直播封面", smart: "智能选帧", template: "成员模板", upload: "自定义上传" }[item.coverSource] || "旧版截图") : "暂无封面"}{item.coverSyncPending ? " · B站待同步" : ""}</small>
-                        </div>
                         <div className="archive-record-meta">
                           <span>{item.segmentCount > 1 ? `MP4 · 已合并 ${item.segmentCount} 个片段` : item.duration ? `${Math.round(item.duration / 60)} 分钟` : item.fileName || (mediaType(item) === "mp4" ? "MP4 录像文件" : "FLV 原始片段")}</span>
                           <span><b>大小</b> {formatBytes(item.fileSize || item.size)}</span>
                           <span><b>录制</b> {formatDate(item.createdAt || item.startTime)}</span>
+                          <span>{item.coverFile ? ({ original: "原直播封面", smart: "智能选帧", template: "成员模板", upload: "自定义上传" }[item.coverSource] || "旧版截图") : "暂无封面"}{item.coverSyncPending ? " · B站待同步" : ""}</span>
+                          {ready && !active && (!uploaded || item.draftId) && <button type="button" className="btn btn-secondary btn-sm archive-cover-btn" disabled={Boolean(busy)} onClick={() => setCoverTarget(item)}>选择封面</button>}
                         </div>
                         <Backup115Card recording={item} backup={backup115} disabled={isDeleting || Boolean(deleteTarget)} selected={backupSelectedIds.includes(String(item.id))} onSelect={checked => setBackupSelectedIds(ids => checked ? ids.length < 100 ? [...new Set([...ids, String(item.id)])] : ids : ids.filter(id => id !== String(item.id)))} />
-                        {item.replayRecovery && <p className="archive-record-replay" title={item.replayRecovery.message}>{item.replayRecovery.status === "replaced" ? "官方回放已替换 · 原录像备份已保留" : item.replayRecovery.message}</p>}
+                        {item.replayRecovery && <p className={`archive-record-replay ${item.replayRecovery.status === "replaced" ? "" : "is-issue"}`} title={item.replayRecovery.message}>{item.replayRecovery.status === "replaced" ? "官方回放已替换 · 原录像备份已保留" : item.replayRecovery.message}</p>}
                       </div>
                       <div className="archive-record-actions">
                         {localConfirmation && ready && !uploaded && !active && <button type="button" className="btn btn-secondary btn-sm" disabled={Boolean(busy) || replayWorking(item)} onClick={() => retryReplay(item)}>{busy === `replay:${item.id}` ? "提交中…" : "重新核对官方回放"}</button>}
@@ -638,11 +632,11 @@ export default function ArchivePage() {
           </div>
         </div>
         <div className="table-wrap"><table>
-          <thead><tr><th>文件名称</th><th>用途</th><th>实际大小</th><th>操作</th></tr></thead>
+          <thead><tr><th>文件名称</th><th>用途</th><th className="td-num">实际大小</th><th>操作</th></tr></thead>
           <tbody>{(diskFiles?.files || []).map(file => <tr key={file.id}>
             <td style={{ overflowWrap: "anywhere" }}>{file.name}</td>
             <td>{{ main: "归档主文件", source: "保留的原始片段", residual: "已删除归档的残留", untracked: "未关联归档" }[file.kind]}</td>
-            <td>{formatBytes(file.size)}</td>
+            <td className="td-num">{formatBytes(file.size)}</td>
             <td>{file.kind === "main" ? <span className="muted">在归档列表中管理</span> : <button type="button" className="btn btn-secondary btn-sm" disabled={file.locked || backupDeleteLocked({ ...file, diskFile: true })} onClick={() => setDeleteTarget({ ...file, diskFile: true })}>{file.locked || backupDeleteLocked({ ...file, diskFile: true }) ? "使用中" : "清理文件"}</button>}</td>
           </tr>)}</tbody>
         </table></div>

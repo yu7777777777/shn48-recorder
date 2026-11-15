@@ -19,6 +19,16 @@ export const adminApi = axios.create({
 // error handling still run.
 let redirecting = false;
 
+// 401 不等于管理员会话失效：B站/口袋48 凭据缺失也会以 401 返回（带各自的
+// errorCode）。只有会话中间件与登录接口的 401 才应该把页面弹去登录；
+// 第三方凭据的 401 留给页面自己展示（如提示扫码绑定），否则会在
+// /admin/bilibili 等页面形成「401 → 登录页 → 已登录 → 弹回」的死循环。
+const NON_SESSION_401_CODES = new Set([
+  "POCKET48_LOGIN_REJECTED",
+  "BILIBILI_LOGIN_REQUIRED",
+  "ADMIN_LOGIN_FAILED",
+]);
+
 adminApi.interceptors.response.use(
   response => response,
   error => {
@@ -27,15 +37,15 @@ adminApi.interceptors.response.use(
     // The session probe is expected to 401 for a signed-out visitor; that is a
     // normal answer, not an expiry, so it must not bounce the page.
     const isSessionProbe = url.includes("/auth/session");
-    // A protected login route has already authenticated our administrator. Its
-    // explicitly marked 401 only rejects third-party credentials, not this session.
-    const credentialPaths = ["/pocket48/login", "/pocket48/login/sms/verify", "/pocket48/token"];
-    const credentialPath = url.split("?")[0].replace(/^\/api\/admin(?=\/)/, "");
-    const isPocketCredentialRejection = String(error?.config?.method).toLowerCase() === "post"
-      && credentialPaths.includes(credentialPath)
-      && error?.response?.data?.errorCode === "POCKET48_LOGIN_REJECTED";
+    const errorCode = error?.response?.data?.errorCode;
 
-    if (status === 401 && !isSessionProbe && !isPocketCredentialRejection && !redirecting && typeof window !== "undefined") {
+    if (
+      status === 401
+      && !isSessionProbe
+      && !NON_SESSION_401_CODES.has(errorCode)
+      && !redirecting
+      && typeof window !== "undefined"
+    ) {
       redirecting = true;
       const here = window.location.pathname + window.location.search;
       window.setTimeout(() => {

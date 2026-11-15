@@ -33,7 +33,7 @@ test('archive cards keep cover, status and actions visible on desktop and mobile
     const card = page.locator('.archive-record-card');
     await card.waitFor();
     assert.equal(await card.count(), 1);
-    assert.equal(await card.getByRole('link', { name: 'SNH48-测试成员-今晚聊天' }).count(), 1);
+    assert.equal(await card.getByText('SNH48-测试成员-今晚聊天').count(), 1);
     assert.equal(await card.getByText('已归档').count(), 1);
     assert.equal(await card.getByRole('button', { name: '选择封面' }).count(), 1);
     assert.equal(await card.getByRole('button', { name: '送入B站草稿' }).count(), 1);

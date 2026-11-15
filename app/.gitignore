@@ -5,6 +5,9 @@ client/dist/
 server/node_modules*/
 *.log
 
+# 本地端到端验证脚本与截图产物（双主题截图、临时数据目录），不入库。
+local-e2e/
+
 # The editable config can contain deployment-specific settings.
 config/config.yaml
 

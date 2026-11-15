@@ -34,14 +34,6 @@ export default function PublicMediaTabs({ active, liveCount, extra = null }) {
             <IconFilm size={15} />
             <span>往期重播</span>
           </Link>
-          <Link
-            className={`public-media-tab ${active === "daily" ? "active" : ""}`}
-            to="/daily"
-            aria-current={active === "daily" ? "page" : undefined}
-          >
-            <IconFilm size={15} />
-            <span>总结日报</span>
-          </Link>
         </nav>
 
         <div className="public-header-extra">{extra}</div>

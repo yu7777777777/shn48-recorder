@@ -282,7 +282,7 @@ function verifyCredentials(username, password) {
 
 function requireAdmin(req, res, next) {
   const session = getSession(req);
-  if (!session) return res.status(401).json({ success: false, error: "Authentication required" });
+  if (!session) return res.status(401).json({ success: false, errorCode: "ADMIN_SESSION_REQUIRED", error: "Authentication required" });
   req.adminSession = session;
   next();
 }

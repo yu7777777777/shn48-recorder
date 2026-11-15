@@ -1,30 +1,49 @@
+/* 115 归档备份：页面级工具条 + 归档卡内的单行紧凑备份条。
+   测试契约：.backup115-toolbar / .backup115-record 类名、按钮文案、
+   role=status/alert 均不可改；窄屏所有块不得超出视口。 */
 .backup115-settings { margin-top: 24px; }
 .backup115-settings p, .backup115-toolbar p { margin: 6px 0 12px; }
-.backup115-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.backup115-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
 .backup115-settings .backup115-actions { margin: 14px 0; }
-.backup115-toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
-.backup115-toggle input { width: 18px; height: 18px; flex: 0 0 18px; accent-color: var(--accent); }
+.backup115-toggle { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--fs-body); cursor: pointer; }
+.backup115-toggle input { width: 16px; height: 16px; flex: 0 0 16px; accent-color: var(--brand); }
 .backup115-settings > .backup115-toggle { display: flex; margin: 16px 0; }
-.backup115-qr { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; padding: 16px; border: 1px solid var(--border); border-radius: 12px; margin: 16px 0; }
-.backup115-qr img { width: 200px; height: 200px; max-width: 100%; object-fit: contain; background: white; padding: 8px; border-radius: 8px; }
+.backup115-qr { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-5); padding: var(--space-4); border-radius: var(--radius-lg); margin: 16px 0; background: var(--bg-layer-2); }
+.backup115-qr img { width: 200px; height: 200px; max-width: 100%; object-fit: contain; background: #ffffff; padding: var(--space-2); border-radius: var(--radius); }
 .backup115-qr > div { flex: 1 1 200px; }
-.backup115-error { color: var(--danger, #dc4545); overflow-wrap: anywhere; white-space: pre-wrap; font-size: 13px; margin: 8px 0; }
-.backup115-toolbar { border-block: 1px solid var(--border); padding: 16px 0; margin-bottom: 12px; }
-.backup115-toolbar strong { font-size: 14px; }
-.backup115-record { min-width: 0; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); font-size: 12px; overflow-wrap: anywhere; }
-.backup115-record-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; margin-bottom: 6px; }
-.backup115-record .backup115-actions { margin-top: 8px; }
-.backup115-record progress { width: 100%; height: 7px; accent-color: var(--accent); margin: 6px 0; }
-.backup115-detail { color: var(--text-dim); margin: 5px 0; }
-.backup115-verified { color: var(--success, #24936b); font-weight: 600; }
-.backup115-files { margin: 8px 0; padding-left: 18px; }
+.backup115-error { color: var(--danger); overflow-wrap: anywhere; white-space: pre-wrap; font-size: var(--fs-caption); margin: var(--space-2) 0 0; }
+.backup115-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); padding: 12px 0; margin-bottom: 12px; border-block: 1px solid var(--border-l1); }
+.backup115-toolbar strong { font-size: var(--fs-body); color: var(--label-primary); }
+.backup115-toolbar > div:first-child p { margin: 3px 0 0; font-size: var(--fs-caption); }
+
+/* ---- 归档卡内的备份条：复选框 + 状态 + 进度 + 按钮同行，明细折叠 ---- */
+.backup115-record { min-width: 0; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-l1); font-size: var(--fs-caption); overflow-wrap: anywhere; }
+.backup115-record-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+.backup115-record .backup115-toggle { font-size: var(--fs-caption); font-weight: var(--fw-medium); color: var(--label-secondary); }
+.backup115-state { color: var(--label-secondary); }
+.backup115-verified { color: var(--success); font-weight: var(--fw-semibold); }
+.backup115-record .backup115-actions { margin-top: 0; margin-left: auto; }
+.backup115-record .backup115-actions .btn { height: 26px; min-height: 26px; padding: 0 8px; font-size: var(--fs-caption); }
+/* 原生 <progress> 样式化为 6px 细条 */
+.backup115-progress { flex: 1 1 120px; min-width: 80px; max-width: 220px; height: 6px; appearance: none; -webkit-appearance: none; border: 0; background: var(--bg-layer-2); border-radius: var(--radius-full); overflow: hidden; }
+.backup115-progress::-webkit-progress-bar { background: var(--bg-layer-2); border-radius: var(--radius-full); }
+.backup115-progress::-webkit-progress-value { background: var(--brand); border-radius: var(--radius-full); transition: width 0.35s ease; }
+.backup115-progress::-moz-progress-bar { background: var(--brand); border-radius: var(--radius-full); }
+.backup115-detail { color: var(--label-tertiary); margin: 0; font-variant-numeric: tabular-nums; }
+.backup115-detail-line { margin-top: 4px; }
+.backup115-files-details { margin-top: 4px; }
+.backup115-files-details summary { cursor: pointer; margin: 4px 0; color: var(--label-secondary); width: fit-content; }
+.backup115-files-details summary:hover { color: var(--label-primary); }
+.backup115-files { margin: var(--space-2) 0; padding-left: 18px; }
 .backup115-files li { margin-bottom: 6px; }
-.backup115-record summary { cursor: pointer; margin: 8px 0; }
+.backup115-record summary { cursor: pointer; }
 @media (max-width: 640px) {
   .backup115-toolbar .backup115-actions > button { flex: 1 1 140px; white-space: normal; min-height: 40px; }
   .backup115-settings .backup115-actions > button { flex: 1 1 120px; min-height: 40px; }
   .backup115-record .backup115-actions > button { min-height: 36px; white-space: normal; }
-  .backup115-qr { justify-content: center; padding: 12px; }
+  .backup115-qr { justify-content: center; padding: var(--space-3); }
   .backup115-qr > div { text-align: center; }
   .backup115-toggle { align-items: flex-start; }
+  /* 备份条窄屏换行：按钮组独占一行并右对齐 */
+  .backup115-record .backup115-actions { margin-left: 0; flex-basis: 100%; }
 }

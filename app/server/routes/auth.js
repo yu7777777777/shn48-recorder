@@ -45,7 +45,7 @@ router.post("/login", (req, res) => {
   const { username, password } = req.body || {};
   if (!auth.verifyCredentials(username, password)) {
     state.count += 1;
-    return res.status(401).json({ success: false, error: "Invalid username or password" });
+    return res.status(401).json({ success: false, errorCode: "ADMIN_LOGIN_FAILED", error: "Invalid username or password" });
   }
   loginFailures.delete(key);
   const session = auth.createSession(req, res, { rememberMe: req.body?.rememberMe === true });

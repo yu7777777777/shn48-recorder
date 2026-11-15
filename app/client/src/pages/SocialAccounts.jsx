@@ -273,7 +273,7 @@ export default function SocialAccounts() {
             <option value={168}>7 天</option>
             <option value={720}>30 天</option>
           </select>
-          <button type="button" className="btn btn-primary" disabled={codeBusy || !codeMember} onClick={createCode}>生成链接</button>
+          <button type="button" className="btn btn-secondary" disabled={codeBusy || !codeMember} onClick={createCode}>生成链接</button>
         </div>
         {freshCode && (
           <div className="sa-share-fresh" role="status">

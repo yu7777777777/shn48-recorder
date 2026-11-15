@@ -102,40 +102,20 @@ export default function ConfigPage() {
             </div>
           </div>
           <div className="grid-2">
-            <div
-              style={{
-                padding: "14px",
-                background: "var(--bg-panel)",
-                borderRadius: "var(--radius)",
-                border: "1px solid var(--border)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
+            <div className="env-check-item">
               <div>
-                <strong style={{ display: "block", fontSize: "14px" }}>FFmpeg</strong>
-                <small style={{ color: "var(--text-muted)", fontSize: "11px" }}>音视频录制与转封装</small>
+                <strong>FFmpeg</strong>
+                <small>音视频录制与转封装</small>
               </div>
               <StatusBadge status={environment.ffmpeg?.available ? "healthy" : "failed"}>
                 {environment.ffmpeg?.available ? "可用" : "未检测到"}
               </StatusBadge>
             </div>
 
-            <div
-              style={{
-                padding: "14px",
-                background: "var(--bg-panel)",
-                borderRadius: "var(--radius)",
-                border: "1px solid var(--border)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
+            <div className="env-check-item">
               <div>
-                <strong style={{ display: "block", fontSize: "14px" }}>Playwright</strong>
-                <small style={{ color: "var(--text-muted)", fontSize: "11px" }}>页面渲染与辅助抓取</small>
+                <strong>Playwright</strong>
+                <small>页面渲染与辅助抓取</small>
               </div>
               <StatusBadge status={environment.playwright?.available ? "healthy" : "failed"}>
                 {environment.playwright?.available ? "可用" : "未检测到"}

@@ -229,11 +229,6 @@ export default function AdminLivePage() {
                 <article
                   className={`admin-live-card ${recording ? "recording-active" : ""}`}
                   key={live.liveId}
-                  style={
-                    recording
-                      ? { borderColor: "rgba(255, 71, 87, 0.4)", boxShadow: "0 0 16px rgba(255, 71, 87, 0.15)" }
-                      : undefined
-                  }
                 >
                   <div className="admin-live-cover">
                     <SafeImage

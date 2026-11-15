@@ -19,12 +19,12 @@ function getCredentialsOr401(res) {
   try {
     const creds = uploadQueue.getCredentials();
     if (!creds) {
-      res.status(401).json({ success: false, error: "Bilibili is not logged in" });
+      res.status(401).json({ success: false, errorCode: "BILIBILI_LOGIN_REQUIRED", error: "B站账号未登录，请先在「B站草稿」页扫码绑定" });
       return null;
     }
     return creds;
   } catch (err) {
-    res.status(401).json({ success: false, error: err.message });
+    res.status(401).json({ success: false, errorCode: "BILIBILI_LOGIN_REQUIRED", error: err.message });
     return null;
   }
 }

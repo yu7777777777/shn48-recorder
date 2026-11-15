@@ -21,15 +21,15 @@ test("the social account route is lazy-loaded and mounted under the admin guard"
   assert.ok(guarded.includes('path="social"'), "social route must stay behind AuthGuard");
 });
 
-test("the sidebar exposes the page in the 内容工具 section", () => {
+test("the sidebar exposes the page in the 内容库 section", () => {
   const layout = read("components/AdminLayout.jsx");
   assert.match(layout, /path: "\/admin\/social", label: "成员社交账号", icon: IconUsers/);
   const sections = layout.slice(layout.indexOf("const NAV_SECTIONS"));
-  const tools = sections.match(/\{ label: "内容工具", from: (\d+), to: (\d+) \}/);
-  assert.ok(tools, "内容工具 section must exist");
-  const items = [...layout.slice(layout.indexOf("const navItems"), layout.indexOf("// Sidebar sections")).matchAll(/path: "([^"]+)"/g)].map((m) => m[1]);
+  const tools = sections.match(/\{ label: "内容库", from: (\d+), to: (\d+) \}/);
+  assert.ok(tools, "内容库 section must exist");
+  const items = [...layout.slice(layout.indexOf("const navItems"), layout.indexOf("const NAV_SECTIONS")).matchAll(/path: "([^"]+)"/g)].map((m) => m[1]);
   const index = items.indexOf("/admin/social");
-  assert.ok(index >= Number(tools[1]) && index < Number(tools[2]), "成员社交账号 must be inside 内容工具");
+  assert.ok(index >= Number(tools[1]) && index < Number(tools[2]), "成员社交账号 must be inside 内容库");
 });
 
 test("account descriptions use notes without a dedicated Weibo subtype UI", () => {

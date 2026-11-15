@@ -1,10 +1,62 @@
 /* ==========================================================================
-   48tools Design System — Clean Studio Light Theme
+   48tools Design System — tool-ui-design-system 令牌层
+   白底 + 浅灰分层、单一强调色（品牌蓝）、克制工具感；深浅色跟随系统。
+   页面与组件样式一律引用这里的令牌，禁止散落 hex。
    ========================================================================== */
 :root {
+  /* 界面固定浅色（白底浅灰分层）；不做跟随系统的深色模式。 */
   color-scheme: light;
 
-  /* 4px Spacing Scale */
+  /* ---- 颜色：分层表面 -------------------------------------------------- */
+  --bg-base: #ffffff;
+  --bg-layer-1: #f7f8fa;
+  --bg-layer-2: #eef0f4;
+  --bg-overlay: rgba(17, 19, 24, 0.45);
+
+  /* ---- 颜色：文字三档 -------------------------------------------------- */
+  --label-primary: #111318;
+  --label-secondary: #6b7280;
+  --label-tertiary: #9aa1ab;
+  --label-inverse: #ffffff;
+
+  /* ---- 颜色：分隔线 ---------------------------------------------------- */
+  --border-l1: #eceef2;
+  --border-l2: #d7dbe3;
+
+  /* ---- 颜色：唯一强调色 ------------------------------------------------ */
+  --brand: #0070f3;
+  --brand-weak: rgba(0, 112, 243, 0.1);
+  --brand-hover: #0059c9;
+
+  /* ---- 颜色：语义状态（只表达状态，不当装饰） -------------------------- */
+  --danger: #e53e3e;
+  --danger-weak: rgba(229, 62, 62, 0.06);
+  --warn: #b7791f;
+  --warn-weak: rgba(183, 121, 31, 0.1);
+  --success: #2f855a;
+  --success-weak: rgba(47, 133, 90, 0.1);
+
+  /* ---- 阴影 ------------------------------------------------------------ */
+  --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-3: 0 12px 36px rgba(0, 0, 0, 0.18);
+
+  /* ---- 字阶：8 档封顶（display/h1/h2/h3/body/small/caption/micro） ----- */
+  --fs-display: 28px;
+  --fs-h1: 21px;
+  --fs-h2: 17px;
+  --fs-h3: 15px;
+  --fs-body: 13px;
+  --fs-small: 12px;
+  --fs-caption: 11px;
+  --fs-micro: 10px;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* ---- 间距：4px 基准 -------------------------------------------------- */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -12,122 +64,128 @@
   --space-5: 20px;
   --space-6: 24px;
   --space-8: 32px;
+  --space-10: 40px;
 
-  /* Typography Scale (14px base, clear hierarchy) */
-  --text-2xs: 11px;
-  --text-xs: 12px;
-  --text-sm: 13px;
-  --text-base: 14px;
-  --text-md: 15px;
-  --text-lg: 16px;
-  --text-xl: 20px;
-  --text-2xl: 22px;
+  /* ---- 圆角：6/8/10/12 + 14(弹窗) + 全圆角 ----------------------------- */
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-md: 8px;
+  --radius-img: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 14px;
+  --radius-full: 9999px;
 
-  --fw-regular: 400;
-  --fw-medium: 500;
-  --fw-semibold: 600;
-  --fw-bold: 700;
+  /* ---- 层级 ------------------------------------------------------------ */
+  --z-sticky: 10;
+  --z-dropdown: 100;
+  --z-overlay: 900;
+  --z-modal: 1000;
+  --z-toast: 1100;
 
-  /* Surfaces */
-  --bg-base: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-subtle: #f1f5f9;
-  --bg-panel: #f1f5f9;
-  --bg-card: #ffffff;
-  --bg-card-hover: #fcfdff;
-  --bg-elevated: #ffffff;
-  --bg-input: #ffffff;
+  /* ---- 动效 ------------------------------------------------------------ */
+  --motion-fast: 0.15s ease;
+  --motion-float: 0.18s ease;
+  --motion-drawer: 0.2s ease;
 
-  /* Borders (soft, airy separation without heavy boxes) */
-  --border-subtle: #eef2f6;
-  --border-soft: #eef2f6;
-  --border: #e2e8f0;
-  --border-strong: #cbd5e1;
-
-  /* Unified Brand Accent (Royal Blue) */
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --accent-soft: #eff6ff;
-  --accent-glow: rgba(37, 99, 235, 0.16);
-
-  /* Text Hierarchy (WCAG AA >= 4.6:1 for muted/dim) */
-  --text-main: #0f172a;
-  --text-soft: #334155;
-  --text-muted: #64748b;
-  --text-dim: #64748b;
-
-  /* Semantic Status Colors */
-  --success: #059669;
-  --success-soft: #ecfdf5;
-  --warning: #d97706;
-  --warning-soft: #fffbeb;
-  --danger: #dc2626;
-  --danger-soft: #fef2f2;
-  --info: #2563eb;
-  --info-soft: #eff6ff;
-
-  /* Sister-Group Brand Palettes & Subtle Cover Gradients */
+  /* ---- 团队色（浅色品牌底纹，仅用于封面占位与队伍徽标） ---------------- */
   --group-snh-bg: #eff6ff;
   --group-snh-fg: #1d4ed8;
   --group-snh-border: #bfdbfe;
-  --group-snh-grad: linear-gradient(135deg, #dbeafe 0%, #eff6ff 52%, #f8fafc 100%);
+  --group-snh-grad: linear-gradient(135deg, #dbeafe 0%, #eff6ff 52%, #f7f8fa 100%);
 
   --group-gnz-bg: #ecfdf5;
   --group-gnz-fg: #047857;
   --group-gnz-border: #a7f3d0;
-  --group-gnz-grad: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 52%, #f8fafc 100%);
+  --group-gnz-grad: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 52%, #f7f8fa 100%);
 
   --group-bej-bg: #fdf2f8;
   --group-bej-fg: #be185d;
   --group-bej-border: #fbcfe8;
-  --group-bej-grad: linear-gradient(135deg, #fce7f3 0%, #fdf2f8 52%, #f8fafc 100%);
+  --group-bej-grad: linear-gradient(135deg, #fce7f3 0%, #fdf2f8 52%, #f7f8fa 100%);
 
   --group-ckg-bg: #fffbeb;
   --group-ckg-fg: #b45309;
   --group-ckg-border: #fde68a;
-  --group-ckg-grad: linear-gradient(135deg, #fef3c7 0%, #fffbeb 52%, #f8fafc 100%);
+  --group-ckg-grad: linear-gradient(135deg, #fef3c7 0%, #fffbeb 52%, #f7f8fa 100%);
 
   --group-cgt-bg: #fef2f2;
   --group-cgt-fg: #b91c1c;
   --group-cgt-border: #fecaca;
-  --group-cgt-grad: linear-gradient(135deg, #fee2e2 0%, #fef2f2 52%, #f8fafc 100%);
+  --group-cgt-grad: linear-gradient(135deg, #fee2e2 0%, #fef2f2 52%, #f7f8fa 100%);
 
-  --group-default-grad: linear-gradient(135deg, #e0e7ff 0%, #eff6ff 52%, #f8fafc 100%);
+  --group-default-grad: linear-gradient(135deg, #e0e7ff 0%, #eff6ff 52%, #f7f8fa 100%);
 
-  /* Pocket48 Message Stream Tokens */
-  --column-all: var(--accent);
+  /* ---- 口袋48消息流令牌 ------------------------------------------------ */
+  --column-all: var(--brand);
   --column-member: #0284c7;
-  --column-notify: #b45309;
+  --column-notify: var(--warn);
   --bubble-member-bg: #f0f9ff;
   --bubble-member-border: #bae6fd;
   --bubble-notify-bg: #fffbeb;
   --bubble-notify-border: #fde68a;
 
-  /* 3-Tier Radius System + Pill */
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 16px;
-  --radius-full: 9999px;
+  /* ======================================================================
+     兼容别名：既有页面/内联样式引用的旧令牌名，全部指向新令牌。
+     新代码请直接使用上面的规范令牌。
+     ====================================================================== */
+  --bg-surface: var(--bg-base);
+  --bg-subtle: var(--bg-layer-2);
+  --bg-panel: var(--bg-layer-2);
+  --bg-card: var(--bg-layer-1);
+  --bg-card-hover: var(--bg-layer-1);
+  --bg-elevated: var(--bg-base);
+  --bg-input: var(--bg-base);
 
-  /* Clean Studio Shadows */
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
-  --shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 10px 24px -6px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 20px 40px -12px rgba(15, 23, 42, 0.14);
+  --border-subtle: var(--border-l1);
+  --border-soft: var(--border-l1);
+  --border: var(--border-l2);
+  --border-strong: var(--border-l2);
 
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC",
-    "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
-  line-height: 1.55;
+  --accent: var(--brand);
+  --accent-hover: var(--brand-hover);
+  --accent-soft: var(--brand-weak);
+  --accent-glow: rgba(0, 112, 243, 0.18);
+
+  --text-main: var(--label-primary);
+  --text-soft: var(--label-secondary);
+  --text-muted: var(--label-secondary);
+  --text-dim: var(--label-tertiary);
+
+  --success-soft: var(--success-weak);
+  --warning: var(--warn);
+  --warning-soft: var(--warn-weak);
+  --danger-soft: var(--danger-weak);
+  --info: var(--brand);
+  --info-soft: var(--brand-weak);
+
+  --shadow-xs: var(--shadow-1);
+  --shadow-sm: var(--shadow-1);
+  --shadow: var(--shadow-2);
+  --shadow-md: var(--shadow-2);
+  --shadow-lg: var(--shadow-3);
+
+  --text-2xs: var(--fs-caption);
+  --text-xs: var(--fs-small);
+  --text-sm: var(--fs-body);
+  --text-base: var(--fs-body);
+  --text-md: var(--fs-h3);
+  --text-lg: var(--fs-h2);
+  --text-xl: var(--fs-h1);
+  --text-2xl: var(--fs-h1);
+
+  /* ---- 字体与全局基线 -------------------------------------------------- */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+    sans-serif;
+  line-height: 1.6;
   font-weight: 400;
-  color: var(--text-main);
+  color: var(--label-primary);
   background: var(--bg-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ---- 基础元素 ---------------------------------------------------------- */
 * {
   box-sizing: border-box;
 }
@@ -142,8 +200,8 @@ body,
 body {
   min-width: 320px;
   background: var(--bg-base);
-  color: var(--text-main);
-  font-size: var(--text-base);
+  color: var(--label-primary);
+  font-size: var(--fs-body);
   overflow-x: hidden;
 }
 
@@ -174,7 +232,19 @@ p {
   margin: 0;
 }
 
-/* Custom Clean Scrollbar */
+/* 数字与时间统一等宽数字 */
+time,
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 焦点统一：2px 品牌色描边、偏移 1px，禁止 outline:none */
+:where(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 1px;
+}
+
+/* ---- 滚动条 ------------------------------------------------------------ */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -185,10 +255,22 @@ p {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.24);
+  background: var(--border-l2);
   border-radius: var(--radius-full);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.42);
+  background: var(--label-tertiary);
+}
+
+/* ---- 动效开关 ---------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
