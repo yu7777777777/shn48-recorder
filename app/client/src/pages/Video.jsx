@@ -23,6 +23,7 @@ import ProgressBar from "../components/ProgressBar";
 import { useToast } from "../components/Toast";
 import VideoPlayer from "../components/VideoPlayer";
 import { adminApi, errorMessage, listPayload, payload } from "../lib/api";
+import { sourceLabel } from "../lib/labels";
 
 function formatBytes(bytes) {
   if (bytes == null || !Number.isFinite(Number(bytes)) || Number(bytes) < 0) return "—";
@@ -580,7 +581,7 @@ export default function ArchivePage() {
                         <div className="archive-record-title-row">
                           <div className="archive-record-title-wrap">
                             <span className="archive-record-title">{item.title || item.name || item.id}</span>
-                            <span className="source-chip">{item.source === "room_voice" ? "房间上麦" : item.source || "Pocket48"}</span>
+                            <span className="source-chip">{sourceLabel(item.source)}</span>
                           </div>
                           <div className="archive-record-badges">
                             <StatusBadge status={item.status || "pending"}>{statusText[item.status] || item.status || "待处理"}</StatusBadge>

@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   shn48:
-    image: shn48-shn48:2.0.0
+    image: shn48-shn48:2.1.0
     build:
       context: .
       args:

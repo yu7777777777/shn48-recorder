@@ -193,7 +193,8 @@
 
 .admin-main > div,
 .admin-main > section {
-  width: min(1240px, 100%);
+  /* 宽屏下充分利用横向空间（表格与归档列表受益），不再留大空白 */
+  width: min(1720px, 100%);
   margin: 0 auto;
 }
 

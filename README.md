@@ -66,9 +66,9 @@ curl http://127.0.0.1:3000/api/public/health
 
 ## 更新记录
 
-当前正式版本：**2.0.0**（以 [app/VERSION](app/VERSION) 为准）。`Unreleased` 段记录未发布内容；历次发布的详细变更见 [app/CHANGELOG.md](app/CHANGELOG.md)， narrative 式发布公告存档见 [docs/release-announcements.md](docs/release-announcements.md)，每版部署核验见 [app/docs/releases/](app/docs/releases/)。
+当前正式版本：**2.1.0**（以 [app/VERSION](app/VERSION) 为准）。`Unreleased` 段记录未发布内容；历次发布的详细变更见 [app/CHANGELOG.md](app/CHANGELOG.md)， narrative 式发布公告存档见 [docs/release-announcements.md](docs/release-announcements.md)，每版部署核验见 [app/docs/releases/](app/docs/releases/)。
 
-未发布概览：前端按 tool-ui-design-system 规范整体重构（统一令牌/组件配方、8 档字阶、界面固定浅色不随系统变暗），清理 2.0.0 下线功能的界面残留（总结日报入口、归档详情死链等），并修复「第三方凭据 401 被误判为会话失效导致管理页死循环跳转」的全站交互缺陷。详见 [app/CHANGELOG.md](app/CHANGELOG.md) 的 `Unreleased`。
+2.1.0 摘要：前端按 tool-ui-design-system 规范整体重构（统一令牌/组件配方、8 档字阶、界面固定浅色不随系统变暗、宽屏内容区加宽），清理 2.0.0 下线功能的界面残留（总结日报入口、归档详情死链等），修复「第三方凭据 401 被误判为会话失效导致管理页死循环跳转」的全站交互缺陷与总览页状态文案。详见 [app/CHANGELOG.md](app/CHANGELOG.md)。
 
 ## 目录结构
 

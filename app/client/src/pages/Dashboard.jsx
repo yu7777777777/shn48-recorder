@@ -16,6 +16,7 @@ import {
 import ProgressBar from "../components/ProgressBar";
 import usePolling from "../hooks/usePolling";
 import { adminApi, listPayload, payload, publicApi } from "../lib/api";
+import { sourceLabel } from "../lib/labels";
 
 // Admin pages follow the browser language the same way the public pages do.
 export function languageOf(languages) {
@@ -30,8 +31,8 @@ const TEXT = {
     live: { heading: "当前公开直播", empty: "口袋48直播", none: "当前无正在录制的任务", guide: "成员开播后可在「直播管理」手动录制，或配置「自动录制」监控。" },
     recording: { heading: "正在录制监视", hint: "录制任务在后台独立运行，关闭页面不会中断录制", manage: "直播管理", writing: "正在写入本地录像" },
     stats: { uploadQueue: "B站待上传队列", archived: "已归档录像", activeRecordings: "正在录制任务" },
-    archive: { heading: "最近归档录像", all: "全部归档", empty: "暂无归档录像", 
-      columns: { name: "录像名称", source: "来源渠道", status: "录制状态", when: "录制时间", size: "文件体积" }, statuses: { archived: "已归档", archiving: "归档中", waiting: "等待续播", failed: "整理失败", pending: "待处理" }, badge: "录制中" },
+    archive: { heading: "最近归档录像", all: "全部归档", empty: "暂无归档录像",
+      columns: { name: "录像名称", source: "来源渠道", status: "录制状态", when: "录制时间", size: "文件体积" }, statuses: { archived: "已归档", archiving: "归档中", waiting: "等待续播", failed: "整理失败", pending: "待处理", recording: "录制中", queued: "等待上传", uploading: "上传中", draft: "已存草稿", paused: "录制中暂停上传", waitingCredentials: "等待登录", failedUpload: "上传失败" }, badge: "录制中" },
     service: { heading: "服务运行概况", uptime: "服务在线时长", used: "录像占用空间", free: "可用磁盘空间", usage: "磁盘使用率" },
     error: "暂时无法读取总览数据，请稍后刷新。",
   },
@@ -42,8 +43,8 @@ const TEXT = {
     live: { heading: "Live on air", empty: "Pocket48 lives", none: "Nothing is being recorded", guide: "Start a recording from Live management once a member goes on air, or enable auto record monitoring." },
     recording: { heading: "Recording monitor", hint: "Recording runs in the background and keeps going if you close this page", manage: "Live management", writing: "Writing local video" },
     stats: { uploadQueue: "Bilibili upload queue", archived: "Archived recordings", activeRecordings: "Active recordings" },
-    archive: { heading: "Recent archives", all: "All archives", empty: "No archived recordings yet", 
-      columns: { name: "Recording", source: "Source", status: "Status", when: "Recorded at", size: "Size" }, statuses: { archived: "Archived", archiving: "Archiving", waiting: "Waiting to resume", failed: "Cleanup failed", pending: "Pending" }, badge: "Recording" },
+    archive: { heading: "Recent archives", all: "All archives", empty: "No archived recordings yet",
+      columns: { name: "Recording", source: "Source", status: "Status", when: "Recorded at", size: "Size" }, statuses: { archived: "Archived", archiving: "Archiving", waiting: "Waiting to resume", failed: "Cleanup failed", pending: "Pending", recording: "Recording", queued: "Queued", uploading: "Uploading", draft: "Draft", paused: "Paused while recording", waitingCredentials: "Waiting for login", failedUpload: "Upload failed" }, badge: "Recording" },
     service: { heading: "Service and storage", uptime: "Uptime", used: "Recording storage used", free: "Free disk space", usage: "Disk usage" },
     error: "Could not load the overview. Try refreshing later.",
   },
@@ -73,6 +74,30 @@ export function getDashboardStatus(requestStatus, languages) {
     ? { badge: "warning", label: t.status.warning }
     : { badge: "healthy", label: t.status.healthy };
   return { ...status, failedRequests };
+}
+
+// 录制/上传状态 → 显示文案。此前只有归档域几个状态有翻译，
+// 「录制中」等行会把英文枚举（如 recording）原样显示出来。
+const STATUS_KEY = {
+  done: "archived",
+  completed: "archived",
+  archived: "archived",
+  processing: "archiving",
+  waiting_merge: "waiting",
+  archive_failed: "failed",
+  recording: "recording",
+  queued: "queued",
+  uploading: "uploading",
+  draft: "draft",
+  paused_recording: "paused",
+  waiting_credentials: "waitingCredentials",
+  failed: "failedUpload",
+};
+
+export function statusTextOf(status, languages) {
+  const t = texts(languages);
+  const key = STATUS_KEY[status];
+  return (key && t.archive.statuses[key]) || status || t.archive.statuses.pending;
 }
 
 // GET /recordings reports how many rows match the filters in meta.total,
@@ -372,19 +397,11 @@ export default function DashboardPage() {
                       {item.title || item.name || item.id}
                     </td>
                     <td>
-                      <span className="source-chip">{item.source || "Pocket48"}</span>
+                      <span className="source-chip">{sourceLabel(item.source)}</span>
                     </td>
                     <td>
                       <StatusBadge status={item.status || "pending"}>
-                        {item.status === "done"
-                          ? "已归档"
-                          : item.status === "processing"
-                          ? "归档中"
-                          : item.status === "waiting_merge"
-                          ? "等待续播"
-                          : item.status === "archive_failed"
-                          ? "整理失败"
-                          : item.status || "待处理"}
+                        {statusTextOf(item.status)}
                       </StatusBadge>
                     </td>
                     <td>{formatTime(item.createdAt || item.startTime)}</td>
